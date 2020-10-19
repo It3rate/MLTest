@@ -18,9 +18,19 @@ namespace MLTest
                 _boxes[i] = new Box();
             }
         }
-        public Layout(params double[] values)
+        public Layout(params float[] values)
         {
             int count = (int)(values.Length / 4);
+            _boxes = new Box[count];
+            for (int i = 0; i < count; i++)
+            {
+                var st = i * 4;
+                _boxes[i] = new Box(values[st + 0], values[st + 1], values[st + 2], values[st + 3]);
+            }
+        }
+        public Layout(params double[] values)
+        {
+             int count = (int)(values.Length / 4);
             _boxes = new Box[count];
             for (int i = 0; i < count; i++)
             {
@@ -54,6 +64,18 @@ namespace MLTest
                 result[i].Cy = _boxes[i].Cy;
                 result[i].Rx = _boxes[i].Rx;
                 result[i].Ry = _boxes[i].Ry;
+            }
+            return result;
+        }
+        public float[] AsFloatArray()
+        {
+            var result = new float[_boxes.Length * 4];
+            for (int i = 0; i < _boxes.Length; i++)
+            {
+                result[i + 0] = _boxes[i].Cx;
+                result[i + 1] = _boxes[i].Cy;
+                result[i + 2] = _boxes[i].Rx;
+                result[i + 3] = _boxes[i].Ry;
             }
             return result;
         }

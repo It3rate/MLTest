@@ -1,4 +1,6 @@
-﻿using Microsoft.ML.Probabilistic.Distributions;
+﻿using Microsoft.ML;
+using Microsoft.ML.Data;
+using Microsoft.ML.Probabilistic.Distributions;
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
@@ -11,11 +13,27 @@ using System.Windows.Forms;
 
 namespace MLTest
 {
-    public enum DrawTarget
+    public class LayoutInput
     {
-        Truth,
-        Mutated,
-        Predictions,
+        [VectorType(12)]
+        public float[] x;
+        LayoutInput(float[] values) { x = values; }
+
+        public static LayoutInput[] GetInputs(List<Layout> layouts)
+        {
+            var result = new LayoutInput[layouts.Count];
+            for (int i = 0; i < layouts.Count; i++)
+            {
+                result[i] = new LayoutInput(layouts[i].AsFloatArray());
+            }
+            return result;
+        }
+    }
+    
+    public class LayoutOutput
+    {
+        [VectorType(12)]
+        public float[] Identity;
     }
     public class BoxGen
     {
@@ -28,22 +46,69 @@ namespace MLTest
 
         public BoxGen()
         {
-            GenValidBoxes();
-            GenerateData(50000, "D:/tmp/Python/PythonApplication1/PythonApplication1/boxData/", "bx3_input.txt", "bx3_target.txt");
+            //GenerateTrainingData();
+            GenerateLocalData();
+            TestModel(mutated);
+        }
+
+        public void LoadData()
+        {
             mutated = LoadData("D:/tmp/Python/PythonApplication1/PythonApplication1/boxData/", "testInputs.txt");
             targets = LoadData("D:/tmp/Python/PythonApplication1/PythonApplication1/boxData/", "testTargets.txt");
             predictions = LoadData("D:/tmp/Python/PythonApplication1/PythonApplication1/boxData/", "testPredictions.txt");
         }
-        public void GenValidBoxes()
+        public void GenerateTrainingData()
+        {
+            GenerateDataAt(50000, "D:/tmp/Python/PythonApplication1/PythonApplication1/boxData/", "bx3_input.txt", "bx3_target.txt");
+        }
+        public void GenerateLocalData()
         {
             for (int i = 0; i < 50; i++)
             {
                 targets.Add(GenBox());
             }
-            TransformAll();
+            mutated = TransformAll(targets);
         }
+        public void TestModel(List<Layout> mutatedInput)
+        {
+            MLContext mlContext = new MLContext();
+            var tensorFlowModel = mlContext.Model.LoadTensorFlowModel("D:/tmp/Python/PythonApplication1/PythonApplication1/boxData/frozenBoxModel.pb");
 
-        public void GenerateData(int count, string folder, string inputFile, string targetFile)
+            DataViewSchema schema = tensorFlowModel.GetModelSchema(); // Vector<Single, 12>
+            Console.WriteLine(" =============== TensorFlow Model Schema =============== ");
+            var featuresType = (VectorDataViewType)schema["x"].Type;
+            Console.WriteLine($"Name: x, Type: {featuresType.ItemType.RawType}, Size: ({featuresType.Dimensions[0]})");
+            var predictionType = (VectorDataViewType)schema["Identity"].Type;
+            Console.WriteLine($"Name: Identity, Type: {predictionType.ItemType.RawType}, Size: ({predictionType.Dimensions[0]})");
+
+
+            var dataView = mlContext.Data.LoadFromEnumerable(LayoutInput.GetInputs(mutated));
+            //var pipeline = tensorFlowModel.ScoreTensorFlowModel("Identity", "x", false);
+            var pipeline = tensorFlowModel.ScoreTensorFlowModel( new[] { nameof(LayoutOutput.Identity) },new[] { nameof(LayoutInput.x) },false);
+            var estimator = pipeline.Fit(dataView);
+            var transformedValues = estimator.Transform(dataView);
+
+            var outScores = mlContext.Data.CreateEnumerable<LayoutOutput>(transformedValues, reuseRowObject: false);
+
+            predictions = new List<Layout>(); 
+            foreach (var prediction in outScores)
+            {
+                predictions.Add(new Layout(prediction.Identity));
+            }
+            Console.WriteLine(outScores);
+            //estimator.Fit()
+            //var engine = mlContext.Model.CreatePredictionEngine<LayoutType, LayoutType> (tensorFlowModel);  //<Vector<Single, 12>, Vector<Single, 12>> (model);
+
+
+            tensorFlowModel.Dispose();
+
+            //IDataView dataView = mlContext.Data.LoadFromEnumerable(new List<MovieReview>());
+            //ITransformer model = pipeline.Fit(dataView);
+            //estimator.Fit(input);
+            //ScoreTensorFlowModel(outputColumnNames: new[] { "softmax2_pre_activation" }, inputColumnNames: new[] { "input" }, addBatchDimensionInput: true)
+
+        }
+        public void GenerateDataAt(int count, string folder, string inputFile, string targetFile)
         {
             var enc = new UTF8Encoding();
             StreamWriter inputStream = new StreamWriter(folder + inputFile, false, enc);
@@ -88,7 +153,6 @@ namespace MLTest
             float v = (float)vGaussian.Sample();
             float h = (float)vGaussian.Sample();
             var boxes = new List<Box> { result[0], result[1], result[2] };
-            boxes.Shuffle();
 
             bool wideBot = v > 0.5;
             boxes[0].Cx = 0.5f;
@@ -110,15 +174,18 @@ namespace MLTest
             {
                 result.Rotate();
             }
+            boxes.Shuffle();
+
             return result;
         }
-        public void TransformAll()
+        public List<Layout> TransformAll(List<Layout> input)
         {
-            mutated.Clear();
-            for(int i = 0; i < targets.Count; i++)
+            var result = new List<Layout>();
+            for(int i = 0; i < input.Count; i++)
             {
-                mutated.Add(Transform(targets[i]));
+                result.Add(Transform(input[i]));
             }
+            return result;
         }
         private Layout Transform(Layout bx)
         {
@@ -164,7 +231,14 @@ namespace MLTest
             g.ScaleTransform(w, h);
             g.TranslateTransform(left / w, top / h);
         }
+    }
 
+
+    public enum DrawTarget
+    {
+        Truth,
+        Mutated,
+        Predictions,
     }
 
     public static class ShuffleExtension
