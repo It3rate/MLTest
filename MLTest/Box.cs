@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -70,6 +71,15 @@ namespace MLTest
             g.FillRectangle(b, r);
         }
 
+        public void InputSerialize(StreamWriter sw)
+        {
+            sw.Write(String.Format("{0:0.000},{1:0.000},{2:0.000},{3:0.000},{4:0.000}", Cx, Cy, Rx, Ry, ColorOffset));
+        }
+        public void TargetSerialize(StreamWriter sw)
+        {
+            sw.Write(String.Format("{0:0.000},{1:0.000},{2:0.000},{3:0.000},", Cx, Cy, Rx, Ry));
+            _color.Serialize(sw);
+        }
         public override string ToString()
         {
             return String.Format("{0:0.000},{1:0.000},{2:0.000},{3:0.000}", Cx, Cy, Rx, Ry);

@@ -26,9 +26,9 @@ namespace MLTest
 
         public BoxGen()
         {
-            //GenerateTrainingData();
-            //LoadTFData();
-            GenerateLocalData();
+            GenerateTrainingData();
+            LoadTFData();
+            //GenerateLocalData();
             //TestModel(mutated);
         }
 
@@ -38,9 +38,25 @@ namespace MLTest
             targets = LoadData("D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/", "testTargets.txt");
             predictions = LoadData("D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/", "testPredictions.txt");
         }
+        public List<Layout> LoadData(string folder, string inputFile)
+        {
+            var result = new List<Layout>();
+            float val;
+            IEnumerable<float> vals;
+            StreamReader reader = new StreamReader(folder + inputFile);
+            while (!reader.EndOfStream)
+            {
+                var line = reader.ReadLine();
+                var values = line.Split(',');
+                vals = values.Select(str => float.TryParse(str, out val) ? val : 0);
+                result.Add(new Layout(3, vals.ToArray()));
+            }
+            reader.Close();
+            return result;
+        }
         public void GenerateTrainingData()
         {
-            GenerateDataAt(50000, "D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/", "bx3_input.txt", "bx3_target.txt");
+            GenerateDataAt(80000, "D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/", "bx3_input.txt", "bx3_target.txt");
         }
         public void GenerateLocalData()
         {
@@ -82,87 +98,34 @@ namespace MLTest
             tensorFlowModel.Dispose();
         }
 
+        Gaussian vGaussian = new Gaussian(0.5, 0.007);
+        Gaussian similarGaussian = new Gaussian(0, 0.4);
+        Gaussian nudgeGaussian = new Gaussian(0, 0.005);
+        HSL baseColor = new HSL(0.9f, 0.7f, 0.3f);
+
+        public Layout GenLayout() => Layout.GenLayout3(baseColor, (float)vGaussian.Sample(), (float)vGaussian.Sample(), similarGaussian, colGaussian);
+
         public void GenerateDataAt(int count, string folder, string inputFile, string targetFile)
         {
             var enc = new UTF8Encoding();
             StreamWriter inputStream = new StreamWriter(folder + inputFile, false, enc);
             StreamWriter targetStream = new StreamWriter(folder + targetFile, false, enc);
 
-            inputStream.WriteLine("Cx0,Cy0,Rx0,Ry0,Cx1,Cy1,Rx1,Ry1,Cx2,Cy2,Rx2,Ry2");
-            targetStream.WriteLine("Cx0,Cy0,Rx0,Ry0,Cx1,Cy1,Rx1,Ry1,Cx2,Cy2,Rx2,Ry2");
+            inputStream.WriteLine("Var,ColH,ColS,ColL, Cx0,Cy0,Rx0,Ry0,Co0, Cx1,Cy1,Rx1,Ry1,Co1, Cx2,Cy2,Rx2,Ry2,Co2");
+            targetStream.WriteLine("Cx0,Cy0,Rx0,Ry0,H0,S0,L0, Cx1,Cy1,Rx1,Ry1,H1,S1,L1, Cx2,Cy2,Rx2,Ry2,H2,S2,L2");
             for (int i = 0; i < count; i++)
             {
                 var bx = GenLayout();
                 var bxt = Transform(bx);
-                inputStream.WriteLine(bxt.ToString());
-                targetStream.WriteLine(bx.ToString());
+                bxt.InputSerialize(inputStream);
+                bx.TargetSerialize(targetStream);
             }
             inputStream.Flush();
             targetStream.Flush();
             inputStream.Close();
             targetStream.Close();
         }
-        public List<Layout> LoadData(string folder, string inputFile)
-        {
-            var result = new List<Layout>();
-            float val;
-            IEnumerable<float> vals;
-            StreamReader reader = new StreamReader(folder + inputFile);
-            while(!reader.EndOfStream)
-            {
-                var line = reader.ReadLine();
-                var values = line.Split(',');
-                vals = values.Select(str => float.TryParse(str, out val) ? val : 0);
-                result.Add(new Layout(3, vals.ToArray()));
-            }
-            reader.Close();
-            return result;
-        }
 
-        Gaussian vGaussian = new Gaussian(0.5, 0.007);
-        Gaussian similarGaussian = new Gaussian(0, 0.4);
-        Gaussian nudgeGaussian = new Gaussian(0, 0.005);
-        HSL baseColor = new HSL(0.9f, 0.7f, 0.3f);
-        public Layout GenLayout()
-        {
-            Layout result = new Layout(3);
-            result.BaseColor = baseColor;
-            result.Variation = (float)Math.Abs(similarGaussian.Sample());
-
-            float v = (float)vGaussian.Sample();
-            float h = (float)vGaussian.Sample();
-            var boxes = result.BoxesRef;
-
-            bool wideBot = v > 0.5;
-            boxes[0].Cx = 0.5f;
-            boxes[0].Cy = wideBot ? v / 2.0f : 1f - (1f - v) / 2.0f;
-            boxes[0].Rx = 0.5f;
-            boxes[0].Ry = wideBot ? v / 2.0f : (1.0f - v) / 2.0f;
-            boxes[0].ColorOffset = (float)colGaussian.Sample();
-            boxes[0].Color = result.BaseColor.HSLFromDistance(result.Variation + boxes[0].ColorOffset);
-
-            boxes[1].Cx = h / 2.0f;
-            boxes[1].Cy = wideBot ? v + (1.0f - v) / 2.0f : v / 2.0f;
-            boxes[1].Rx = h / 2.0f;
-            boxes[1].Ry = wideBot ? (1.0f - v) / 2.0f : v / 2.0f;
-            boxes[1].ColorOffset = (float)colGaussian.Sample();
-            boxes[1].Color = result.BaseColor.HSLFromDistance(result.Variation + boxes[0].ColorOffset);
-
-            boxes[2].Cx = h + (1.0f - h) / 2.0f;
-            boxes[2].Cy = boxes[1].Cy;
-            boxes[2].Rx = (1.0f - h) / 2.0f;
-            boxes[2].Ry = boxes[1].Ry;
-            boxes[2].ColorOffset = (float)colGaussian.Sample();
-            boxes[2].Color = result.BaseColor.HSLFromDistance(result.Variation + boxes[0].ColorOffset);
-
-            if (rnd.NextDouble() > 0.5)
-            {
-                result.Rotate();
-            }
-            boxes.Shuffle();
-
-            return result;
-        }
         public List<Layout> TransformAll(List<Layout> input)
         {
             var result = new List<Layout>();
@@ -189,7 +152,7 @@ namespace MLTest
             return result;
         }
 
-        Layout layoutOfInterest = new Layout(3, 0.17118305f, 0.2429369f,  0.16565311f, 0.24538253f, 0.66856414f, 0.25028878f, 0.31348467f, 0.23988356f, 0.48624027f, 0.7277348f,  0.50574875f, 0.24975622f);
+        Layout layoutOfInterest;// = new Layout(3, 0.17118305f, 0.2429369f,  0.16565311f, 0.24538253f, 0.66856414f, 0.25028878f, 0.31348467f, 0.23988356f, 0.48624027f, 0.7277348f,  0.50574875f, 0.24975622f);
         public void OnDraw(Graphics g)
         {
             var toDraw = DrawTarget == DrawTarget.Truth ? targets : DrawTarget == DrawTarget.Mutated ? mutated : predictions;
@@ -202,7 +165,8 @@ namespace MLTest
             }
 
             ScaleTranslateTo(toDraw.Count, g);
-            layoutOfInterest.Draw(g);
+
+            if (layoutOfInterest != null) { layoutOfInterest.Draw(g); }
         }
 
         private void ScaleTranslateTo(int index, Graphics g)

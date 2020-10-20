@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -136,6 +137,15 @@ namespace MLTest
             if (hue < 180) return q2;
             if (hue < 240) return q1 + (q2 - q1) * (240 - hue) / 60;
             return q1;
+        }
+
+        public void Serialize(StreamWriter sw)
+        {
+            sw.Write(String.Format("{0:0.000},{1:0.000},{2:0.000}", H, S, L));
+        }
+        public override string ToString()
+        {
+            return "HSL:[" + String.Format("{0:0.000},{1:0.000},{2:0.000}", H, S, L) + "]";
         }
     }
 }

@@ -70,7 +70,7 @@ def load_frozen_model():
                                 outputs=["Identity:0"],
                                 print_graph=True)
 
-train = False #True #
+train = True #False #
 useMLNetVersion = False #True #
 
 if train:
