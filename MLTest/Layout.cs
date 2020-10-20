@@ -72,10 +72,10 @@ namespace MLTest
             var result = new float[_boxes.Length * 4];
             for (int i = 0; i < _boxes.Length; i++)
             {
-                result[i + 0] = _boxes[i].Cx;
-                result[i + 1] = _boxes[i].Cy;
-                result[i + 2] = _boxes[i].Rx;
-                result[i + 3] = _boxes[i].Ry;
+                result[i * 4 + 0] = _boxes[i].Cx;
+                result[i * 4 + 1] = _boxes[i].Cy;
+                result[i * 4 + 2] = _boxes[i].Rx;
+                result[i * 4 + 3] = _boxes[i].Ry;
             }
             return result;
         }

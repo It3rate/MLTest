@@ -1,6 +1,8 @@
-﻿using Microsoft.ML;
+﻿using Keras.Models;
+using Microsoft.ML;
 using Microsoft.ML.Data;
 using Microsoft.ML.Probabilistic.Distributions;
+using Numpy;
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
@@ -15,8 +17,10 @@ namespace MLTest
 {
     public class LayoutInput
     {
+        [ColumnName("x")]
         [VectorType(12)]
         public float[] x;
+
         LayoutInput(float[] values) { x = values; }
 
         public static LayoutInput[] GetInputs(List<Layout> layouts)
@@ -32,6 +36,7 @@ namespace MLTest
     
     public class LayoutOutput
     {
+        [ColumnName("Identity")]
         [VectorType(12)]
         public float[] Identity;
     }
@@ -47,19 +52,20 @@ namespace MLTest
         public BoxGen()
         {
             //GenerateTrainingData();
-            GenerateLocalData();
+            LoadTFData();
+            //GenerateLocalData();
             TestModel(mutated);
         }
 
-        public void LoadData()
+        public void LoadTFData()
         {
-            mutated = LoadData("D:/tmp/Python/PythonApplication1/PythonApplication1/boxData/", "testInputs.txt");
-            targets = LoadData("D:/tmp/Python/PythonApplication1/PythonApplication1/boxData/", "testTargets.txt");
-            predictions = LoadData("D:/tmp/Python/PythonApplication1/PythonApplication1/boxData/", "testPredictions.txt");
+            mutated = LoadData("D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/", "testInputs.txt");
+            targets = LoadData("D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/", "testTargets.txt");
+            predictions = LoadData("D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/", "testPredictions.txt");
         }
         public void GenerateTrainingData()
         {
-            GenerateDataAt(50000, "D:/tmp/Python/PythonApplication1/PythonApplication1/boxData/", "bx3_input.txt", "bx3_target.txt");
+            GenerateDataAt(50000, "D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/", "bx3_input.txt", "bx3_target.txt");
         }
         public void GenerateLocalData()
         {
@@ -72,7 +78,7 @@ namespace MLTest
         public void TestModel(List<Layout> mutatedInput)
         {
             MLContext mlContext = new MLContext();
-            var tensorFlowModel = mlContext.Model.LoadTensorFlowModel("D:/tmp/Python/PythonApplication1/PythonApplication1/boxData/frozenBoxModel.pb");
+            var tensorFlowModel = mlContext.Model.LoadTensorFlowModel("D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/frozenBoxModel.pb");
 
             DataViewSchema schema = tensorFlowModel.GetModelSchema(); // Vector<Single, 12>
             Console.WriteLine(" =============== TensorFlow Model Schema =============== ");
@@ -81,33 +87,22 @@ namespace MLTest
             var predictionType = (VectorDataViewType)schema["Identity"].Type;
             Console.WriteLine($"Name: Identity, Type: {predictionType.ItemType.RawType}, Size: ({predictionType.Dimensions[0]})");
 
-
             var dataView = mlContext.Data.LoadFromEnumerable(LayoutInput.GetInputs(mutated));
-            //var pipeline = tensorFlowModel.ScoreTensorFlowModel("Identity", "x", false);
-            var pipeline = tensorFlowModel.ScoreTensorFlowModel( new[] { nameof(LayoutOutput.Identity) },new[] { nameof(LayoutInput.x) },false);
+            var pipeline = tensorFlowModel.ScoreTensorFlowModel( new[] { nameof(LayoutOutput.Identity) },new[] { nameof(LayoutInput.x) }, false);
             var estimator = pipeline.Fit(dataView);
             var transformedValues = estimator.Transform(dataView);
 
             var outScores = mlContext.Data.CreateEnumerable<LayoutOutput>(transformedValues, reuseRowObject: false);
-
             predictions = new List<Layout>(); 
             foreach (var prediction in outScores)
             {
+                Console.WriteLine(string.Join(",", prediction.Identity));
                 predictions.Add(new Layout(prediction.Identity));
             }
-            Console.WriteLine(outScores);
-            //estimator.Fit()
-            //var engine = mlContext.Model.CreatePredictionEngine<LayoutType, LayoutType> (tensorFlowModel);  //<Vector<Single, 12>, Vector<Single, 12>> (model);
-
 
             tensorFlowModel.Dispose();
-
-            //IDataView dataView = mlContext.Data.LoadFromEnumerable(new List<MovieReview>());
-            //ITransformer model = pipeline.Fit(dataView);
-            //estimator.Fit(input);
-            //ScoreTensorFlowModel(outputColumnNames: new[] { "softmax2_pre_activation" }, inputColumnNames: new[] { "input" }, addBatchDimensionInput: true)
-
         }
+
         public void GenerateDataAt(int count, string folder, string inputFile, string targetFile)
         {
             var enc = new UTF8Encoding();
