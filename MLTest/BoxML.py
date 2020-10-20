@@ -32,7 +32,10 @@ def get_model(n_inputs, n_outputs):
 
 def freeze_and_save(v2Model):
 	full_model = tf.function(lambda x: v2Model(x))
-	full_model = full_model.get_concrete_function(x=tf.TensorSpec(v2Model.inputs[0].shape, v2Model.inputs[0].dtype))
+	full_model = full_model.get_concrete_function(
+		x=tf.TensorSpec(v2Model.inputs[0].shape, 
+				  v2Model.inputs[0].dtype, 
+				  name="layoutInput"))
 	frozen_func = convert_variables_to_constants_v2(full_model)
 	frozen_func.graph.as_graph_def()
 	layers = [op.name for op in frozen_func.graph.get_operations()]
@@ -63,11 +66,13 @@ def load_frozen_model():
 		graph_def = tf.compat.v1.GraphDef()
 		loaded = graph_def.ParseFromString(f.read())
 	return wrap_frozen_graph(graph_def=graph_def,
-                                inputs=["x:0"],
+                                inputs=["layoutInput:0"],
                                 outputs=["Identity:0"],
                                 print_graph=True)
 
 train = False #True #
+useMLNetVersion = False #True #
+
 if train:
 	X, y = get_dataset()
 	n_inputs, n_outputs = X.shape[1], y.shape[1]
@@ -82,7 +87,6 @@ if train:
 
 if not train:	
 	XTest = pd.read_csv("boxModel/testInputs.txt", header=None).to_numpy(dtype=np.float32)
-	useMLNetVersion = True;
 	if useMLNetVersion:
 		fr_modelfn = load_frozen_model();
 		pred = fr_modelfn(x=tf.constant(XTest))
@@ -90,6 +94,7 @@ if not train:
 		np.savetxt('boxModel/testPredictions.txt', pred[0], delimiter=',', fmt='%1.4f')
 	else:
 		model = tf.keras.models.load_model('boxModel/boxModel.h5')
+		freeze_and_save(model) # For ML.net
 		yhat = model(XTest)
 		print('Predicted: %s' % yhat)
 		np.savetxt('boxModel/testPredictions.txt', yhat, delimiter=',', fmt='%1.4f')

@@ -30,8 +30,15 @@ namespace MLTest
         protected override void OnMouseDown(MouseEventArgs e)
         {
             base.OnMouseDown(e);
-            //drawable.TransformAll();
-            drawable.DrawTarget = (e.Button == MouseButtons.Left) ? DrawTarget.Truth : DrawTarget.Predictions;
+            if(e.Button == MouseButtons.Middle)
+            {
+                drawable.GenerateLocalData();
+            }
+            else
+            {
+                //drawable.TransformAll();
+                drawable.DrawTarget = (e.Button == MouseButtons.Left) ? DrawTarget.Truth : DrawTarget.Predictions;
+            }
             Invalidate();
         }
         protected override void OnMouseUp(MouseEventArgs e)
