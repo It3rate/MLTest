@@ -18,29 +18,29 @@ namespace MLTest
     public class BoxGen
     {
         Random rnd = new Random();
-        List<Layout> mutated = new List<Layout>();
-        List<Layout> targets = new List<Layout>();
-        List<Layout> predictions = new List<Layout>();
+        public List<Design> Mutated = new List<Design>();
+        List<Design> targets = new List<Design>();
+        List<Design> predictions = new List<Design>();
 
-        public DrawTarget DrawTarget = DrawTarget.Mutated;
+        public DrawTarget DrawTarget = DrawTarget.Truth;
 
         public BoxGen()
         {
-            GenerateTrainingData();
+            //GenerateTrainingData();
             LoadTFData();
             //GenerateLocalData();
-            //TestModel(mutated);
+            TestModel(Mutated);
         }
 
         public void LoadTFData()
         {
-            mutated = LoadData("D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/", "testInputs.txt");
+            Mutated = LoadData("D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/", "testInputs.txt");
             targets = LoadData("D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/", "testTargets.txt");
             predictions = LoadData("D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/", "testPredictions.txt");
         }
-        public List<Layout> LoadData(string folder, string inputFile)
+        public List<Design> LoadData(string folder, string inputFile)
         {
-            var result = new List<Layout>();
+            var result = new List<Design>();
             float val;
             IEnumerable<float> vals;
             StreamReader reader = new StreamReader(folder + inputFile);
@@ -49,29 +49,36 @@ namespace MLTest
                 var line = reader.ReadLine();
                 var values = line.Split(',');
                 vals = values.Select(str => float.TryParse(str, out val) ? val : 0);
-                result.Add(new Layout(3, vals.ToArray()));
+                result.Add(new Design(3, vals.ToArray()));
             }
             reader.Close();
             return result;
         }
         public void GenerateTrainingData()
         {
-            GenerateDataAt(80000, "D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/", "bx3_input.txt", "bx3_target.txt");
+            GenerateDataAt(100000, "D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/", "bx3_input.txt", "bx3_target.txt");
         }
         public void GenerateLocalData()
         {
             targets.Clear();
-            mutated.Clear();
+            Mutated.Clear();
             predictions.Clear();
             for (int i = 0; i < 50; i++)
             {
                 targets.Add(GenLayout());
             }
-            mutated = TransformAll(targets);
+            Mutated = TransformAll(targets);
+            if (runModelOnNewData)
+            {
+                TestModel(Mutated);
+            }
+
             baseColor = new HSL((float)rnd.NextDouble(), (float)rnd.NextDouble(), (float)rnd.NextDouble());
         }
-        public void TestModel(List<Layout> mutatedInput)
+        bool runModelOnNewData = false;
+        public void TestModel(List<Design> mutatedInput)
         {
+            runModelOnNewData = true;
             MLContext mlContext = new MLContext();
             var tensorFlowModel = mlContext.Model.LoadTensorFlowModel("D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/frozenBoxModel.pb");
 
@@ -82,28 +89,27 @@ namespace MLTest
             var predictionType = (VectorDataViewType)schema["Identity"].Type;
             Console.WriteLine($"Name: Identity, Type: {predictionType.ItemType.RawType}, Size: ({predictionType.Dimensions[0]})");
 
-            var dataView = mlContext.Data.LoadFromEnumerable(LayoutInput.GetInputs(mutated));
+            var dataView = mlContext.Data.LoadFromEnumerable(LayoutInput.GetInputs(Mutated));
             var pipeline = tensorFlowModel.ScoreTensorFlowModel( new[] { nameof(LayoutOutput.Identity) },new[] { nameof(LayoutInput.layoutInput) }, false);
             var estimator = pipeline.Fit(dataView);
             var transformedValues = estimator.Transform(dataView);
 
             var outScores = mlContext.Data.CreateEnumerable<LayoutOutput>(transformedValues, reuseRowObject: false);
-            predictions = new List<Layout>(); 
+            predictions = new List<Design>(); 
             foreach (var prediction in outScores)
             {
                 Console.WriteLine(string.Join(",", prediction.Identity));
-                predictions.Add(new Layout(3, prediction.Identity));
+                predictions.Add(new Design(3, prediction.Identity));
             }
 
             tensorFlowModel.Dispose();
         }
 
         Gaussian vGaussian = new Gaussian(0.5, 0.007);
-        Gaussian similarGaussian = new Gaussian(0, 0.4);
         Gaussian nudgeGaussian = new Gaussian(0, 0.005);
         HSL baseColor = new HSL(0.9f, 0.7f, 0.3f);
 
-        public Layout GenLayout() => Layout.GenLayout3(baseColor, (float)vGaussian.Sample(), (float)vGaussian.Sample(), similarGaussian, colGaussian);
+        public Design GenLayout() => Design.GenLayout3((float)vGaussian.Sample(), (float)vGaussian.Sample());
 
         public void GenerateDataAt(int count, string folder, string inputFile, string targetFile)
         {
@@ -126,17 +132,26 @@ namespace MLTest
             targetStream.Close();
         }
 
-        public List<Layout> TransformAll(List<Layout> input)
+        public void RecolorDesigns(List<Design> designs, float stdDev = 0.03f)
         {
-            var result = new List<Layout>();
-            for(int i = 0; i < input.Count; i++)
+            foreach (var design in designs)
+            {
+                Design.ColorBoxesWithOffset(design, stdDev);
+            }
+        }
+        public List<Design> TransformAll(List<Design> input)
+        {
+            var result = new List<Design>();
+            for (int i = 0; i < input.Count; i++)
             {
                 result.Add(Transform(input[i]));
             }
+            RecolorDesigns(result);
             return result;
         }
-        Gaussian colGaussian = new Gaussian(0.5, 0.001);
-        private Layout Transform(Layout bx)
+        TruncatedGaussian colTransformOffset = new TruncatedGaussian(0, 0.06, -0.2, 0.2);
+        //Gaussian colTransformOffset = new Gaussian(0, 0.01);
+        private Design Transform(Design bx)
         {
             var result = bx.Clone();
 
@@ -146,16 +161,16 @@ namespace MLTest
                 result[i].Cy += (float)nudgeGaussian.Sample();
                 result[i].Rx += (float)nudgeGaussian.Sample();
                 result[i].Ry += (float)nudgeGaussian.Sample();
-                result[i].Color = result[i].Color.HSLFromDistance((float)colGaussian.Sample());
+                // no need to transform color because it is already aproximated using variation and color offset in the input format
+                //result[i].ColorOffset += (float)colTransformOffset.Sample();
             }
 
             return result;
         }
 
-        Layout layoutOfInterest;// = new Layout(3, 0.17118305f, 0.2429369f,  0.16565311f, 0.24538253f, 0.66856414f, 0.25028878f, 0.31348467f, 0.23988356f, 0.48624027f, 0.7277348f,  0.50574875f, 0.24975622f);
         public void OnDraw(Graphics g)
         {
-            var toDraw = DrawTarget == DrawTarget.Truth ? targets : DrawTarget == DrawTarget.Mutated ? mutated : predictions;
+            var toDraw = DrawTarget == DrawTarget.Truth ? targets : DrawTarget == DrawTarget.Mutated ? Mutated : predictions;
             for (int i = 0; i < toDraw.Count; i++)
             {
                 var state = g.Save();
@@ -165,8 +180,6 @@ namespace MLTest
             }
 
             ScaleTranslateTo(toDraw.Count, g);
-
-            if (layoutOfInterest != null) { layoutOfInterest.Draw(g); }
         }
 
         private void ScaleTranslateTo(int index, Graphics g)
@@ -195,12 +208,12 @@ namespace MLTest
     public class LayoutInput
     {
         [ColumnName("layoutInput")]
-        [VectorType(12)]
+        [VectorType(19)]
         public float[] layoutInput;
 
         LayoutInput(float[] values) { layoutInput = values; }
 
-        public static LayoutInput[] GetInputs(List<Layout> layouts)
+        public static LayoutInput[] GetInputs(List<Design> layouts)
         {
             var result = new LayoutInput[layouts.Count];
             for (int i = 0; i < layouts.Count; i++)
@@ -214,7 +227,7 @@ namespace MLTest
     public class LayoutOutput
     {
         [ColumnName("Identity")]
-        [VectorType(12)]
+        [VectorType(21)]
         public float[] Identity;
     }
 

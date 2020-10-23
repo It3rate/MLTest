@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace MLTest
 {
-    public class Layout
+    public class Design
     {
         public float Variation { get; set; }
         public HSL BaseColor { get; set; }
@@ -21,11 +21,11 @@ namespace MLTest
         private Box[] _boxes;
         public Box[] BoxesRef => _boxes;
 
-        public Layout(int count)
+        public Design(int count)
         {
             Init(count);
         }
-        public Layout(int count, params float[] values)
+        public Design(int count, params float[] values)
         {
             if (values.Length == 19) // input array (has base color and variation)
             {
@@ -56,13 +56,19 @@ namespace MLTest
             }
         }
 
-        static Gaussian similarGaussian = new Gaussian(0, 0.4);
         static Random rnd = new Random();
-        public static Layout GenLayout3(HSL baseColor, float h, float v, Gaussian similarity, Gaussian boxColorOffset)
+        public static Design GenLayout3(float h, float v)
         {
-            Layout result = new Layout(3);
-            result.BaseColor = baseColor;
-            result.Variation = (float)Math.Abs(similarGaussian.Sample());
+            Design result = new Design(3);
+            TruncatedGaussian colorGenGaussian = new TruncatedGaussian(0.5, 0.04, 0.2, 0.8);
+            //Gaussian colorGenGaussian = new Gaussian(0.5, 0.3);
+            result.BaseColor = new HSL(
+                (float)rnd.NextDouble(),
+                (float)(colorGenGaussian.Sample() * 0.70 + 0.25),
+                (float)(colorGenGaussian.Sample()));
+            TruncatedGaussian variationGaussian = new TruncatedGaussian(0, 0.02, -0.1, 0.1);
+            var vs = variationGaussian.Sample();
+            result.Variation = (float) ((Math.Abs(vs) + 0.025) * Math.Sign(vs));
 
             var boxes = result.BoxesRef;
 
@@ -71,7 +77,7 @@ namespace MLTest
             boxes[0].Cy = wideBot ? v / 2.0f : 1f - (1f - v) / 2.0f;
             boxes[0].Rx = 0.5f;
             boxes[0].Ry = wideBot ? v / 2.0f : (1.0f - v) / 2.0f;
-
+                
             boxes[1].Cx = h / 2.0f;
             boxes[1].Cy = wideBot ? v + (1.0f - v) / 2.0f : v / 2.0f;
             boxes[1].Rx = h / 2.0f;
@@ -82,11 +88,8 @@ namespace MLTest
             boxes[2].Rx = (1.0f - h) / 2.0f;
             boxes[2].Ry = boxes[1].Ry;
 
-            foreach (var box in boxes)
-            {
-                box.ColorOffset = (float)boxColorOffset.Sample();
-                box.Color = result.BaseColor.HSLFromDistance(result.Variation + box.ColorOffset);
-            }
+            ColorBoxesWithOffset(result, 0.03f);
+
             if (rnd.NextDouble() > 0.5)
             {
                 result.Rotate();
@@ -95,11 +98,34 @@ namespace MLTest
             return result;
 
         }
+        public static void ColorBoxesWithOffset(Design design, float stdDev)
+        {
+            var boxes = design.BoxesRef;
+
+            // sort by size to keep coloring constant across shuffles
+            var dict = new Dictionary<int, float>() { { 0, 0 }, { 1, 0 }, { 2, 0 } };
+            var list = new List<KeyValuePair<int, float>>();
+            foreach (var val in dict)
+            {
+                list.Add(new KeyValuePair<int, float>(val.Key, boxes[val.Key].Rx * boxes[val.Key].Ry));
+            }
+            list.Sort((x, y) => x.Value.CompareTo(y.Value));
+
+            TruncatedGaussian boxColorMOffset = new TruncatedGaussian(0, stdDev, -stdDev * 3f, stdDev * 3f);
+            var offset = (float)Math.Abs(boxColorMOffset.Sample()) + 0.05f;
+            boxes[list[2].Key].ColorOffset = 0;
+            boxes[list[1].Key].ColorOffset = offset;
+            boxes[list[0].Key].ColorOffset = -offset;
+            foreach (var box in boxes)
+            {
+                box.Color = design.BaseColor.HSLFromDistance(design.Variation + box.ColorOffset);
+            }
+        }
         public void GenColor()
         {
             foreach (var box in _boxes)
             {
-                box.Color = BaseColor.HSLFromDistance(Variation + box.ColorOffset);
+                box.Color = BaseColor.HSLFromDistance(Variation * box.ColorOffset);
             }
         }
 
@@ -120,9 +146,9 @@ namespace MLTest
                 box.Rx = temp;
             }
         }
-        public Layout Clone()
+        public Design Clone()
         {
-            var result = new Layout(_boxes.Length);
+            var result = new Design(_boxes.Length);
             result.BaseColor = BaseColor.Clone();
             result.Variation = Variation;
             for (int i = 0; i < _boxes.Length; i++)

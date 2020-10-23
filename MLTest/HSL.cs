@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.ML.Probabilistic.Distributions;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -22,23 +23,21 @@ namespace MLTest
             S = Math.Min(1f, Math.Max(0, s));
             L = Math.Min(1f, Math.Max(0, l));
         }
-
         /// <summary>
         /// Divides distance into 3 random sections, applies to existing H, S, and L.
         /// </summary>
         public HSL HSLFromDistance(float distance)
         {
-            var div0 = (float)rnd.NextDouble() * distance;
-            var div1 = (float)rnd.NextDouble() * distance;
-            var p0 = Math.Min(div0, div1);
-            var p1 = Math.Max(div0, div1);
-            var hNudge = (p0 * (float)rnd.NextDouble()) - (p0 / 2f);
-            var sNudge = ((p1 - p0) * (float)rnd.NextDouble()) - ((p1-p0) / 2f);
-            var lNudge = ((1f - p1) * (float)rnd.NextDouble()) - ((1f - p1) / 2f);
-            // now is -nudge to nudge
-            // account for remaining room in each HSL for shift. Clamp?
-
-            return new HSL(H+hNudge, S+sNudge, L+lNudge);
+            TruncatedGaussian variation = new TruncatedGaussian(distance, 0.01, distance-0.03, distance + 0.03);
+            var nudgeH = distance + (float)variation.Sample()*.3f;
+            var nudgeS =  -0.3f;
+            var nudgeL = (distance + (float)variation.Sample()) * 0.5f;
+            return new HSL((H + nudgeH)%1f, S + nudgeS, L + nudgeL);
+        }
+        static Gaussian centerDist = new Gaussian(0.5, 0.02);
+        public static HSL RandomColor()
+        {
+            return new HSL((float)centerDist.Sample(), (float)centerDist.Sample(), (float)centerDist.Sample());
         }
         public float[] AsArray() 
         {
@@ -56,7 +55,7 @@ namespace MLTest
             return Color.FromArgb(255, r, g, b);
         }
 
-        public static void HlsToRgb(double h, double l, double s,
+        public static void HlsToRgb(double h, double s, double l, 
             out int r, out int g, out int b)
         {
             double p2;

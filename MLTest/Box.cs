@@ -82,7 +82,7 @@ namespace MLTest
         }
         public override string ToString()
         {
-            return String.Format("{0:0.000},{1:0.000},{2:0.000},{3:0.000}", Cx, Cy, Rx, Ry);
+            return String.Format("{0:0.000},{1:0.000},{2:0.000},{3:0.000} - [{4:0.00},{5:0.00},{6:0.00}]", Cx, Cy, Rx, Ry, _color.H, _color.S, _color.L);
         }
     }
 }
