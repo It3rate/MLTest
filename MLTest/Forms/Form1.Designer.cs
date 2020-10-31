@@ -28,23 +28,23 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.lbTitle = new System.Windows.Forms.Label();
+            this.lbTitleX = new System.Windows.Forms.Label();
             this.slColor = new System.Windows.Forms.HScrollBar();
             this.slLayout = new System.Windows.Forms.HScrollBar();
             this.lbColor = new System.Windows.Forms.Label();
             this.lbLayout = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
-            // lbTitle
+            // lbTitleX
             // 
-            this.lbTitle.AutoSize = true;
-            this.lbTitle.Font = new System.Drawing.Font("Berlin Sans FB", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lbTitle.Location = new System.Drawing.Point(477, 589);
-            this.lbTitle.Name = "lbTitle";
-            this.lbTitle.Size = new System.Drawing.Size(122, 35);
-            this.lbTitle.TabIndex = 0;
-            this.lbTitle.Text = "Original";
-            this.lbTitle.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.lbTitleX.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.lbTitleX.Font = new System.Drawing.Font("Berlin Sans FB", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbTitleX.Location = new System.Drawing.Point(365, 589);
+            this.lbTitleX.Name = "lbTitleX";
+            this.lbTitleX.Size = new System.Drawing.Size(401, 35);
+            this.lbTitleX.TabIndex = 0;
+            this.lbTitleX.Text = "Original";
+            this.lbTitleX.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             // 
             // slColor
             // 
@@ -66,7 +66,7 @@
             // lbColor
             // 
             this.lbColor.AutoSize = true;
-            this.lbColor.Location = new System.Drawing.Point(127, 578);
+            this.lbColor.Location = new System.Drawing.Point(12, 578);
             this.lbColor.Name = "lbColor";
             this.lbColor.Size = new System.Drawing.Size(113, 20);
             this.lbColor.TabIndex = 3;
@@ -75,7 +75,7 @@
             // lbLayout
             // 
             this.lbLayout.AutoSize = true;
-            this.lbLayout.Location = new System.Drawing.Point(901, 578);
+            this.lbLayout.Location = new System.Drawing.Point(811, 578);
             this.lbLayout.Name = "lbLayout";
             this.lbLayout.Size = new System.Drawing.Size(124, 20);
             this.lbLayout.TabIndex = 4;
@@ -90,7 +90,7 @@
             this.Controls.Add(this.lbColor);
             this.Controls.Add(this.slLayout);
             this.Controls.Add(this.slColor);
-            this.Controls.Add(this.lbTitle);
+            this.Controls.Add(this.lbTitleX);
             this.Name = "Form1";
             this.Text = "Form1";
             this.ResumeLayout(false);
@@ -100,7 +100,7 @@
 
         #endregion
 
-        private System.Windows.Forms.Label lbTitle;
+        private System.Windows.Forms.Label lbTitleX;
         private System.Windows.Forms.HScrollBar slColor;
         private System.Windows.Forms.HScrollBar slLayout;
         private System.Windows.Forms.Label lbColor;

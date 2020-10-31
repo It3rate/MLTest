@@ -2,6 +2,7 @@
 using Microsoft.ML;
 using Microsoft.ML.Data;
 using Microsoft.ML.Probabilistic.Distributions;
+using Microsoft.ML.Transforms;
 using Numpy;
 using System;
 using System.CodeDom.Compiler;
@@ -15,28 +16,57 @@ using System.Windows.Forms;
 
 namespace MLTest
 {
-    public class BoxGen
+    public class DesignGenerator
     {
-        Random rnd = new Random();
+        private static MLContext mlContext;
+        private static TensorFlowModel _tfModel;
+        public static TensorFlowModel TFModel
+        {
+            get
+            {
+                if(_tfModel == null)
+                {
+                        mlContext = new MLContext();
+                        _tfModel = mlContext.Model.LoadTensorFlowModel("D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/frozenBoxModel.pb");
+                        //DataViewSchema schema = TFModel.GetModelSchema();
+                        //var featuresType = (VectorDataViewType)schema["layoutInput"].Type;
+                        //var predictionType = (VectorDataViewType)schema["Identity"].Type;
+                }
+                return _tfModel;
+            }
+        }
+
         public List<Design> Mutated = new List<Design>();
         List<Design> targets = new List<Design>();
-        List<Design> predictions = new List<Design>();
+        public List<Design> Predictions = new List<Design>();
+
+        Random rnd = new Random();
 
         public DrawTarget DrawTarget = DrawTarget.Truth;
 
-        public BoxGen()
+        public DesignGenerator(bool train, bool useModelData)
         {
-            //GenerateTrainingData();
-            LoadTFData();
-            //GenerateLocalData();
-            TestModel(Mutated);
+            if (train)
+            {
+                GenerateTrainingData();
+            }
+
+            if (useModelData)
+            {
+                LoadTFData();
+            }
+            else
+            {
+                GenerateLocalData();
+            }
+            TestModel();
         }
 
         public void LoadTFData()
         {
             Mutated = LoadData("D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/", "testInputs.txt");
             targets = LoadData("D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/", "testTargets.txt");
-            predictions = LoadData("D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/", "testPredictions.txt");
+            Predictions = LoadData("D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/", "testPredictions.txt");
         }
         public List<Design> LoadData(string folder, string inputFile)
         {
@@ -62,7 +92,7 @@ namespace MLTest
         {
             targets.Clear();
             Mutated.Clear();
-            predictions.Clear();
+            Predictions.Clear();
             for (int i = 0; i < 50; i++)
             {
                 targets.Add(GenLayout());
@@ -70,39 +100,32 @@ namespace MLTest
             Mutated = TransformAll(targets);
             if (runModelOnNewData)
             {
-                TestModel(Mutated);
+                TestModel();
             }
 
             baseColor = new HSL((float)rnd.NextDouble(), (float)rnd.NextDouble(), (float)rnd.NextDouble());
         }
         bool runModelOnNewData = false;
-        public void TestModel(List<Design> mutatedInput)
+        public void TestModel(List<Design> mutatedInput = null, List<Design> outputPredictions = null)
         {
+            mutatedInput = mutatedInput ?? Mutated;
+            outputPredictions = outputPredictions ?? Predictions;
+
             runModelOnNewData = true;
-            MLContext mlContext = new MLContext();
-            var tensorFlowModel = mlContext.Model.LoadTensorFlowModel("D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/frozenBoxModel.pb");
 
-            DataViewSchema schema = tensorFlowModel.GetModelSchema(); // Vector<Single, 12>
-            Console.WriteLine(" =============== TensorFlow Model Schema =============== ");
-            var featuresType = (VectorDataViewType)schema["layoutInput"].Type;
-            Console.WriteLine($"Name: layoutInput, Type: {featuresType.ItemType.RawType}, Size: ({featuresType.Dimensions[0]})");
-            var predictionType = (VectorDataViewType)schema["Identity"].Type;
-            Console.WriteLine($"Name: Identity, Type: {predictionType.ItemType.RawType}, Size: ({predictionType.Dimensions[0]})");
-
+            var pipeline = TFModel.ScoreTensorFlowModel( new[] { nameof(LayoutOutput.Identity) },new[] { nameof(LayoutInput.layoutInput) }, false);
             var dataView = mlContext.Data.LoadFromEnumerable(LayoutInput.GetInputs(Mutated));
-            var pipeline = tensorFlowModel.ScoreTensorFlowModel( new[] { nameof(LayoutOutput.Identity) },new[] { nameof(LayoutInput.layoutInput) }, false);
             var estimator = pipeline.Fit(dataView);
             var transformedValues = estimator.Transform(dataView);
 
             var outScores = mlContext.Data.CreateEnumerable<LayoutOutput>(transformedValues, reuseRowObject: false);
-            predictions = new List<Design>(); 
+            outputPredictions.Clear(); 
             foreach (var prediction in outScores)
             {
-                Console.WriteLine(string.Join(",", prediction.Identity));
-                predictions.Add(new Design(3, prediction.Identity));
+                //Console.WriteLine(string.Join(",", prediction.Identity));
+                outputPredictions.Add(new Design(3, prediction.Identity));
             }
-
-            tensorFlowModel.Dispose();
+            //tensorFlowModel.Dispose();
         }
 
         Gaussian vGaussian = new Gaussian(0.5, 0.007);
@@ -170,7 +193,7 @@ namespace MLTest
 
         public void OnDraw(Graphics g)
         {
-            var toDraw = DrawTarget == DrawTarget.Truth ? targets : DrawTarget == DrawTarget.Mutated ? Mutated : predictions;
+            var toDraw = DrawTarget == DrawTarget.Truth ? targets : DrawTarget == DrawTarget.Mutated ? Mutated : Predictions;
             for (int i = 0; i < toDraw.Count; i++)
             {
                 var state = g.Save();

@@ -112,7 +112,7 @@ namespace MLTest
             list.Sort((x, y) => x.Value.CompareTo(y.Value));
 
             TruncatedGaussian boxColorMOffset = new TruncatedGaussian(0, stdDev, -stdDev * 3f, stdDev * 3f);
-            var offset = (float)Math.Abs(boxColorMOffset.Sample()) + 0.05f;
+            var offset = (float)Math.Abs(boxColorMOffset.Sample()) + 0.01f;
             boxes[list[2].Key].ColorOffset = 0;
             boxes[list[1].Key].ColorOffset = offset;
             boxes[list[0].Key].ColorOffset = -offset;

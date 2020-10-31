@@ -12,19 +12,19 @@ namespace MLTest
 {
     public partial class Form1 : Form
     {
-        BoxGen drawable;
+        DesignGenerator generator;
         public Form1()
         {
             InitializeComponent();
             DoubleBuffered = true;
             //var t = new Test1(this);
-            drawable = new BoxGen();
+            generator = new DesignGenerator(false, true);
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-            drawable.OnDraw(e.Graphics);
+            generator.OnDraw(e.Graphics);
         }
 
         protected override void OnMouseDown(MouseEventArgs e)
@@ -32,23 +32,23 @@ namespace MLTest
             base.OnMouseDown(e);
             if(e.Button == MouseButtons.Middle)
             {
-                drawable.GenerateLocalData();
-                lbTitle.Text = "Refresh";
+                generator.GenerateLocalData();
+                lbTitleX.Text = "Refresh";
             }
             else
             {
                 //drawable.TransformAll();
-                drawable.DrawTarget = (e.Button == MouseButtons.Left) ? DrawTarget.Mutated : DrawTarget.Predictions;
+                generator.DrawTarget = (e.Button == MouseButtons.Left) ? DrawTarget.Mutated : DrawTarget.Predictions;
 
-                lbTitle.Text = (drawable.DrawTarget == DrawTarget.Mutated) ? "Mutated Data" : "Predictions";
+                lbTitleX.Text = (generator.DrawTarget == DrawTarget.Mutated) ? "Mutated Data" : "Predictions";
             }
             Invalidate();
         }
         protected override void OnMouseUp(MouseEventArgs e)
         {
             base.OnMouseUp(e);
-            drawable.DrawTarget = DrawTarget.Truth;
-            lbTitle.Text = "Ground Truth";
+            generator.DrawTarget = DrawTarget.Truth;
+            lbTitleX.Text = "Ground Truth";
             Invalidate();
         }
 
@@ -56,20 +56,28 @@ namespace MLTest
         {
         }
 
+        bool dbuf;
         private void slColor_Scroll(object sender, ScrollEventArgs e)
         {
             if (e.Type == ScrollEventType.EndScroll)
             {
-                drawable.DrawTarget = DrawTarget.Truth;
-                lbTitle.Text = "Ground Truth";
+                generator.DrawTarget = DrawTarget.Truth;
+                lbTitleX.Text = "Ground Truth";
+                generator.TestModel();
             }
             else
             {
-                drawable.DrawTarget = DrawTarget.Mutated;
-                lbTitle.Text = "Color Adjust";
+                generator.DrawTarget = DrawTarget.Predictions;
+                lbTitleX.Text = "Color Adjust Inference";
                 var stdDev = e.NewValue * 0.0006f;
-                drawable.RecolorDesigns(drawable.Mutated, stdDev);
-                Console.WriteLine("val: " + stdDev);
+                generator.RecolorDesigns(generator.Mutated, stdDev);
+                if (dbuf)
+                {
+                    generator.TestModel();
+                    lbColor.Text = "Color Variation (stdDev): " + stdDev.ToString("F4");
+                }
+                dbuf = !dbuf;
+                Console.WriteLine("val: " + generator.Mutated[0].BoxesRef[0].ColorOffset);
             }
             Invalidate();
         }
