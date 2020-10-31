@@ -1,6 +1,6 @@
 ﻿namespace MLTest
 {
-    partial class Form1
+    partial class GeneratorForm
     {
         /// <summary>
         /// Required designer variable.
@@ -33,6 +33,7 @@
             this.slLayout = new System.Windows.Forms.HScrollBar();
             this.lbColor = new System.Windows.Forms.Label();
             this.lbLayout = new System.Windows.Forms.Label();
+            this.btNext = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lbTitleX
@@ -66,7 +67,7 @@
             // lbColor
             // 
             this.lbColor.AutoSize = true;
-            this.lbColor.Location = new System.Drawing.Point(12, 578);
+            this.lbColor.Location = new System.Drawing.Point(12, 574);
             this.lbColor.Name = "lbColor";
             this.lbColor.Size = new System.Drawing.Size(113, 20);
             this.lbColor.TabIndex = 3;
@@ -75,17 +76,31 @@
             // lbLayout
             // 
             this.lbLayout.AutoSize = true;
-            this.lbLayout.Location = new System.Drawing.Point(811, 578);
+            this.lbLayout.Location = new System.Drawing.Point(811, 574);
             this.lbLayout.Name = "lbLayout";
             this.lbLayout.Size = new System.Drawing.Size(124, 20);
             this.lbLayout.TabIndex = 4;
             this.lbLayout.Text = "Layout Variation";
+            // 
+            // btNext
+            // 
+            this.btNext.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.btNext.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btNext.Location = new System.Drawing.Point(1043, 6);
+            this.btNext.Name = "btNext";
+            this.btNext.Size = new System.Drawing.Size(75, 35);
+            this.btNext.TabIndex = 5;
+            this.btNext.TabStop = false;
+            this.btNext.Text = "Next";
+            this.btNext.UseVisualStyleBackColor = true;
+            this.btNext.Click += new System.EventHandler(this.btNext_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1128, 644);
+            this.Controls.Add(this.btNext);
             this.Controls.Add(this.lbLayout);
             this.Controls.Add(this.lbColor);
             this.Controls.Add(this.slLayout);
@@ -93,6 +108,7 @@
             this.Controls.Add(this.lbTitleX);
             this.Name = "Form1";
             this.Text = "Form1";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -105,6 +121,7 @@
         private System.Windows.Forms.HScrollBar slLayout;
         private System.Windows.Forms.Label lbColor;
         private System.Windows.Forms.Label lbLayout;
+        private System.Windows.Forms.Button btNext;
     }
 }
 

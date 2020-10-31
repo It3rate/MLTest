@@ -10,21 +10,25 @@ using System.Windows.Forms;
 
 namespace MLTest
 {
-    public partial class Form1 : Form
+    public partial class GeneratorForm : Form
     {
-        DesignGenerator generator;
-        public Form1()
+        public DesignGenerator Generator { get; set; }
+        public DrawTarget CurrentDrawTarget = DrawTarget.Truth;
+
+        public List<Design> _mutated;
+        public List<Design> _targets;
+        public List<Design> _predictions;
+
+        public GeneratorForm()
         {
             InitializeComponent();
             DoubleBuffered = true;
             //var t = new Test1(this);
-            generator = new DesignGenerator(false, true);
-        }
+            Generator = new DesignGenerator(false, true);
 
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            base.OnPaint(e);
-            generator.OnDraw(e.Graphics);
+            _mutated = Generator.Mutated;
+            _targets = Generator.Targets;
+            _predictions = Generator.Predictions;
         }
 
         protected override void OnMouseDown(MouseEventArgs e)
@@ -32,22 +36,22 @@ namespace MLTest
             base.OnMouseDown(e);
             if(e.Button == MouseButtons.Middle)
             {
-                generator.GenerateLocalData();
+                Generator.GenerateLocalData(50);
                 lbTitleX.Text = "Refresh";
             }
             else
             {
                 //drawable.TransformAll();
-                generator.DrawTarget = (e.Button == MouseButtons.Left) ? DrawTarget.Mutated : DrawTarget.Predictions;
+                CurrentDrawTarget = (e.Button == MouseButtons.Left) ? DrawTarget.Mutated : DrawTarget.Predictions;
 
-                lbTitleX.Text = (generator.DrawTarget == DrawTarget.Mutated) ? "Mutated Data" : "Predictions";
+                lbTitleX.Text = (CurrentDrawTarget == DrawTarget.Mutated) ? "Mutated Data" : "Predictions";
             }
             Invalidate();
         }
         protected override void OnMouseUp(MouseEventArgs e)
         {
             base.OnMouseUp(e);
-            generator.DrawTarget = DrawTarget.Truth;
+            CurrentDrawTarget = DrawTarget.Truth;
             lbTitleX.Text = "Ground Truth";
             Invalidate();
         }
@@ -61,26 +65,79 @@ namespace MLTest
         {
             if (e.Type == ScrollEventType.EndScroll)
             {
-                generator.DrawTarget = DrawTarget.Truth;
+                CurrentDrawTarget = DrawTarget.Truth;
                 lbTitleX.Text = "Ground Truth";
-                generator.TestModel();
+                Generator.TestModel();
             }
             else
             {
-                generator.DrawTarget = DrawTarget.Predictions;
+                CurrentDrawTarget = DrawTarget.Predictions;
                 lbTitleX.Text = "Color Adjust Inference";
                 var stdDev = e.NewValue * 0.0006f;
-                generator.RecolorDesigns(generator.Mutated, stdDev);
+                Generator.RecolorDesigns(_mutated, stdDev);
                 if (dbuf)
                 {
-                    generator.TestModel();
+                    Generator.TestModel();
                     lbColor.Text = "Color Variation (stdDev): " + stdDev.ToString("F4");
                 }
                 dbuf = !dbuf;
-                Console.WriteLine("val: " + generator.Mutated[0].BoxesRef[0].ColorOffset);
+                Console.WriteLine("val: " + _mutated[0].BoxesRef[0].ColorOffset);
             }
             Invalidate();
         }
 
+        private void btNext_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            Program._interactForm.DesktopLocation = this.DesktopLocation;
+            Program._interactForm.Show();
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+            OnDraw(e.Graphics);
+        }
+
+        public void OnDraw(Graphics g)
+        {
+            var toDraw = CurrentDrawTarget == DrawTarget.Truth ? _targets : CurrentDrawTarget == DrawTarget.Mutated ? _mutated : _predictions;
+            for (int i = 0; i < toDraw.Count; i++)
+            {
+                var state = g.Save();
+                ScaleTranslateTo(i, g);
+                toDraw[i].Draw(g);
+                g.Restore(state);
+            }
+
+            ScaleTranslateTo(toDraw.Count, g);
+        }
+
+        private void ScaleTranslateTo(int index, Graphics g)
+        {
+            int orgX = 50;
+            int orgY = 30;
+            int cols = 10;
+            float w = 50;
+            float h = 50;
+            float marg = 20;
+            float left = (index % cols) * (w + marg) + orgX;
+            float top = (int)(index / cols) * (h + marg) + orgY;
+            g.ScaleTransform(w, h);
+            g.TranslateTransform(left / w, top / h);
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Application.Exit();
+        }
     }
+
+    public enum DrawTarget
+    {
+        Truth,
+        Mutated,
+        Predictions,
+    }
+
 }

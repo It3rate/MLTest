@@ -26,23 +26,22 @@ namespace MLTest
             {
                 if(_tfModel == null)
                 {
-                        mlContext = new MLContext();
-                        _tfModel = mlContext.Model.LoadTensorFlowModel("D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/frozenBoxModel.pb");
-                        //DataViewSchema schema = TFModel.GetModelSchema();
-                        //var featuresType = (VectorDataViewType)schema["layoutInput"].Type;
-                        //var predictionType = (VectorDataViewType)schema["Identity"].Type;
+                    mlContext = new MLContext();
+                    _tfModel = mlContext.Model.LoadTensorFlowModel("D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/frozenBoxModel.pb");
+                    //DataViewSchema schema = TFModel.GetModelSchema();
+                    //var featuresType = (VectorDataViewType)schema["layoutInput"].Type;
+                    //var predictionType = (VectorDataViewType)schema["Identity"].Type;
                 }
                 return _tfModel;
             }
         }
 
         public List<Design> Mutated = new List<Design>();
-        List<Design> targets = new List<Design>();
+        public List<Design> Targets = new List<Design>();
         public List<Design> Predictions = new List<Design>();
 
         Random rnd = new Random();
 
-        public DrawTarget DrawTarget = DrawTarget.Truth;
 
         public DesignGenerator(bool train, bool useModelData)
         {
@@ -57,20 +56,21 @@ namespace MLTest
             }
             else
             {
-                GenerateLocalData();
+                GenerateLocalData(50);
             }
             TestModel();
         }
 
         public void LoadTFData()
         {
-            Mutated = LoadData("D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/", "testInputs.txt");
-            targets = LoadData("D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/", "testTargets.txt");
-            Predictions = LoadData("D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/", "testPredictions.txt");
+             LoadData("D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/", "testInputs.txt", Mutated);
+             LoadData("D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/", "testTargets.txt", Targets);
+             LoadData("D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/", "testPredictions.txt", Predictions);
         }
-        public List<Design> LoadData(string folder, string inputFile)
+
+        public void LoadData(string folder, string inputFile, List<Design> container)
         {
-            var result = new List<Design>();
+            container.Clear();
             float val;
             IEnumerable<float> vals;
             StreamReader reader = new StreamReader(folder + inputFile);
@@ -79,25 +79,26 @@ namespace MLTest
                 var line = reader.ReadLine();
                 var values = line.Split(',');
                 vals = values.Select(str => float.TryParse(str, out val) ? val : 0);
-                result.Add(new Design(3, vals.ToArray()));
+                container.Add(new Design(3, vals.ToArray()));
             }
             reader.Close();
-            return result;
         }
+
         public void GenerateTrainingData()
         {
             GenerateDataAt(100000, "D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/", "bx3_input.txt", "bx3_target.txt");
         }
-        public void GenerateLocalData()
+
+        public void GenerateLocalData(int count)
         {
-            targets.Clear();
+            Targets.Clear();
             Mutated.Clear();
             Predictions.Clear();
-            for (int i = 0; i < 50; i++)
+            for (int i = 0; i < count; i++)
             {
-                targets.Add(GenLayout());
+                Targets.Add(GenLayout());
             }
-            Mutated = TransformAll(targets);
+            TransformAll(Targets, Mutated);
             if (runModelOnNewData)
             {
                 TestModel();
@@ -105,6 +106,7 @@ namespace MLTest
 
             baseColor = new HSL((float)rnd.NextDouble(), (float)rnd.NextDouble(), (float)rnd.NextDouble());
         }
+
         bool runModelOnNewData = false;
         public void TestModel(List<Design> mutatedInput = null, List<Design> outputPredictions = null)
         {
@@ -162,16 +164,17 @@ namespace MLTest
                 Design.ColorBoxesWithOffset(design, stdDev);
             }
         }
-        public List<Design> TransformAll(List<Design> input)
+
+        public void TransformAll(List<Design> input, List<Design> container)
         {
-            var result = new List<Design>();
+            container.Clear();
             for (int i = 0; i < input.Count; i++)
             {
-                result.Add(Transform(input[i]));
+                container.Add(Transform(input[i]));
             }
-            RecolorDesigns(result);
-            return result;
+            RecolorDesigns(container);
         }
+
         TruncatedGaussian colTransformOffset = new TruncatedGaussian(0, 0.06, -0.2, 0.2);
         //Gaussian colTransformOffset = new Gaussian(0, 0.01);
         private Design Transform(Design bx)
@@ -191,41 +194,6 @@ namespace MLTest
             return result;
         }
 
-        public void OnDraw(Graphics g)
-        {
-            var toDraw = DrawTarget == DrawTarget.Truth ? targets : DrawTarget == DrawTarget.Mutated ? Mutated : Predictions;
-            for (int i = 0; i < toDraw.Count; i++)
-            {
-                var state = g.Save();
-                ScaleTranslateTo(i, g);
-                toDraw[i].Draw(g);
-                g.Restore(state);
-            }
-
-            ScaleTranslateTo(toDraw.Count, g);
-        }
-
-        private void ScaleTranslateTo(int index, Graphics g)
-        {
-            int orgX = 50;
-            int orgY = 30;
-            int cols = 10;
-            float w = 50;
-            float h = 50;
-            float marg = 20;
-            float left = (index % cols) * (w + marg) + orgX;
-            float top = (int)(index / cols) * (h + marg) + orgY;
-            g.ScaleTransform(w, h);
-            g.TranslateTransform(left / w, top / h);
-        }
-    }
-
-
-    public enum DrawTarget
-    {
-        Truth,
-        Mutated,
-        Predictions,
     }
 
     public class LayoutInput

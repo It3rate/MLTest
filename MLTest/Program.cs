@@ -10,6 +10,9 @@ namespace MLTest
 {
     static class Program
     {
+        public static GeneratorForm _generatorForm;
+        public static InteractForm _interactForm;
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -18,7 +21,13 @@ namespace MLTest
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+
+            _generatorForm = new GeneratorForm();
+            _generatorForm.Hide();
+
+            _interactForm = new InteractForm(_generatorForm.Generator);
+
+            Application.Run(_generatorForm);
         }
 
     }
