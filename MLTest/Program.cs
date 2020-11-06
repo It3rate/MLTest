@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.ML.Data;
 using MLTest.Forms;
-using MLTest.Primitives;
+using MLTest.Tylox;
 
 namespace MLTest
 {

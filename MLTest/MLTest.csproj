@@ -375,11 +375,14 @@
     <Compile Include="Forms\InteractForm.Designer.cs">
       <DependentUpon>InteractForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Primitives\TyloxGenerator.cs" />
+    <Compile Include="Tylox\AnchorSegment.cs" />
+    <Compile Include="Tylox\BaseSegment.cs" />
+    <Compile Include="Tylox\TyloxGenerator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ML\Regress.cs" />
     <Compile Include="ML\Test1.cs" />
+    <Compile Include="Tylox\TyloxSegment.cs" />
     <EmbeddedResource Include="Forms\GeneratorForm.resx">
       <DependentUpon>GeneratorForm.cs</DependentUpon>
     </EmbeddedResource>

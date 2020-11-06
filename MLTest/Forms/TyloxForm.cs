@@ -1,9 +1,10 @@
-﻿using MLTest.Primitives;
+﻿using MLTest.Tylox;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,6 +26,7 @@ namespace MLTest.Forms
 
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
+            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
             OnDraw(e.Graphics);
         }
 
@@ -36,7 +38,7 @@ namespace MLTest.Forms
             
             g.ScaleTransform(w, h);
             //g.TranslateTransform(1f,1f); // center at 0,0, box is -1 to 1
-            _tylox.Draw(g);
+            _tylox.Draw(w, g);
             g.Restore(state);
         }
 
