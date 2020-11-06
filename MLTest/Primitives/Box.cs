@@ -50,6 +50,16 @@ namespace MLTest
 
             Color = hsl;
         }
+        public bool IsZeroed;
+        public void ZeroPositions()
+        {
+            IsZeroed = true;
+            Cx = 0f;
+            Cy = 0f;
+            Rx = 0f;
+            Ry = 0f;
+        }
+
         public float[] InputArray()
         {
             return new float[] { Cx, Cy, Rx, Ry, ColorOffset};
@@ -73,7 +83,14 @@ namespace MLTest
 
         public void InputSerialize(StreamWriter sw)
         {
-            sw.Write(String.Format("{0:0.000},{1:0.000},{2:0.000},{3:0.000},{4:0.000}", Cx, Cy, Rx, Ry, ColorOffset));
+            if(IsZeroed)
+            {
+                sw.Write(String.Format("{0:0.000}", ColorOffset));
+            }
+            else
+            {
+                sw.Write(String.Format("{0:0.000},{1:0.000},{2:0.000},{3:0.000},{4:0.000}", Cx, Cy, Rx, Ry, ColorOffset));
+            }
         }
         public void TargetSerialize(StreamWriter sw)
         {

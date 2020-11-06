@@ -24,7 +24,7 @@ namespace MLTest
             InitializeComponent();
             DoubleBuffered = true;
             //var t = new Test1(this);
-            Generator = new DesignGenerator(false, true);
+            Generator = new DesignGenerator();
 
             _mutated = Generator.Mutated;
             _targets = Generator.Targets;
@@ -89,8 +89,8 @@ namespace MLTest
         private void btNext_Click(object sender, EventArgs e)
         {
             this.Hide();
-            Program._interactForm.DesktopLocation = this.DesktopLocation;
-            Program._interactForm.Show();
+            Program._tyloxForm.DesktopLocation = this.DesktopLocation;
+            Program._tyloxForm.Show();
         }
 
         protected override void OnPaint(PaintEventArgs e)

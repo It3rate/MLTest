@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.ML.Data;
+using MLTest.Forms;
+using MLTest.Primitives;
 
 namespace MLTest
 {
@@ -12,6 +14,7 @@ namespace MLTest
     {
         public static GeneratorForm _generatorForm;
         public static InteractForm _interactForm;
+        public static TyloxForm _tyloxForm;
 
         /// <summary>
         /// The main entry point for the application.
@@ -26,8 +29,13 @@ namespace MLTest
             _generatorForm.Hide();
 
             _interactForm = new InteractForm(_generatorForm.Generator);
+            _interactForm.Hide();
 
-            Application.Run(_generatorForm);
+            _tyloxForm = new TyloxForm(new TyloxGenerator());
+            _tyloxForm.Hide();
+
+            // Application.Run(_generatorForm);
+            Application.Run(_tyloxForm);
         }
 
     }

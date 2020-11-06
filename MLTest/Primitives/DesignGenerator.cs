@@ -3,6 +3,7 @@ using Microsoft.ML;
 using Microsoft.ML.Data;
 using Microsoft.ML.Probabilistic.Distributions;
 using Microsoft.ML.Transforms;
+using Microsoft.ML.Transforms.Onnx;
 using Numpy;
 using System;
 using System.CodeDom.Compiler;
@@ -13,6 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Media;
 
 namespace MLTest
 {
@@ -20,19 +22,40 @@ namespace MLTest
     {
         private static MLContext mlContext;
         private static TensorFlowModel _tfModel;
+        private static OnnxScoringEstimator _onnxModel;
+        private static bool useTransformerModel = true;
         public static TensorFlowModel TFModel
         {
             get
             {
                 if(_tfModel == null)
                 {
-                    mlContext = new MLContext();
-                    _tfModel = mlContext.Model.LoadTensorFlowModel("D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/frozenBoxModel.pb");
-                    //DataViewSchema schema = TFModel.GetModelSchema();
-                    //var featuresType = (VectorDataViewType)schema["layoutInput"].Type;
-                    //var predictionType = (VectorDataViewType)schema["Identity"].Type;
+                    var dir = useTransformerModel ? "boxTransformer" : "boxModel";
+                    var file = useTransformerModel ? "frozenTransformerModel" : "frozenBoxModel";
+                    _tfModel = mlContext.Model.LoadTensorFlowModel("D:/tmp/Python/PythonApplication1/PythonApplication1/" + dir + "/" + file + ".pb");
+                    DataViewSchema schema = _tfModel.GetModelSchema();
+                    var featuresType = (VectorDataViewType)schema["layoutInput"].Type;
+                    var predictionType = (VectorDataViewType)schema["Identity"].Type;
+                    Console.WriteLine(schema);
                 }
                 return _tfModel;
+            }
+        }
+
+        public static OnnxScoringEstimator OnnxModel
+        {
+            get
+            {
+                if (_onnxModel == null)
+                {
+                    var dir = useTransformerModel ? "boxTransformer" : "boxModel";
+                    var file = useTransformerModel ? "frozenTransformerModel" : "frozenBoxModel";
+                    var fullPath = "D:/tmp/Python/PythonApplication1/PythonApplication1/" + dir + "/" + file + ".onnx";
+                    _onnxModel = mlContext.Transforms.ApplyOnnxModel(fullPath);
+
+                    Console.WriteLine(_onnxModel);
+                }
+                return _onnxModel;
             }
         }
 
@@ -42,10 +65,13 @@ namespace MLTest
 
         Random rnd = new Random();
 
-
-        public DesignGenerator(bool train, bool useModelData)
+        private bool _genTrainData = false;
+        private int _trainDataCount = 80000;
+        private bool useModelData = false;
+        public DesignGenerator()
         {
-            if (train)
+            mlContext = new MLContext();
+            if (_genTrainData)
             {
                 GenerateTrainingData();
             }
@@ -86,7 +112,7 @@ namespace MLTest
 
         public void GenerateTrainingData()
         {
-            GenerateDataAt(100000, "D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/", "bx3_input.txt", "bx3_target.txt");
+            GenerateDataAt(_trainDataCount, "D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/", "bx3_input.txt", "bx3_target.txt");
         }
 
         public void GenerateLocalData(int count)
@@ -107,6 +133,7 @@ namespace MLTest
             baseColor = new HSL((float)rnd.NextDouble(), (float)rnd.NextDouble(), (float)rnd.NextDouble());
         }
 
+        private bool _useOnnx = true;
         bool runModelOnNewData = false;
         public void TestModel(List<Design> mutatedInput = null, List<Design> outputPredictions = null)
         {
@@ -114,11 +141,21 @@ namespace MLTest
             outputPredictions = outputPredictions ?? Predictions;
 
             runModelOnNewData = true;
+            var inputs = LayoutInput.GetInputs(mutatedInput);
+            var dataView = mlContext.Data.LoadFromEnumerable(inputs);
+            IDataView transformedValues;
 
-            var pipeline = TFModel.ScoreTensorFlowModel( new[] { nameof(LayoutOutput.Identity) },new[] { nameof(LayoutInput.layoutInput) }, false);
-            var dataView = mlContext.Data.LoadFromEnumerable(LayoutInput.GetInputs(Mutated));
-            var estimator = pipeline.Fit(dataView);
-            var transformedValues = estimator.Transform(dataView);
+            if (_useOnnx)
+            {
+                var onnxTransformer = OnnxModel.Fit(dataView);
+                transformedValues = onnxTransformer.Transform(dataView);
+            }
+            else // tensorflow
+            {
+                var pipeline = TFModel.ScoreTensorFlowModel(new[] { nameof(LayoutOutput.Identity) }, new[] { nameof(LayoutInput.layoutInput) }, false);
+                var estimator = pipeline.Fit(dataView);
+                transformedValues = estimator.Transform(dataView);
+            }
 
             var outScores = mlContext.Data.CreateEnumerable<LayoutOutput>(transformedValues, reuseRowObject: false);
             outputPredictions.Clear(); 
@@ -127,11 +164,9 @@ namespace MLTest
                 //Console.WriteLine(string.Join(",", prediction.Identity));
                 outputPredictions.Add(new Design(3, prediction.Identity));
             }
-            //tensorFlowModel.Dispose();
         }
 
-        Gaussian vGaussian = new Gaussian(0.5, 0.007);
-        Gaussian nudgeGaussian = new Gaussian(0, 0.005);
+        Gaussian vGaussian = new Gaussian(0.5, 0.009);
         HSL baseColor = new HSL(0.9f, 0.7f, 0.3f);
 
         public Design GenLayout() => Design.GenLayout3((float)vGaussian.Sample(), (float)vGaussian.Sample());
@@ -176,21 +211,30 @@ namespace MLTest
         }
 
         TruncatedGaussian colTransformOffset = new TruncatedGaussian(0, 0.06, -0.2, 0.2);
+        Gaussian nudgeGaussian = new Gaussian(0, 0.001);
         //Gaussian colTransformOffset = new Gaussian(0, 0.01);
-        private Design Transform(Design bx)
+        private Design Transform(Design design)
         {
-            var result = bx.Clone();
+            var result = design.Clone();
+            int smallestIndex = result.SmallestIndex();
 
             for (int i = 0; i < result.Count; i++)
             {
-                result[i].Cx += (float)nudgeGaussian.Sample();
-                result[i].Cy += (float)nudgeGaussian.Sample();
-                result[i].Rx += (float)nudgeGaussian.Sample();
-                result[i].Ry += (float)nudgeGaussian.Sample();
+                bool zeroPos = false;// (i == smallestIndex);
+                if (zeroPos)
+                {
+                    result[i].ZeroPositions();
+                }
+                else
+                {
+                    result[i].Cx += (float)nudgeGaussian.Sample();
+                    result[i].Cy += (float)nudgeGaussian.Sample();
+                    result[i].Rx += (float)nudgeGaussian.Sample();
+                    result[i].Ry += (float)nudgeGaussian.Sample();
+                }
                 // no need to transform color because it is already aproximated using variation and color offset in the input format
                 //result[i].ColorOffset += (float)colTransformOffset.Sample();
             }
-
             return result;
         }
 

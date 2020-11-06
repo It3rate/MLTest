@@ -72,7 +72,9 @@ namespace MLTest
 
             var boxes = result.BoxesRef;
 
-            bool wideBot = v > 0.5;
+            h = (float)((Math.Abs(h) + 0.1) * Math.Sign(h));
+            v = (float)((Math.Abs(v) + 0.1) * Math.Sign(v));
+            bool wideBot = rnd.NextDouble() > 0.5;
             boxes[0].Cx = 0.5f;
             boxes[0].Cy = wideBot ? v / 2.0f : 1f - (1f - v) / 2.0f;
             boxes[0].Rx = 0.5f;
@@ -89,12 +91,12 @@ namespace MLTest
             boxes[2].Ry = boxes[1].Ry;
 
             ColorBoxesWithOffset(result, 0.03f);
-
+            boxes.Shuffle();
             if (rnd.NextDouble() > 0.5)
             {
                 result.Rotate();
             }
-            boxes.Shuffle();
+
             return result;
 
         }
@@ -146,6 +148,22 @@ namespace MLTest
                 box.Rx = temp;
             }
         }
+
+        public int SmallestIndex()
+        {
+            int result = 0;
+            float min = float.MaxValue;
+            for (int i = 0; i < _boxes.Length; i++)
+            {
+                var val = _boxes[i].Rx * _boxes[i].Ry;
+                if(val < min)
+                {
+                    result = i;
+                    min = val;
+                }
+            }
+            return result;
+        }
         public Design Clone()
         {
             var result = new Design(_boxes.Length);
@@ -191,8 +209,9 @@ namespace MLTest
             List<float> vals = new List<float>();
             vals.Add(Variation);
             vals.AddRange(BaseColor.AsArray());
-            foreach (var box in _boxes)
+            for (int i = 0; i < _boxes.Length; i++)
             {
+                var box = _boxes[i];
                 vals.AddRange(box.InputArray());
             }
             return vals.ToArray();
