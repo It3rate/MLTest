@@ -44,7 +44,7 @@ namespace MLTest.Tylox
             }
             return result;
         }
-        public void Draw(Pen pen, Graphics g)
+        public virtual void Draw(Pen pen, Graphics g)
         {
             g.DrawLine(pen, Start, End);
         }

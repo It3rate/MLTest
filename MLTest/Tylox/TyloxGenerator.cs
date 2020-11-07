@@ -40,13 +40,13 @@ namespace MLTest.Tylox
             var vert = AddSegment(new AnchorSegment(0.5f, .1f, 0.5f, .9f, penIndex: (int)PenTypes.LightGray));
             var horz = AddSegment(new AnchorSegment(0.1f, .9f, 0.9f, .9f, penIndex: (int)PenTypes.LightGray));
             
-            AddSegment(new TyloxSegment(vert, crossSlide: 0.0f, pos: 0.4f, len: 0.3f, angle: 0.25f, penIndex: (int)PenTypes.Black));
-            AddSegment(new TyloxSegment(vert, crossSlide: 0.0f, pos: 0.4f, len: 0.2f, angle: 0.50f, penIndex: (int)PenTypes.Black));
-            AddSegment(new TyloxSegment(vert, crossSlide: 0.0f, pos: 0.4f, len: 0.3f, angle: 0.75f, penIndex: (int)PenTypes.Black));
-            
-            AddSegment(new TyloxSegment(vert, crossSlide: 0.5f, pos: 0.75f, len: 0.3f, angle: 0.5f, penIndex: (int)PenTypes.DarkBlue));
-            AddSegment(new TyloxSegment(horz, crossSlide: 0f, pos: 1, len: 0.4f, angle: -0.3f, penIndex: (int)PenTypes.Orange));
-            AddSegment(new TyloxSegment(horz, crossSlide: 0f, pos: 0f, len: 0.4f, angle: 0.3f, penIndex: (int)PenTypes.DarkRed));
+            AddSegment(new TyloxSegment(vert, offset:0, crossSlide: 0.0f, pos: 0.4f, len: 0.3f, angle: 0.25f, penIndex: (int)PenTypes.Black));
+            AddSegment(new TyloxSegment(vert, offset:0.2f, crossSlide: 0.0f, pos: 0.4f, len: 0.2f, angle: 0.50f, penIndex: (int)PenTypes.Black));
+            AddSegment(new TyloxSegment(vert, offset:0, crossSlide: 0.0f, pos: 0.4f, len: 0.3f, angle: 0.75f, penIndex: (int)PenTypes.Black));
+                                              
+            AddSegment(new TyloxSegment(vert, offset:0, crossSlide: 0.5f, pos: 0.75f, len: 0.3f, angle: 0.5f, penIndex: (int)PenTypes.DarkBlue));
+            AddSegment(new TyloxSegment(horz, offset:0.1f, crossSlide: 0f, pos: 1, len: 0.4f, angle: -0.3f, penIndex: (int)PenTypes.Orange));
+            AddSegment(new TyloxSegment(horz, offset:0.1f, crossSlide: 0f, pos: 0f, len: 0.4f, angle: 0.3f, penIndex: (int)PenTypes.DarkRed));
         }
 
         private int AddSegment(BaseSegment seg)
