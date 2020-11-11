@@ -383,6 +383,7 @@
     <Compile Include="ML\Regress.cs" />
     <Compile Include="ML\Test1.cs" />
     <Compile Include="Tylox\TyloxSegment.cs" />
+    <Compile Include="Tylox\TyloxShape.cs" />
     <EmbeddedResource Include="Forms\GeneratorForm.resx">
       <DependentUpon>GeneratorForm.cs</DependentUpon>
     </EmbeddedResource>

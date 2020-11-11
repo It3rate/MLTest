@@ -21,7 +21,6 @@ namespace MLTest.Tylox
 
         public TyloxSegment(int parentId = 0, float offset = 0, float crossSlide = 0, float pos = 0, float len = 1, float angle = 0, int penIndex = 0) : base(parentId, penIndex)
         {
-            Id = idCounter++;
             Offset = offset;
             Position = pos;
             AbsLength = len;
@@ -47,7 +46,7 @@ namespace MLTest.Tylox
                 float anchorX = p.Start.X + xDif * Position + xOffset;
                 float anchorY = p.Start.Y + yDif * Position + yOffset;
                 Center = new PointF(anchorX, anchorY);
-                float rLen = AbsLength * p.Length;
+                float rLen = AbsLength;// * p.Length;
                 float posCross = rLen * CrossSlide;
                 float negCross = (rLen - posCross);
                 Start = new PointF(anchorX + sin * -negCross, anchorY + cos * -negCross);

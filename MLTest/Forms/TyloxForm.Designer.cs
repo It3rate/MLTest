@@ -37,7 +37,7 @@
             // 
             this.btNext.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
             this.btNext.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btNext.Location = new System.Drawing.Point(739, 11);
+            this.btNext.Location = new System.Drawing.Point(691, 11);
             this.btNext.Margin = new System.Windows.Forms.Padding(2);
             this.btNext.Name = "btNext";
             this.btNext.Size = new System.Drawing.Size(50, 23);

@@ -32,10 +32,6 @@ namespace MLTest
             _predictions = _generator.Predictions;
         }
 
-        private void Refresh()
-        {
-
-        }
         private void btNext_Click(object sender, EventArgs e)
         {
             this.Hide();
