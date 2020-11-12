@@ -39,16 +39,6 @@ namespace MLTest.Tylox
         {
             AddRect(Segments, .1f, .1f, .9f, .9f);
             AddRect(Segments, .3f, .4f, .7f, .6f);
-            //var vert = AddSegment(new AnchorSegment(0.5f, .1f, 0.5f, .9f, penIndex: (int)PenTypes.LightGray));
-            //var horz = AddSegment(new AnchorSegment(0.1f, .9f, 0.9f, .9f, penIndex: (int)PenTypes.LightGray));
-
-            //AddSegment(segments, new TyloxSegment(vert, offset:0, crossSlide: 0.0f, pos: 0.4f, len: 0.3f, angle: 0.25f, penIndex: (int)PenTypes.Black));
-            //AddSegment(segments, new TyloxSegment(vert, offset:0.2f, crossSlide: 0.0f, pos: 0.4f, len: 0.2f, angle: 0.50f, penIndex: (int)PenTypes.Black));
-            //AddSegment(segments, new TyloxSegment(vert, offset:0, crossSlide: 0.0f, pos: 0.4f, len: 0.3f, angle: 0.75f, penIndex: (int)PenTypes.Black));
-
-            //AddSegment(segments, new TyloxSegment(vert, offset:0, crossSlide: 0.5f, pos: 0.75f, len: 0.3f, angle: 0.5f, penIndex: (int)PenTypes.DarkBlue));
-            //AddSegment(segments, new TyloxSegment(horz, offset:0.1f, crossSlide: 0f, pos: 1, len: 0.4f, angle: -0.3f, penIndex: (int)PenTypes.Orange));
-            //AddSegment(segments, new TyloxSegment(horz, offset:0.1f, crossSlide: 0f, pos: 0f, len: 0.4f, angle: 0.3f, penIndex: (int)PenTypes.DarkRed));
         }
 
         private void AddRect(List<BaseSegment> segments, float x0, float y0, float x1, float y1)

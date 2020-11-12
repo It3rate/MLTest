@@ -14,8 +14,8 @@ namespace MLTest.Forms
 {
     public partial class TyloxForm : Form
     {
-        TyloxGenerator _tylox;
-        public TyloxForm(TyloxGenerator generator)
+        TyloxRenderer _tylox;
+        public TyloxForm(TyloxRenderer generator)
         {
             InitializeComponent();
 

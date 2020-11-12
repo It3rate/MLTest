@@ -31,7 +31,9 @@ namespace MLTest
             _interactForm = new InteractForm(_generatorForm.Generator);
             _interactForm.Hide();
 
-            _tyloxForm = new TyloxForm(new TyloxGenerator());
+            //_tyloxForm = new TyloxForm(new TyloxGenerator());
+            //_tyloxForm.Hide();
+            _tyloxForm = new TyloxForm(new TyloxRenderer());
             _tyloxForm.Hide();
 
             // Application.Run(_generatorForm);

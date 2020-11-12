@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Windows;
 using PointIndex = System.Int32;
 using ShapeIndex = System.Int32;
@@ -11,8 +13,10 @@ namespace MLTest.Tylox
     public abstract class TyloxPosition
     {
         protected static PointIndex _indexCounter = 0;
-        public PointF Point { get; set; }
+        public PointF AnchorPoint { get; set; }
+        public virtual void SetPoint(TyloxShape parent) { }
     }
+
     public class TyloxPoint : TyloxPosition
     {
         public PointIndex Id { get; }
@@ -20,9 +24,9 @@ namespace MLTest.Tylox
         public TyloxPoint(float x, float y) 
         {
             Id = _indexCounter++;
-            Point = new PointF(x, y);
+            AnchorPoint = new PointF(x, y);
         }
-        public static TyloxPositions CreatePointList(float x, float y, params float[] points)
+        public static TyloxPosition[] CreatePointList(float x, float y, params float[] points)
         {
             var result = new List<TyloxPosition>();
             result.Add(new TyloxPoint(x, y));
@@ -30,9 +34,10 @@ namespace MLTest.Tylox
             {
                 result.Add(new TyloxPoint(points[i], points[i + 1]));
             }
-            return new TyloxPositions(result.ToArray());
+            return result.ToArray();
         }
     }
+
     public class TyloxJoint : TyloxPosition
     {
         public PointIndex Id { get; }
@@ -50,6 +55,7 @@ namespace MLTest.Tylox
         public float Angle { get; set; }    // angle of intersection with endpoint. Set speed to zero if don't care
         public float Speed { get; set; }   // inertia of intersection connection ( probably sets cubic bezier endpoint with angle)
 
+        // this should be in the segment pair data
         public float ZOffset { get; set; }  // pen up (-1) or down (1), use pen up for roughing in and moving to new positions. Needs to ramp somehow __/***\__
                                             // maybe this is just defined as odd up, even down, odd up... always alternating
 
@@ -69,43 +75,70 @@ namespace MLTest.Tylox
             Angle = angle;
             Speed = speed;
         }
-    }
-    public class TyloxPositions
-    {
-        List<TyloxPosition> Positions { get; set; }
-        public TyloxPositions(params TyloxPosition[] positions)
+        public override void SetPoint(TyloxShape parent)
         {
-            Positions = new List<TyloxPosition>(positions);
-        }
-        public TyloxPosition this[int index] => Positions[index];
+            // this will not work until the line is continuous
+            int segIndex = (int)(Position + 0.00001f);
+            float segPos = Position % 1;
 
-        public void CalculatePoints(TyloxShape parent)
-        {
-            foreach (var pos in Positions)
+            var seg = parent.Pairs[segIndex];
+            //int last = parent.Pairs.Count - 1;
+            //var seg = (segIndex < 0) ? parent.Pairs[0] : (segIndex > last) ? parent.Pairs[last] : parent.Pairs[segIndex];
+            var sp = parent.Positions[seg.Start].AnchorPoint;
+            var ep = parent.Positions[seg.End].AnchorPoint;
+            float xOffset = 0;
+            float yOffset = 0;
+            float xDif = ep.X - sp.X;
+            float yDif = ep.Y - sp.Y;
+            if (Offset != 0)
             {
-                if(pos is TyloxJoint joint)
-                {
-                    joint.Point = parent.GetPositionOnPath(joint.Position);
-                }
+                float ang = (float)(Math.Atan2(yDif, xDif));
+                xOffset = (float)(-Math.Sin(ang) * Math.Abs(Offset) * Math.Sign(-Offset));
+                yOffset = (float)(Math.Cos(ang) * Math.Abs(Offset) * Math.Sign(-Offset));
             }
+            AnchorPoint = new PointF(sp.X + (ep.X - sp.X) * segPos + xOffset, sp.Y + (ep.Y - sp.Y) * segPos + yOffset);
         }
     }
+
+    //public class TyloxPositions:IEnumerable<TyloxPosition>
+    //{
+    //    List<TyloxPosition> Positions { get; set; }
+    //    public TyloxPositions(params TyloxPosition[] positions)
+    //    {
+    //        Positions = new List<TyloxPosition>(positions);
+    //    }
+    //    public TyloxPosition this[int index] => Positions[index];
+
+    //    public IEnumerator<TyloxPosition> GetEnumerator()
+    //    {
+    //        return Positions.GetEnumerator();
+    //    }
+
+    //    IEnumerator IEnumerable.GetEnumerator()
+    //    {
+    //        return this.GetEnumerator();
+    //    }
+
+    //}
+
     public struct TyloxPair
     {
         public PointIndex Start { get; }
         public PointIndex End { get; }
-        public TyloxPair(PointIndex start, PointIndex end)
+        public int Pen { get; }
+        public TyloxPair(PointIndex start, PointIndex end, int pen)
         {
             Start = start;
             End = end;
+            Pen = pen;
         }
-        public static List<TyloxPair> CreatePairList(PointIndex start, PointIndex end, params PointIndex[] pairs)
+        public static List<TyloxPair> CreatePairList(PointIndex start, PointIndex end, int pen, params PointIndex[] pairs)
         {
             var result = new List<TyloxPair>();
-            result.Add(new TyloxPair(start, end));
-            for (int i = 0; i < pairs.Length; i += 2)
+            result.Add(new TyloxPair(start, end, pen));
+            for (int i = 0; i < pairs.Length; i += 3)
             {
-                result.Add(new TyloxPair(pairs[i], pairs[i + 1]));
+                result.Add(new TyloxPair(pairs[i], pairs[i + 1], pairs[i + 2]));
             }
             return result;
         }
@@ -121,34 +154,60 @@ namespace MLTest.Tylox
         public ShapeIndex Id { get; }
 
         public TyloxShape Parent { get; private set; }
-        List<TyloxShape> Children { get; }
-        private TyloxPositions Positions { get; }
-        private List<TyloxPair> Pairs { get; }
+        List<TyloxShape> Children { get; } = new List<TyloxShape>();
+        public List<TyloxPosition> Positions { get; }
+        public List<TyloxPair> Pairs { get; }
 
-        public TyloxShape(TyloxPositions positions, List<TyloxPair> pairs)
+        public TyloxShape(TyloxPosition[] positions, List<TyloxPair> pairs)
         {
             Id = _indexCounter++;
-            Positions = positions;
+            Positions = new List<TyloxPosition>(positions);
             Pairs = pairs;
-        }
-        public PointF GetPositionOnPath(float index)
-        {
-            int segIndex = (int)index;
-            float segPos = index % 1;
-            int last = Pairs.Count - 1;
-            var seg = (segIndex < 0) ? Pairs[0] : (segIndex > last) ? Pairs[last] : Pairs[segIndex];
-            var sp = Positions[seg.Start].Point;
-            var ep = Positions[seg.End].Point;
-            return new PointF(sp.X + (ep.X - sp.X) * segPos, sp.Y + (ep.Y - sp.Y) * segPos);
         }
 
         public void AddChild(TyloxShape child)
         {
             Children.Add(child);
             child.Parent = this;
-            child.Positions.CalculatePoints(this);
+            child.CalculatePoints(this);
         }
-        private static TyloxShape CreateBox()
+
+        public void CalculatePoints(TyloxShape parent)
+        {
+            foreach (var pos in Positions)
+            {
+                pos.SetPoint(parent);
+            }
+        }
+        //public PointF[] GetSegmentPoints(int index)
+        //{
+        //    var posPair = Positions[index];
+        //    var st = Parent.Positions[posPair.AnchorPoint];
+        //}
+        public void Draw(List<Pen> pens, Graphics g, int colorIndex)
+        {
+            float r = pens[0].Width * 0.6f;
+            foreach (var pos in Positions)
+            {
+                g.DrawEllipse(pens[0], pos.AnchorPoint.X - r, pos.AnchorPoint.Y - r, r * 2, r * 2);
+            }
+            if(Parent != null)
+            {
+                foreach (var seg in Pairs)
+                {
+                    var p0 = Positions[seg.Start];
+                    var p1 = Positions[seg.End];
+                    var penIndex = seg.Pen == 0 ? 0 : colorIndex;
+                    g.DrawLine(pens[penIndex], p0.AnchorPoint.X, p0.AnchorPoint.Y, p1.AnchorPoint.X, p1.AnchorPoint.Y);
+                }
+            }
+            foreach (var child in Children)
+            {
+                child.Draw(pens, g, colorIndex + 1);
+            }
+        }
+
+        public static TyloxShape CreateBoxx()
         {
             // Add angle and len for semantic reasons when you care, even if not needed.
 
@@ -160,20 +219,48 @@ namespace MLTest.Tylox
             // could even have lower layers do detail like serifs or texture, with a different system for different level of detail.
 
             var positions = TyloxPoint.CreatePointList(0.1f, 0.1f, 0.9f, 0.1f, 0.9f, 0.9f, 0.1f, 0.9f); // TL TR BR BL
-            var pairs = TyloxPair.CreatePairList(0,1,0,3,1,2,3,2); // TLRB
+            var pairs = TyloxPair.CreatePairList(0,1,0,  0,3,0, 1,2,0, 3,2,0); // TLRB
             var root = new TyloxShape(positions, pairs);
 
             var Atop = new TyloxJoint(0.5f, 0, 0, 0f, 0f);
-            var Abl = new TyloxJoint(3.2f, 0, 0, 0f, 0f); 
-            var Abr = new TyloxJoint(3.8f, 0, 0, 0f, 0f);
-            var APairs = TyloxPair.CreatePairList(0, 1, 0, 2); //   / \ 
-            var level1 = new TyloxShape(new TyloxPositions(Atop, Abl, Abr), APairs);
+            var Abl = new TyloxJoint(3.1f, 0, 0, 0f, 0f); 
+            var Abr = new TyloxJoint(3.9f, 0, 0, 0f, 0f);
+            var APairs = TyloxPair.CreatePairList(0, 1, 1,   0, 2, 1); //   / \ 
+            var level1 = new TyloxShape(new TyloxPosition[] { Atop, Abl, Abr }, APairs);
             root.AddChild(level1);
 
-            var ACrossLeft = new TyloxJoint(0.3f, 0, 0, 0.5f, 0f);
-            var ACrossRight = new TyloxJoint(1.3f, 0, 0, -0.5f, 0f);
-            var ACrossPairs = TyloxPair.CreatePairList(0, 1); //   -
-            var level2 = new TyloxShape(new TyloxPositions(ACrossLeft, ACrossRight), APairs);
+            var ACrossLeft = new TyloxJoint(0.6f, 0, 0, 0.5f, 0f);
+            var ACrossRight = new TyloxJoint(1.6f, 0, 0, -0.5f, 0f);
+            var ACrossPairs = TyloxPair.CreatePairList(0, 1, 1); //   -
+            var level2 = new TyloxShape(new TyloxPosition[] { ACrossLeft, ACrossRight }, ACrossPairs);
+            level1.AddChild(level2);
+
+            return root;
+        }
+        public static TyloxShape CreateBox()
+        {
+            // problem is skelton lines aren't mentally continuous, hmmmmmm
+            var maxX = 0.7f;
+            var positions = TyloxPoint.CreatePointList(0.1f, 0.1f, maxX, 0.1f, maxX, 0.9f, 0.1f, 0.9f); // TL TR BR BL
+            var pairs = TyloxPair.CreatePairList(0,1,0, 1,0,0,  0,3,0, 3,1,0,  1,2,0, 2,3,0,  3,2,0, 2,0,0); // T-L-R-B-
+            var root = new TyloxShape(positions, pairs);
+
+            var top = new TyloxJoint(2.0f, 0, 0, 0f, 0f);
+            var bl = new TyloxJoint(3.0f, 0, 0, 0f, 0f);
+            var topB0 = new TyloxPoint(maxX - 0.2f, 0.1f);
+            var topB1 = new TyloxPoint(maxX - 0.2f, 0.5f);
+            var pairs1 = TyloxPair.CreatePairList(0,1,1,  1,2,0,  2,3,0); //  | / *
+            var level1 = new TyloxShape(new TyloxPosition[] { top, bl, topB0, topB1 }, pairs1);
+            root.AddChild(level1);
+
+            var bTop0 = new TyloxJoint(0.0f, 0, 0, 0.5f, 0.5f);
+            var bTop1 = new TyloxJoint(2.5f, 0, 0, 0.5f, 0.5f);
+            var bTop2 = new TyloxJoint(0.5f, 0, 0, 0.5f, 0.5f);
+            var bBot0 = new TyloxJoint(0.5f, 0, 0, 0.5f, 0.6f);
+            var bBot1 = new TyloxJoint(0.75f, maxX - 0.1f, 0, 0.5f, 0.6f);
+            var bBot2 = new TyloxJoint(1.0f, 0, 0, 0.5f, 0.6f);
+            var pairs2 = TyloxPair.CreatePairList(0,1,1, 1,2,1, 2,3,1, 2,3,1, 3,4,1, 4,5,1); //   -
+            var level2 = new TyloxShape(new TyloxPosition[] { bTop0, bTop1, bTop1, bBot0, bBot1, bBot2 }, pairs2);
             level1.AddChild(level2);
 
             return root;
@@ -182,6 +269,59 @@ namespace MLTest.Tylox
 
 
 
+    public class TyloxRenderer
+    {
+        public int Width { get; set; } = 250;
+        public int Height { get; set; } = 250;
+        List<TyloxShape> Shapes = new List<TyloxShape>();
+
+        public TyloxRenderer()
+        {
+            Shapes.Add(TyloxShape.CreateBox());
+        }
+        public void Draw(float scale, Graphics g)
+        {
+            if (Pens.Count == 0)
+            {
+                GenPens(scale);
+            }
+            g.DrawLine(Pens[(int)PenTypes.LightGray], new PointF(-1f, 0), new PointF(1f, 0));
+            g.DrawLine(Pens[(int)PenTypes.LightGray], new PointF(0, -1f), new PointF(0, 1f));
+
+            foreach (var shape in Shapes)
+            {
+                shape.Draw(Pens, g, 0);
+            }
+        }
+
+        private List<Pen> Pens { get; } = new List<Pen>();
+        private enum PenTypes
+        {
+            LightGray,
+            Black,
+            DarkRed,
+            DarkBlue,
+            Orange,
+        }
+        private void GenPens(float scale)
+        {
+            Pens.Add(GetPen(Color.Gray, 2f / scale));
+            Pens.Add(GetPen(Color.Black, 8f / scale));
+            Pens.Add(GetPen(Color.DarkRed, 8f / scale));
+            Pens.Add(GetPen(Color.DarkBlue, 8f / scale));
+            Pens.Add(GetPen(Color.Orange, 8f / scale));
+        }
+        private Pen GetPen(Color color, float width)
+        {
+            var pen = new Pen(color, width);
+            pen.LineJoin = LineJoin.Round;
+            pen.StartCap = LineCap.Round;
+            pen.EndCap = LineCap.Round;
+            return pen;
+        }
+
+
+    }
 
     //public class ITyloxAnchor 
     //{
