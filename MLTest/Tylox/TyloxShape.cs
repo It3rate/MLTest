@@ -144,6 +144,23 @@ namespace MLTest.Tylox
         }
     }
 
+    public class TyloxPrimitive
+    {
+        public List<TyloxPoint> ShapePoints { get; }
+    }
+    public class TyloxWorldSaliency
+    {
+        public List<TyloxPrimitive> Shapes { get; }
+    }
+    public class TyloxAttention
+    {
+        // Sees both imagined positions and joints, as well as line drawn so far.
+        // combine world, 
+        public TyloxWorldSaliency WorldSaliency { get; }
+        public List<TyloxPosition> Positions { get; }
+        public TyloxShape Shape { get; }
+    }
+
     // A shape is any list of strokes that only reference their parent layer. 
     // If a segment requires a built version of the shape to reference location, it must go in a child level.
     // E.g. the tail in K or R should be in a new layer as they reference the shape. 
