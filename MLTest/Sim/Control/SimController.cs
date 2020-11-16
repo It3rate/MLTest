@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace MLTest.Sim
 {
-    public class SimScratchPad
+    // The element that controls the action that was decided upon by the agent.
+    public class SimController
     {
     }
 }

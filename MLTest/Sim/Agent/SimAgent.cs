@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 namespace MLTest.Sim
 {
     /// <summary>
-    /// reference element and prepostions type features to locate/lookup/solve the desired element.
+    /// The mind that holds the focus, memory, reasoning, skills, cummunication and judgement. 
     /// </summary>
-    public class SimLocator
+    public class SimAgent
     {
+        List<SimFocusPad> FocusPads { get; } = new List<SimFocusPad>();
     }
 }

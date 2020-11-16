@@ -375,17 +375,18 @@
     <Compile Include="Forms\InteractForm.Designer.cs">
       <DependentUpon>InteractForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Sim\Primitives\SimWhere.cs" />
-    <Compile Include="Sim\SimActor.cs" />
+    <Compile Include="Sim\Agent\SimSkill.cs" />
+    <Compile Include="Sim\Control\SimRenderer.cs" />
+    <Compile Include="Sim\Primitives\SimZone.cs" />
+    <Compile Include="Sim\Pad\SimWhere.cs" />
+    <Compile Include="Sim\Agent\SimAgent.cs" />
     <Compile Include="Sim\Primitives\SimStroke.cs" />
-    <Compile Include="Sim\SimController.cs" />
-    <Compile Include="Sim\SimFocus.cs" />
+    <Compile Include="Sim\Control\SimController.cs" />
+    <Compile Include="Sim\Pad\SimFocusPad.cs" />
     <Compile Include="Sim\Primitives\SimJoint.cs" />
-    <Compile Include="Sim\SimLocator.cs" />
     <Compile Include="Sim\SimPlanner.cs" />
     <Compile Include="Sim\Primitives\SimPosition.cs" />
     <Compile Include="Sim\Primitives\SimShape.cs" />
-    <Compile Include="Sim\SimScratchPad.cs" />
     <Compile Include="Sim\SimWorld.cs" />
     <Compile Include="Tylox\AnchorSegment.cs" />
     <Compile Include="Tylox\BaseSegment.cs" />
