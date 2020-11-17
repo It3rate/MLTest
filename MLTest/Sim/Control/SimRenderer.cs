@@ -10,7 +10,7 @@ namespace MLTest.Sim
     public class SimRenderer
     {
         public List<Pen> Pens;
-        public void DrawSpot(SimZone spot, Graphics g)
+        public void DrawSpot(SimSection spot, Graphics g)
         {
         }
         public void DrawStroke(SimStroke shape, Graphics g)

@@ -15,16 +15,16 @@ namespace MLTest.Sim
     }
     public class SimAngle : SimOrientation
     {
-        public SimZone Direction { get; set; }
-        public SimZone Radius { get; set; } // negative is away
+        public SimSection Direction { get; set; }
+        public SimSection Radius { get; set; } // negative is away
         public SimAngle(float direction, float radius)
         {
-            Direction = new SimZone(direction);
-            Radius = new SimZone(radius);
+            Direction = new SimSection(direction);
+            Radius = new SimSection(radius);
         }
     }
 
-    public class SimZone : SimOrientation
+    public class SimSection : SimOrientation
     {
         public double Exact { get; }
         private Gaussian _location;
@@ -33,16 +33,24 @@ namespace MLTest.Sim
         private int _sign;
         private SimDirection _startLocator;
 
+        public double Mean { get => _location.GetMean(); }
+        public double Variance { get => _location.GetVariance(); }
+
         public bool IsEndPoint => _encoding == -2 || _encoding == 2;
         public bool IsMidPoint => _encoding == 0;
         public bool IsInnerArea => _encoding == -1 || _encoding == 1;
         public bool IsFirstHalf => _encoding < 0;
         public bool IsLastHalf => _encoding > 0;
 
-        public SimZone(double loc)
+        public SimSection(double loc)
         {
             Exact = loc;
             _location = SetEncoding(loc);
+        }
+        public double Likelihood(double x)
+        {
+            var less = Location.GetProbLessThan(-Math.Abs(x));
+            return Math.Abs(less * 2.0);
         }
         private Gaussian SetEncoding(double n)
         {
@@ -80,9 +88,7 @@ namespace MLTest.Sim
                 mean = 1.0;
                 stdDev = 0.1 / 2.0;
             }
-            return new Gaussian(mean, stdDev);
+            return new Gaussian(mean, stdDev * stdDev);
         }
     }
-
-    public enum SimDirection { Defualt, N, NE, E, SE, S, SW, W, NW, Center }
 }

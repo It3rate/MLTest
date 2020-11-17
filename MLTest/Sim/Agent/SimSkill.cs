@@ -28,5 +28,10 @@ namespace MLTest.Sim
         // evaluate the finished work
         // check for errors, if corrections needed, new cycle for corrections
         // notify base controller of completed letter, wait for next task
+
+        public static void LetterR()
+        {
+            //SimFocusPad pad = new SimFocusPad();
+        }
     }
 }

@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 
 namespace MLTest.Sim
 {
+    public enum SimDirection { Defualt, N, NE, E, SE, S, SW, W, NW, Center }
+
     public class SimWhere
     {
         // Start with just PostionXY
-        public SimPosition Locator { get; }
-        public SimWhere(SimPosition pos) { Locator = pos; }
+        public Sim2DPosition Locator { get; }
+        public SimWhere(Sim2DPosition pos) { Locator = pos; }
 
         // Reference is a SimFocus or ScratchPad
         // Orientation - need to explicitily reorient shape origin in case strokes aren't in expected order.

@@ -9,7 +9,7 @@ namespace MLTest.Sim
 {
     public abstract class SimOrientation { }
 
-    public class SimPosition : SimOrientation
+    public class Sim2DPosition : SimOrientation
     {
         // hold reference: rect, oval, 5grid hex, 9 grid hex (or dynamic sized hex grids)
         // positions are means in a gaussian, sigma is extra variable
@@ -20,16 +20,16 @@ namespace MLTest.Sim
         // Or separate X,Y into start, space mid, space end (10,30,20,30,10)
         // a set of XY choices as gaussians give an area, segment or point
 
-        public SimZone X { get; set; }
-        public SimZone Y { get; set; }
+        public SimSection X { get; set; }
+        public SimSection Y { get; set; }
 
         public double ExactX => X.Exact;
         public double ExactY => Y.Exact;
 
-        public SimPosition(float x, float y)
+        public Sim2DPosition(float x, float y)
         {
-            X = new SimZone(x);
-            Y = new SimZone(y);
+            X = new SimSection(x);
+            Y = new SimSection(y);
         }
     }
 }
