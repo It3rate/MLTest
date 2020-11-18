@@ -74,10 +74,21 @@ namespace MLTest.Sim
                 return anchors.ToArray();
             }
         }
+
+        /// <summary>
+        /// Clone and return stroke oriented top to bottom, or if aproximately horizontal, left to right.
+        /// </summary>
         public SimStroke GetOrientedClone()
         {
             var result = Clone();
-            if(result.Start.AnchorPoint.Y > result.End.AnchorPoint.Y)
+            var start = result.Start.AnchorPoint;
+            var end = result.End.AnchorPoint;
+            // this needs to eventually use the bounds scale of the stroke being tested
+            if (SimUtils.LikelyLess(end.Y, start.Y))
+            {
+                result.FlipEnds();
+            }
+            else if (SimUtils.LikelyEqual(start.Y, end.Y) && SimUtils.LikelyLess(end.X, start.X))
             {
                 result.FlipEnds();
             }

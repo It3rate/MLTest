@@ -56,7 +56,7 @@ namespace MLTest.Sim
         {
             SimStroke result = null;
             double similarity = 0;
-            foreach (var stroke in AllStrokes())
+            foreach (var stroke in AllStrokes(where.ShapeType))
             {
                 double max = SimUtils.ComparePoints(where.Locator.AnchorPoint, stroke.Center);
                 if (max > similarity)
@@ -177,12 +177,22 @@ namespace MLTest.Sim
             // clear bitmap
         }
 
+        public SimShape AddShape()
+        {
+            if(CurrentShape != null)
+            {
+                CurrentShape.ShapeType = SimShapeType.Exisiting;
+            }
+            CurrentShape = new SimShape(SimShapeType.Current);
+            Shapes.Add(CurrentShape);
+            return CurrentShape;
+        }
+
         public void AddStroke(SimStroke stroke)
         {
             if(CurrentShape == null)
             {
-                CurrentShape = new SimShape(SimShapeType.Current);
-                Shapes.Add(CurrentShape);
+                AddShape();
             }
             CurrentShape.AddStroke(stroke);
         }

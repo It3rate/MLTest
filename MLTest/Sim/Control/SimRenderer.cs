@@ -35,30 +35,30 @@ namespace MLTest.Sim
         {
             foreach(var stroke in shape.Strokes)
             {
-                DrawStroke(g, stroke);
+                DrawStroke(g, stroke, (int)shape.ShapeType);
             }
         }
 
-        public void DrawStroke(Graphics g, SimStroke stroke)
+        public void DrawStroke(Graphics g, SimStroke stroke, int penIndex = 0)
         {
             foreach (var point in stroke.Anchors)
             {
-                DrawCircle(g, point);
+                DrawCircle(g, point, 0);
             }
 
             if(stroke.Edges.Count == 0)
             {
-                DrawLine(g, stroke.Start, stroke.End, 1);
+                DrawLine(g, stroke.Start, stroke.End, penIndex);
             }
         }
-        public void DrawSpot(Graphics g, SimSection spot)
+        public void DrawSpot(Graphics g, SimSection spot, int penIndex = 0)
         {
         }
 
-        public void DrawCircle(Graphics g, PointF pos, double scale = 0)
+        public void DrawCircle(Graphics g, PointF pos, int penIndex = 0, double scale = 0)
         {
-            float r = (float)(scale == 0 ? Pens[0].Width * 4f : Pens[0].Width * scale);
-            g.DrawEllipse(Pens[0], pos.X - r, pos.Y - r, r * 2f, r * 2f);
+            float r = (float)(scale == 0 ? Pens[penIndex].Width * 4f : Pens[penIndex].Width * scale);
+            g.DrawEllipse(Pens[penIndex], pos.X - r, pos.Y - r, r * 2f, r * 2f);
         }
 
         public void DrawLine(Graphics g, SimNode p0, SimNode p1, int penIndex = 0)
@@ -78,7 +78,7 @@ namespace MLTest.Sim
         private void GenPens(float scale)
         {
             Pens.Clear();
-            Pens.Add(GetPen(Color.LightGray, 3f / scale));
+            Pens.Add(GetPen(Color.LightGray, 4f / scale));
             Pens.Add(GetPen(Color.Black, 8f / scale));
             Pens.Add(GetPen(Color.DarkRed, 8f / scale));
             Pens.Add(GetPen(Color.DarkBlue, 8f / scale));

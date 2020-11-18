@@ -31,11 +31,31 @@ namespace MLTest.Sim
 
         public static void LetterR(SimFocusPad pad)
         {
-            var left = pad.GetStroke(new SimWhere(SimDirection.E, SimShapeType.PadStructure, SimElementType.Stroke));
-            var tl = new SimNode(left, .1, .2);
-            var bl = new SimNode(left, .9, .2);
-            var l_stroke = new SimStroke(tl, bl);
-            pad.AddStroke(l_stroke);
+            var refStroke = pad.GetStroke(new SimWhere(SimDirection.E, SimShapeType.PadStructure, SimElementType.Stroke));
+            var start = new SimNode(refStroke, .1, .2);
+            var end = new SimNode(refStroke, .9, .2);
+            var newStroke = new SimStroke(start, end);
+            pad.AddStroke(newStroke);
+
+            refStroke = pad.GetStroke(new SimWhere(SimDirection.E, SimShapeType.Current, SimElementType.Stroke));
+            start = new SimNode(refStroke, 0, 0);
+            end = new SimNode(refStroke, 0, .8);
+            newStroke = new SimStroke(start, end);
+            pad.AddStroke(newStroke);
+
+            refStroke = pad.GetStroke(new SimWhere(SimDirection.E, SimShapeType.Current, SimElementType.Stroke));
+            start = new SimNode(refStroke, 0.5, 0);
+            end = new SimNode(refStroke, 0.5, .6);
+            newStroke = new SimStroke(start, end);
+            pad.AddStroke(newStroke);
+
+            refStroke = pad.GetStroke(new SimWhere(SimDirection.E, SimShapeType.Current, SimElementType.Stroke));
+            start = new SimNode(refStroke, 1, 0);
+            end = new SimNode(refStroke, 1, .8);
+            newStroke = new SimStroke(start, end);
+            pad.AddStroke(newStroke);
+
+            pad.AddShape();
         }
     }
 }
