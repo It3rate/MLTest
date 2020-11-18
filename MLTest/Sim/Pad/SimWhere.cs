@@ -6,13 +6,62 @@ using System.Threading.Tasks;
 
 namespace MLTest.Sim
 {
-    public enum SimDirection { Defualt, N, NE, E, SE, S, SW, W, NW, Center }
+    public enum SimDirection { Default, N, NE, E, SE, S, SW, W, NW, Center }
 
+    // maybe just use shape/joint/edge/point similarity?
+    // draw plan on one pad, copy those expectations to what is seen - use the expectations to find new anchors for next step.
     public class SimWhere
     {
         // Start with just PostionXY
-        public Sim2DPosition Locator { get; }
-        public SimWhere(Sim2DPosition pos) { Locator = pos; }
+        public SimNode Locator { get; }
+        public SimShapeType ShapeType { get; }
+        public SimElementType ElementType { get; }
+
+        public SimWhere(SimNode pos, SimShapeType shapeType = SimShapeType.Any, SimElementType elementType = SimElementType.Any)
+        {
+            Locator = pos;
+            ShapeType = shapeType;
+            ElementType = elementType;
+        }
+        public SimWhere(SimDirection dir, SimShapeType shapeType = SimShapeType.Any, SimElementType elementType = SimElementType.Any) : this(NodeFromDirection(dir), shapeType, elementType){ }
+        
+        public static SimNode NodeFromDirection(SimDirection dir)
+        {
+            double x = 0;
+            double y = 0;
+            switch (dir)
+            {
+                case SimDirection.N:
+                    y = -1;
+                    break;
+                case SimDirection.NE:
+                    x = -1;
+                    y = -1;
+                    break;
+                case SimDirection.E:
+                    x = -1;
+                    break;        
+                case SimDirection.SE:
+                    x = -1;
+                    y = 1;
+                    break;
+                case SimDirection.S:
+                    y = 1;
+                    break;
+                case SimDirection.SW:
+                    x = 1;
+                    y = 1;
+                    break;
+                case SimDirection.W:
+                    x = 1;
+                    break;
+                case SimDirection.NW:
+                    x = 1;
+                    y = -1;
+                    break;
+            }
+            return new SimNode(null, x, y);
+        }
 
         // Reference is a SimFocus or ScratchPad
         // Orientation - need to explicitily reorient shape origin in case strokes aren't in expected order.

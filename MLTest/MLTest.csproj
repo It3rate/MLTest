@@ -353,6 +353,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Forms\SimForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\SimForm.Designer.cs">
+      <DependentUpon>SimForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\TyloxForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -376,6 +382,7 @@
       <DependentUpon>InteractForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Sim\Agent\SimSkill.cs" />
+    <Compile Include="Sim\Agent\SimVision.cs" />
     <Compile Include="Sim\Control\SimRenderer.cs" />
     <Compile Include="Sim\Primitives\SimSection.cs" />
     <Compile Include="Sim\Pad\SimWhere.cs" />
@@ -384,8 +391,9 @@
     <Compile Include="Sim\Control\SimController.cs" />
     <Compile Include="Sim\Pad\SimFocusPad.cs" />
     <Compile Include="Sim\Primitives\SimJoint.cs" />
+    <Compile Include="Sim\Primitives\SimUtils.cs" />
     <Compile Include="Sim\SimPlanner.cs" />
-    <Compile Include="Sim\Primitives\Sim2DPosition.cs" />
+    <Compile Include="Sim\Primitives\SimNode.cs" />
     <Compile Include="Sim\Primitives\SimShape.cs" />
     <Compile Include="Sim\SimWorld.cs" />
     <Compile Include="Tylox\AnchorSegment.cs" />
@@ -403,6 +411,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\InteractForm.resx">
       <DependentUpon>InteractForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\SimForm.resx">
+      <DependentUpon>SimForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\TyloxForm.resx">
       <DependentUpon>TyloxForm.cs</DependentUpon>

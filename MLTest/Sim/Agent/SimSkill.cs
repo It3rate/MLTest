@@ -29,9 +29,13 @@ namespace MLTest.Sim
         // check for errors, if corrections needed, new cycle for corrections
         // notify base controller of completed letter, wait for next task
 
-        public static void LetterR()
+        public static void LetterR(SimFocusPad pad)
         {
-            //SimFocusPad pad = new SimFocusPad();
+            var left = pad.GetStroke(new SimWhere(SimDirection.E, SimShapeType.PadStructure, SimElementType.Stroke));
+            var tl = new SimNode(left, .1, .2);
+            var bl = new SimNode(left, .9, .2);
+            var l_stroke = new SimStroke(tl, bl);
+            pad.AddStroke(l_stroke);
         }
     }
 }

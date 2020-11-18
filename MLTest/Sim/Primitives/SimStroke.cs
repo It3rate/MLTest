@@ -8,73 +8,18 @@ using System.Threading.Tasks;
 
 namespace MLTest.Sim
 {
-    public class SimNode
-    {
-        public SimStroke Reference { get; set; } // if reference is null, this is skeleton point, position is x, offset is y
-        public SimSection Position { get; set; }
-        public SimSection Offset { get; set; }   // perpendicular distance from line of reference at intersection point
-
-        public PointF AnchorPoint { get; }
-
-        public SimNode(SimStroke reference, SimSection position, SimSection offset)
-        {
-            Reference = reference;
-            Position = position;
-            Offset = offset;
-            if(Reference == null)
-            {
-                AnchorPoint = new PointF((float)Position.Exact, (float)Offset.Exact);
-            }
-            else
-            {
-                AnchorPoint = Reference.GetPointOnLine(Position.Exact, Offset.Exact);
-            }
-        }
-        public SimNode(SimStroke reference, double position, double offset = 0) : this(reference, new SimSection(position), new SimSection(offset))
-        {
-        }
-
-        public virtual bool IsTip => true;
-
-        public virtual double TouchLikelihood(double x)
-        {
-            // need to account for offset, that is probably job of joint though
-            // x should already be extended from comaparing stroke to touch this section.
-            return Position.Likelihood(x);
-        }
-    }
-
-    public class SimEdge : SimNode
-    {
-        bool _isTip;
-        public override bool IsTip => _isTip;
-
-        // based on segment start/end that this edge is part of.
-        //public SimSection Position { get; set; }
-        //public SimSection Offset { get; set; }   // perpendicular distance from line of reference at intersection point
-        public SimSection CurveAmount { get; set; }// concave [.( is -1<n<0, convex [.) 0<n<1, straight line --- is 0, closed O--- or ---O is -1 (center outside) or 1 (center inside).
-        public SimSection CrossSlide { get; set; } // needed? how much of the curve is at the top vs the bottom (based on segment)
-
-        public SimAngle Angle { get; set; }    // angle of intersection with endpoint. Set speed to zero if don't care
-        public SimSection Speed { get; set; }   // inertia of intersection connection ( probably sets cubic bezier endpoint with angle)
-
-        public SimEdge(SimStroke reference, double position, double offset = 0, double curve = 0, double cross = 0) : base(reference, position, offset)
-        {
-            CurveAmount = new SimSection(curve);
-            CrossSlide = new SimSection(cross);
-            _isTip = Position.Likelihood(0) > 0.01 || Position.Likelihood(1) > 0.01; // todo: account for offset
-        }
-
-    }
-
     // A line, but can also be a more complex bezier, like an S curve or more.
     // Can also be constructed when wanting to focus on part of an object, like the loop part of a 'P'.
     // We don't overtly care about stroke order (unless it matters while creating) because the stroke is always evaluated on inspection
-    public class SimStroke
+    public class SimStroke : SimElement
     {
         public SimNode Start { get; set; }
         public SimNode End { get; set; }
         public List<SimEdge> Edges { get; set; } = new List<SimEdge>(); // straight line if empty
+
+        public SimNode[] EndPoints { get; private set; }
+        public SimNode[] AllElements { get; private set; }
+        public PointF Center { get; private set; }
 
         public double StartAngle { get; protected set; }
         public double EndAngle { get; protected set; }
@@ -90,8 +35,61 @@ namespace MLTest.Sim
             float ang = (float)(Math.Atan2(yDif, xDif)); // (- Math.PI / 2.0) so zero is up?
             StartAngle = NormalizeRadians(ang);
             EndAngle = NormalizeRadians(ang + Math.PI);
-        }
 
+            SetAccessArrays();
+            SetCenter();
+        }
+        private void SetAccessArrays()
+        {
+            EndPoints = new SimNode[] { Start, End };
+
+            var elms = new List<SimNode>();
+            elms.Add(Start);
+            elms.AddRange(Edges);
+            elms.Add(End);
+            AllElements = elms.ToArray();
+        }
+        private void SetCenter()
+        {
+            double x = 0;
+            double y = 0;
+            foreach (var element in AllElements)
+            {
+                x += element.AnchorPoint.X;
+                y += element.AnchorPoint.Y;
+            }
+            Center = new PointF((float)(x / (double)AllElements.Length), (float)(y / (double)AllElements.Length));
+        }
+        public PointF[] Anchors
+        {
+            get
+            {
+                var anchors = new List<PointF>();
+                anchors.Add(Start.AnchorPoint);
+                foreach (var edge in Edges)
+                {
+                    anchors.Add(edge.AnchorPoint);
+                }
+                anchors.Add(End.AnchorPoint);
+                return anchors.ToArray();
+            }
+        }
+        public SimStroke GetOrientedClone()
+        {
+            var result = Clone();
+            if(result.Start.AnchorPoint.Y > result.End.AnchorPoint.Y)
+            {
+                result.FlipEnds();
+            }
+            return result;
+        }
+        public void FlipEnds()
+        {
+            var temp = Start;
+            Start = End;
+            End = temp;
+            Edges.Reverse();
+        }
         public PointF GetPointOnLine(double position, double offset)
         {
             var sp = Start.AnchorPoint;
@@ -117,6 +115,21 @@ namespace MLTest.Sim
             double normalized = radians % TWO_PI;
             normalized = (normalized + TWO_PI) % TWO_PI;
             return normalized <= Math.PI ? normalized : normalized - TWO_PI;
+        }
+
+        public override double CompareTo(SimElement element)
+        {
+            var result = 0.0; // default if isn't Node, for now
+            // has Edges? Edges: Start/End
+            if (element is SimStroke stroke)
+            {
+                result = (stroke.Start.CompareTo(Start) + stroke.End.CompareTo(End)) / 2.0;
+            }
+            return result;
+        }
+        public SimStroke Clone()
+        {
+            return new SimStroke(Start, End, Edges.ToArray()); // clone these as well
         }
     }
 }

@@ -7,11 +7,25 @@ using System.Threading.Tasks;
 
 namespace MLTest.Sim
 {
+    public abstract class SimOrientation
+    {
+        //public abstract double Likelihood(SimOrientation x);
+    }
+
     public class SimSize : SimOrientation
     {
-        public enum HumanScale { Micro = -5, Flea = -4, Finger = -3, Hand = -2, Arm = -1, Body = 0, Room = 1, Camp = 2, Throw = 3, Walk = 4, Journey = 5 }
-        private double[] ScaleRatios = new double[] { 0.0001, 0.0033, 0.0366, 0.111, 0.333, 1.0, 3.0, 6.0, 9.0, 90.0, 1000.0 };
+        public enum HumanScale { Micro = -5, Fingernail = -4, Finger = -3, Hand = -2, Arm = -1, Body = 0, Room = 1, Camp = 2, Throw = 3, Walk = 4, Journey = 5 }
 
+        // Use gaussians here, they can overlap in places. 
+        // To compare two objects, normalize them so one in body size and then compare to get the relation (e.g. A tire is a 'hand' scale to a truck, but 'fingernail' to a 747).
+        private static double[] ScaleRatios = new double[] { 0.0001, 0.0033, 0.0366, 0.111, 0.333, 1.0, 3.0, 6.0, 9.0, 90.0, 1000.0 };
+        
+        public HumanScale Scale { get; }
+
+        public double Likelihood(SimSize size)
+        {
+            return size.Scale == Scale ? 1 : 0; // use gaussians eventually
+        }
     }
     public class SimAngle : SimOrientation
     {
@@ -22,6 +36,10 @@ namespace MLTest.Sim
             Direction = new SimSection(direction);
             Radius = new SimSection(radius);
         }
+        public double Likelihood(SimAngle angle)
+        {
+            return angle.Direction.Likelihood(Direction.Exact) * angle.Radius.Likelihood(Radius.Exact);
+        }
     }
 
     public class SimSection : SimOrientation
@@ -31,7 +49,6 @@ namespace MLTest.Sim
         public Gaussian Location { get => _location; }
         private int _encoding;
         private int _sign;
-        private SimDirection _startLocator;
 
         public double Mean { get => _location.GetMean(); }
         public double Variance { get => _location.GetVariance(); }

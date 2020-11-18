@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using Microsoft.ML.Data;
 using MLTest.Forms;
 using MLTest.Tylox;
+using MLTest.Sim;
 
 namespace MLTest
 {
@@ -15,6 +16,7 @@ namespace MLTest
         public static GeneratorForm _generatorForm;
         public static InteractForm _interactForm;
         public static TyloxForm _tyloxForm;
+        public static SimForm _simForm;
 
         /// <summary>
         /// The main entry point for the application.
@@ -31,13 +33,14 @@ namespace MLTest
             _interactForm = new InteractForm(_generatorForm.Generator);
             _interactForm.Hide();
 
-            //_tyloxForm = new TyloxForm(new TyloxGenerator());
-            //_tyloxForm.Hide();
             _tyloxForm = new TyloxForm(new TyloxRenderer());
             _tyloxForm.Hide();
 
+            _simForm = new SimForm();
+            _simForm.Hide();
+
             // Application.Run(_generatorForm);
-            Application.Run(_tyloxForm);
+            Application.Run(_simForm);
         }
 
     }
