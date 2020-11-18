@@ -72,8 +72,10 @@ namespace MLTest.Sim
             LightGray,
             Black,
             DarkRed,
-            DarkBlue,
             Orange,
+            DarkGreen,
+            DarkBlue,
+            DarkViolet,
         }
         private void GenPens(float scale)
         {
@@ -81,8 +83,10 @@ namespace MLTest.Sim
             Pens.Add(GetPen(Color.LightGray, 4f / scale));
             Pens.Add(GetPen(Color.Black, 8f / scale));
             Pens.Add(GetPen(Color.DarkRed, 8f / scale));
-            Pens.Add(GetPen(Color.DarkBlue, 8f / scale));
             Pens.Add(GetPen(Color.Orange, 8f / scale));
+            Pens.Add(GetPen(Color.DarkGreen, 8f / scale));
+            Pens.Add(GetPen(Color.DarkBlue, 8f / scale));
+            Pens.Add(GetPen(Color.DarkViolet, 8f / scale));
         }
         private Pen GetPen(Color color, float width)
         {
