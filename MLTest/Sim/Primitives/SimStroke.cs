@@ -78,6 +78,36 @@ namespace MLTest.Sim
             }
         }
 
+        public PointF[] GetBezierPoints()
+        {
+            List<PointF> pts = new List<PointF>();
+
+            pts.Add(Start.AnchorPoint);
+            if (Edges.Count > 0)
+            {
+                PointF p0 = Start.AnchorPoint;
+                for (int i = 0; i < Edges.Count; i++)
+                {
+                    SimEdge edge = Edges[i];
+
+                    PointF a0 = edge.Anchor0;
+                    var mid0 = p0.MidPoint(a0);
+                    PointF a1 = edge.Anchor1;
+                    var mid1 = a0.MidPoint(a1);
+                    pts.AddRange(new[] { mid0, a0, mid1 });
+
+                    p0 = (i < Edges.Count - 1) ? Edges[i + 1].Anchor0 : End.AnchorPoint;
+                    var mid2 = a1.MidPoint(p0);
+                    pts.AddRange(new[] { a1, mid2, p0 });
+                }
+            }
+            else
+            {
+                pts.Add(End.AnchorPoint);
+            }
+            return pts.ToArray();
+        }
+
         /// <summary>
         /// Clone and return stroke oriented top to bottom, or if aproximately horizontal, left to right.
         /// </summary>

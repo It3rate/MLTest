@@ -52,9 +52,10 @@ namespace MLTest.Sim
             }
             else
             {
-                DrawCircle(g, stroke.Edges[0].Anchor0, 2, 1.5);
-                DrawCircle(g, stroke.Edges[0].Anchor1, 3, 1.5);
-                DrawCurve(g, stroke.Start, stroke.Edges[0], stroke.End, penIndex);
+                DrawCircle(g, stroke.Edges[0].Anchor0, 2, 0.5);
+                DrawCircle(g, stroke.Edges[0].Anchor1, 3, 0.5);
+                //DrawCurve(g, stroke.Start, stroke.Edges[0], stroke.End, penIndex);
+                DrawCurve(g, stroke, penIndex);
             }
         }
         public void DrawSpot(Graphics g, SimSection spot, int penIndex = 0)
@@ -71,14 +72,34 @@ namespace MLTest.Sim
         {
             g.DrawLine(Pens[penIndex], p0.AnchorPoint.X, p0.AnchorPoint.Y, p1.AnchorPoint.X, p1.AnchorPoint.Y);
         }
+        public void DrawCurve(Graphics g, SimStroke stroke, int penIndex = 0)
+        {
+            var pts = stroke.GetBezierPoints();
+            if(pts.Length >= 4)
+            {
+                g.DrawBeziers(Pens[penIndex], pts);
+            }
+            else
+            {
+                g.DrawLine(Pens[penIndex], pts[0], pts[pts.Length - 1]);
+            }
+        }
+
         public void DrawCurve(Graphics g, SimNode p0, SimEdge edge, SimNode p1, int penIndex = 0)
         {
-            //g.DrawBezier(Pens[penIndex], p0.AnchorPoint, edge.Anchor0, edge.Anchor1, p1.AnchorPoint);
-            var mid = new PointF(
-                (float)((edge.Anchor1.X - edge.Anchor0.X) / 2.0 + edge.Anchor0.X),
-                (float)((edge.Anchor1.Y - edge.Anchor0.Y) / 2.0 + edge.Anchor0.Y));
-            g.DrawBezier(Pens[penIndex], p0.AnchorPoint, edge.Anchor0, edge.Anchor0, mid);
-            g.DrawBezier(Pens[penIndex], mid, edge.Anchor1, edge.Anchor1, p1.AnchorPoint);
+            //g.DrawBezier(Pens[4], p0.AnchorPoint, edge.Anchor0, edge.Anchor1, p1.AnchorPoint);
+            var mid0 = p0.AnchorPoint.MidPoint(edge.Anchor0);
+            var mid1 = edge.Anchor0.MidPoint(edge.Anchor1);
+            var mid2 = p1.AnchorPoint.MidPoint(edge.Anchor1);
+
+            g.DrawBezier(Pens[4], p0.AnchorPoint, mid0, edge.Anchor0, mid1);
+            g.DrawBezier(Pens[4], mid1, edge.Anchor1, mid2, p1.AnchorPoint);
+            DrawCircle(g, mid0, 5, 0.5);
+            DrawCircle(g, mid1, 5, 0.5);
+            DrawCircle(g, mid2, 5, 0.5);
+
+            //g.DrawBezier(Pens[penIndex], p0.AnchorPoint, edge.Anchor0, edge.Anchor0, edge.Anchor1);
+            //g.DrawBezier(Pens[penIndex], edge.Anchor0, edge.Anchor1, edge.Anchor1, p1.AnchorPoint);
         }
 
         public List<Pen> Pens = new List<Pen>();

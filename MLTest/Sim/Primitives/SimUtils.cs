@@ -63,5 +63,20 @@ namespace MLTest.Sim
             return normalized;
         }
 
+
     }
+    public static class ExtensionMethods
+    {
+        public static PointF Add(this PointF operand1, PointF operand2)
+        {
+            return new PointF(operand1.X + operand2.X, operand1.Y + operand2.Y);
+        }
+        public static PointF MidPoint(this PointF p0, PointF p1)
+        {
+            return new PointF(
+                (float)((p1.X - p0.X) / 2.0 + p0.X),
+                (float)((p1.Y - p0.Y) / 2.0 + p0.Y));
+        }
+    }
+
 }

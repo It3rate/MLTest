@@ -40,7 +40,8 @@ namespace MLTest.Sim
 
             refStroke = pad.GetStroke(new SimWhere(SimDirection.E, SimShapeType.Current, SimElementType.Stroke));
             start = new SimNode(refStroke, 0, 0);
-            var edge = new SimEdge(refStroke, .25, .7, 0.35, 0, -1, 0.3);
+            var edge = new SimEdge(refStroke, .25, .5, 0.35, 0, -1, 0.3);
+            //var edge2 = new SimEdge(refStroke, .35, .3, 0.25, -.2, -1, 0.2);
             end = new SimNode(refStroke, 0.5, 0);
             newStroke = new SimStroke(start, end, new[] { edge });
             pad.AddStroke(newStroke);
@@ -52,8 +53,8 @@ namespace MLTest.Sim
             //pad.AddStroke(newStroke);
 
             refStroke = pad.GetStroke(new SimWhere(SimDirection.E, SimShapeType.Current, SimElementType.Stroke));
-            start = new SimNode(refStroke, 0.43, 0.4);
-            end = new SimNode(refStroke, 1, .8);
+            start = new SimNode(refStroke, 0.44, 0.25);
+            end = new SimNode(refStroke, 1, .5);
             newStroke = new SimStroke(start, end);
             pad.AddStroke(newStroke);
 

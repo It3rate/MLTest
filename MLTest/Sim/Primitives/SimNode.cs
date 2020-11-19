@@ -41,11 +41,12 @@ namespace MLTest.Sim
 
         public PointF AnchorPoint { get; }
 
-        public SimNode(SimStroke reference, SimSection position, SimSection offset)
+        public SimNode(SimStroke reference, SimSection position, double offset)
         {
             Reference = reference;
             Position_X = position;
-            Offset_Y = offset;
+            offset = reference == null ? offset : offset * reference.Length();
+            Offset_Y = new SimSection(offset);
             if (Reference == null)
             {
                 AnchorPoint = new PointF((float)Position_X.Exact, (float)Offset_Y.Exact);
@@ -55,7 +56,7 @@ namespace MLTest.Sim
                 AnchorPoint = Reference.GetPointOnLine(Position_X.Exact, Offset_Y.Exact);
             }
         }
-        public SimNode(SimStroke reference, double position, double offset = 0) : this(reference, new SimSection(position), new SimSection(offset)) { }
+        public SimNode(SimStroke reference, double position, double offset = 0) : this(reference, new SimSection(position), offset) { }
 
         public virtual bool IsTip => true;
         public double DistanceTo(SimNode node) => Math.Sqrt((AnchorPoint.X - node.AnchorPoint.X) * (AnchorPoint.X - node.AnchorPoint.X) + (AnchorPoint.Y - node.AnchorPoint.Y) * (AnchorPoint.Y - node.AnchorPoint.Y));
