@@ -33,12 +33,15 @@ namespace MLTest.Sim
             float yDif = Start.AnchorPoint.Y - End.AnchorPoint.Y;
 
             float ang = (float)(Math.Atan2(yDif, xDif)); // (- Math.PI / 2.0) so zero is up?
-            StartAngle = NormalizeRadians(ang);
-            EndAngle = NormalizeRadians(ang + Math.PI);
+            StartAngle = SimUtils.NormalizeRadians(ang);
+            EndAngle = SimUtils.NormalizeRadians(ang + Math.PI);
 
             SetAccessArrays();
             SetCenter();
         }
+
+        public double Length() => Start.DistanceTo(End);
+
         private void SetAccessArrays()
         {
             EndPoints = new SimNode[] { Start, End };
@@ -120,13 +123,6 @@ namespace MLTest.Sim
                 sp.Y + (ep.Y - sp.Y) * (float)position + yOffset);
         }
 
-        private static double TWO_PI = 2 * Math.PI;
-        public double NormalizeRadians(double radians)
-        {
-            double normalized = radians % TWO_PI;
-            normalized = (normalized + TWO_PI) % TWO_PI;
-            return normalized <= Math.PI ? normalized : normalized - TWO_PI;
-        }
 
         public override double CompareTo(SimElement element)
         {

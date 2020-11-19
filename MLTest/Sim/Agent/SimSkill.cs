@@ -31,6 +31,7 @@ namespace MLTest.Sim
 
         public static void LetterR(SimFocusPad pad)
         {
+            // Probably should swap Pos and offset here? Or maybe vertical line isn't typical for an anchor.
             var refStroke = pad.GetStroke(new SimWhere(SimDirection.E, SimShapeType.PadStructure, SimElementType.Stroke));
             var start = new SimNode(refStroke, .1, .2);
             var end = new SimNode(refStroke, .9, .2);
@@ -39,18 +40,19 @@ namespace MLTest.Sim
 
             refStroke = pad.GetStroke(new SimWhere(SimDirection.E, SimShapeType.Current, SimElementType.Stroke));
             start = new SimNode(refStroke, 0, 0);
-            end = new SimNode(refStroke, 0, .8);
-            newStroke = new SimStroke(start, end);
+            var edge = new SimEdge(refStroke, .25, .7, 0.35, 0, -1, 0.3);
+            end = new SimNode(refStroke, 0.5, 0);
+            newStroke = new SimStroke(start, end, new[] { edge });
             pad.AddStroke(newStroke);
 
-            refStroke = pad.GetStroke(new SimWhere(SimDirection.E, SimShapeType.Current, SimElementType.Stroke));
-            start = new SimNode(refStroke, 0.5, 0);
-            end = new SimNode(refStroke, 0.5, .6);
-            newStroke = new SimStroke(start, end);
-            pad.AddStroke(newStroke);
+            //refStroke = pad.GetStroke(new SimWhere(SimDirection.E, SimShapeType.Current, SimElementType.Stroke));
+            //start = new SimNode(refStroke, 0.5, 0);
+            //end = new SimNode(refStroke, 0.5, .6);
+            //newStroke = new SimStroke(start, end);
+            //pad.AddStroke(newStroke);
 
             refStroke = pad.GetStroke(new SimWhere(SimDirection.E, SimShapeType.Current, SimElementType.Stroke));
-            start = new SimNode(refStroke, 1, 0);
+            start = new SimNode(refStroke, 0.43, 0.4);
             end = new SimNode(refStroke, 1, .8);
             newStroke = new SimStroke(start, end);
             pad.AddStroke(newStroke);

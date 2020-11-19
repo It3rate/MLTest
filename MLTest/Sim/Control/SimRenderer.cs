@@ -50,6 +50,12 @@ namespace MLTest.Sim
             {
                 DrawLine(g, stroke.Start, stroke.End, penIndex);
             }
+            else
+            {
+                DrawCircle(g, stroke.Edges[0].Anchor0, 2, 1.5);
+                DrawCircle(g, stroke.Edges[0].Anchor1, 3, 1.5);
+                DrawCurve(g, stroke.Start, stroke.Edges[0], stroke.End, penIndex);
+            }
         }
         public void DrawSpot(Graphics g, SimSection spot, int penIndex = 0)
         {
@@ -64,6 +70,15 @@ namespace MLTest.Sim
         public void DrawLine(Graphics g, SimNode p0, SimNode p1, int penIndex = 0)
         {
             g.DrawLine(Pens[penIndex], p0.AnchorPoint.X, p0.AnchorPoint.Y, p1.AnchorPoint.X, p1.AnchorPoint.Y);
+        }
+        public void DrawCurve(Graphics g, SimNode p0, SimEdge edge, SimNode p1, int penIndex = 0)
+        {
+            //g.DrawBezier(Pens[penIndex], p0.AnchorPoint, edge.Anchor0, edge.Anchor1, p1.AnchorPoint);
+            var mid = new PointF(
+                (float)((edge.Anchor1.X - edge.Anchor0.X) / 2.0 + edge.Anchor0.X),
+                (float)((edge.Anchor1.Y - edge.Anchor0.Y) / 2.0 + edge.Anchor0.Y));
+            g.DrawBezier(Pens[penIndex], p0.AnchorPoint, edge.Anchor0, edge.Anchor0, mid);
+            g.DrawBezier(Pens[penIndex], mid, edge.Anchor1, edge.Anchor1, p1.AnchorPoint);
         }
 
         public List<Pen> Pens = new List<Pen>();

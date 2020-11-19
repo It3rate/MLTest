@@ -95,17 +95,39 @@ namespace MLTest.Sim
         public SimSection CurveAmount { get; set; }// concave [.( is -1<n<0, convex [.) 0<n<1, straight line --- is 0, closed O--- or ---O is -1 (center outside) or 1 (center inside).
         public SimSection CrossSlide { get; set; } // needed? how much of the curve is at the top vs the bottom (based on segment)
 
-        public SimAngle Angle { get; set; }    // angle of intersection with endpoint. Set speed to zero if don't care
-        public SimSection Speed { get; set; }   // inertia of intersection connection ( probably sets cubic bezier endpoint with angle)
+        public SimSection Angle { get; set; }    // abs angle of intersection with endpoint. Set speed to zero if don't care
+        public SimSection Spread { get; set; }   // inertia of intersection connection ( probably sets cubic bezier endpoint with angle)
 
-        public SimEdge(SimStroke reference, double position, double offset = 0, double curve = 0, double cross = 0) : base(reference, position, offset)
+        public PointF Anchor0 { get; private set; }
+        public PointF Anchor1 { get; private set; }
+
+        public SimEdge(SimStroke reference, double position, double offset = 0, double spread = 1, double angle = 0, double curve = 0, double cross = 0) : base(reference, position, offset)
         {
             CurveAmount = new SimSection(curve);
             CrossSlide = new SimSection(cross);
+            Angle = new SimSection(angle);
+            spread = reference == null ? spread : spread * reference.Length();
+            Spread = new SimSection(spread);
             _isTip = Position_X.Likelihood(0) > 0.01 || Position_X.Likelihood(1) > 0.01; // todo: account for offset
+            SetCurveAnchors();
         }
 
-        public double AngleSimilarity(SimEdge edge) => edge.Angle.Likelihood(Angle);
+        public double AngleSimilarity(SimEdge edge) => edge.Angle.Likelihood(Angle.Exact);
+
+        public void SetCurveAnchors()
+        {
+            var negLen = Spread.Exact * ((CrossSlide.Exact / 2.0) + 0.5);
+            var posLen = Spread.Exact - negLen;
+            var ang = SimUtils.NormalizedToRadians(Angle.Exact);
+            var x = AnchorPoint.X;
+            var y = AnchorPoint.Y;
+            var xNeg = (float)(-Math.Sin(ang) * negLen);
+            var yNeg = (float)(Math.Cos(ang) * negLen);
+            var xPos = (float)(-Math.Sin(ang) * posLen);
+            var yPos = (float)(Math.Cos(ang) * posLen);
+            Anchor0 = new PointF(x - xNeg, y - yNeg);
+            Anchor1 = new PointF(x + xPos, y + yPos);
+        }
 
         public override double CompareTo(SimElement element)
         {

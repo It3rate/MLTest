@@ -48,5 +48,20 @@ namespace MLTest.Sim
             return Math.Abs(less * 2.0);
         }
 
+        private static double TWO_PI = 2 * Math.PI;
+        public static double NormalizeRadians(double radians)
+        {
+            double normalized = radians % TWO_PI;
+            normalized = (normalized + TWO_PI) % TWO_PI;
+            return normalized <= Math.PI ? normalized : normalized - TWO_PI;
+        }
+        public static double NormalizedToRadians(double norm)
+        {
+            double normalized = 1.0 - (norm / 2.0 + 0.5) - 0.5; // 0-1 cw, 0 is east with extra 0.25
+            normalized *= TWO_PI;
+            normalized = (normalized + TWO_PI) % TWO_PI;
+            return normalized;
+        }
+
     }
 }
