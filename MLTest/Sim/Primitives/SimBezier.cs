@@ -65,23 +65,31 @@ namespace MLTest.Sim
             List<float> pts = new List<float>();
             pts.AddRange(new[] { values[0].X, values[0].Y });
             moves.Add(SimBezierMove.MoveTo);
-
-            int index = 1;
-            while(values.Length > index + 2)
+            if(values.Length == 2)
             {
-                pts.AddRange(new[]{
-                    values[index].X, values[index].Y,
-                    values[index + 1].X, values[index + 1].Y,
-                    values[index + 2].X, values[index + 2].Y,
-                    });
-                moves.Add(SimBezierMove.CubeTo);
-                index += 3;
+                pts.AddRange(new[] { values[1].X, values[1].Y });
+                moves.Add(SimBezierMove.LineTo);
             }
-            pts.AddRange(new[] { values[values.Length - 2].X, values[values.Length - 1].Y });
-            moves.Add(SimBezierMove.End);
+            else
+            {
+                int index = 1;
+                while(values.Length > index + 2)
+                {
+                    pts.AddRange(new[]{
+                        values[index].X, values[index].Y,
+                        values[index + 1].X, values[index + 1].Y,
+                        values[index + 2].X, values[index + 2].Y,
+                        });
+                    moves.Add(SimBezierMove.CubeTo);
+                    index += 3;
+                }
+                //pts.AddRange(new[] { values[values.Length - 2].X, values[values.Length - 1].Y });
+            }
+            //moves.Add(SimBezierMove.End);
 
             _points = pts.ToArray();
             Moves = moves.ToArray();
+            EvenlySpaced = true;
         }
 
         private void MakeEvenlySpaced()
@@ -89,19 +97,24 @@ namespace MLTest.Sim
             MeasureBezier();
 
         }
+
+        private List<PointF> _polyPoints = new List<PointF>();
         private void MeasureBezier()
         {
+            _polyPoints.Clear();
             float len = 0;
             _polylineDistances = new float[_polyLineCount];
 
             if (Moves.Length > 1)
             {
                 var pt0 = GetPointAtT(0);
+                _polyPoints.Add(pt0);
                 var x0 = pt0.X;
                 var y0 = pt0.Y;
                 for (int i = 1; i < _polyLineCount; i++)
                 {
-                    var pt1 = GetPointAtT(i / (float)_polyLineCount);
+                    var pt1 = GetPointAtT(i / (float)(_polyLineCount - 1.0));
+                    _polyPoints.Add(pt1);
                     var x1 = pt1.X;
                     var y1 = pt1.Y;
                     var xDif = x1 - x0;
@@ -129,55 +142,24 @@ namespace MLTest.Sim
             Array.Copy(_points, start, result, 0, size);
             return result; // new SimBezier(result, new[] { Moves[index] });
         }
-        //// todo: need an insertDataAtIndex
-        //public override void SetRawDataAt(int index, Series series)
-        //{
-        //    index = Math.Max(0, Math.Min(Moves.Length - 1, index));
-        //    var start = 0;
-        //    for (var i = 0; i < index; i++)
-        //    {
-        //        start += MoveSize[(int)Moves[i]];
-        //    }
 
-        //    // todo: need to adjust float array length if move size is different
-        //    var size = MoveSize[(int)Moves[index]];
-        //    if (series is BezierSeries)
-        //    {
-        //        var newMove = ((BezierSeries)series).Moves[0];
-        //        var newSize = MoveSize[(int)newMove];
-        //        if (newSize != size)
-        //        {
-        //            int diff = newSize - size;
-        //            float[] newFloats = new float[_floatValues.Length + diff];
-        //            Array.Copy(_floatValues, 0, newFloats, 0, start);
-        //            Array.Copy(series.FloatDataRef, 0, newFloats, start, newSize);
-        //            Array.Copy(_floatValues, start + 1, newFloats, start + newSize, _floatValues.Length - start);
-        //            _floatValues = newFloats; // todo: make immutable, return a series (or this if no change) to store.
-        //        }
-        //        else
-        //        {
-        //            Array.Copy(series.FloatDataRef, 0, _floatValues, start, newSize);
-        //        }
-        //        Moves[index] = newMove;
-        //    }
-        //    else
-        //    {
-        //        Array.Copy(series.FloatDataRef, 0, _floatValues, start, size);
-        //    }
-        //}
-
-        public PointF GetPointAtT(float t)
+        public PointF GetPointAtT(double _t)
         {
-            float vT;
+            var fullT = (float)_t;
+            //if(_t >= 1.0)
+            //{
+            //    return new PointF(_points[_points.Length - 2], _points[_points.Length - 1]);
+            //}
+            float t;
             int startIndex, endIndex;
 
             if (EvenlySpaced)
             {
-                GetEvenSpacedSegmentFromT(t, out vT, out startIndex, out endIndex);
+                GetEvenSpacedSegmentFromT(fullT, out t, out startIndex, out endIndex);
             }
             else
             {
-                GetSegmentFromT(t, out vT, out startIndex, out endIndex);
+                GetSegmentFromT(fullT, out t, out startIndex, out endIndex);
             }
 
             float[] aSeries = GetRawDataAt(startIndex);
@@ -186,23 +168,26 @@ namespace MLTest.Sim
             var moveType = endIndex < Moves.Length ? Moves[endIndex] : SimBezierMove.End;
 
             float[] result = { 0, 0 };
-            var mt = 1f - vT;
-            var t2 = vT * vT;
+            var mt = 1f - t;
+            var t2 = t * t;
             var mt2 = mt * mt;
             switch (moveType)
             {
                 case SimBezierMove.MoveTo:
+                    result[0] = p0[0];
+                    result[1] = p0[1];
+                    break;
                 case SimBezierMove.LineTo:
-                    result[0] = p0[0] + (p1[0] - p0[0]) * vT;
-                    result[1] = p0[1] + (p1[1] - p0[1]) * vT;
+                    result[0] = p0[0] + (p1[0] - p0[0]) * t;
+                    result[1] = p0[1] + (p1[1] - p0[1]) * t;
                     break;
                 case SimBezierMove.QuadTo:
-                    result[0] = mt2 * p0[0] + 2 * mt * vT * p1[0] + t2 * p1[2];
-                    result[1] = mt2 * p0[1] + 2 * mt * vT * p1[1] + t2 * p1[3];
+                    result[0] = mt2 * p0[0] + 2 * mt * t * p1[0] + t2 * p1[2];
+                    result[1] = mt2 * p0[1] + 2 * mt * t * p1[1] + t2 * p1[3];
                     break;
                 case SimBezierMove.CubeTo:
-                    var t3 = t2 * t;
-                    var mt3 = mt2 * mt;
+                    var t3 = t * t * t;
+                    var mt3 = mt * mt * mt;
                     result[0] = mt3 * p0[0] + 3 * mt2 * t * p1[0] + 3 * mt * t2 * p1[2] + t3 * p1[4];
                     result[1] = mt3 * p0[1] + 3 * mt2 * t * p1[1] + 3 * mt * t2 * p1[3] + t3 * p1[5];
                     break;
@@ -259,9 +244,14 @@ namespace MLTest.Sim
         {
             var path = new GraphicsPath();
             path.FillMode = FillMode.Alternate;
+            for (int i = 1; i < _polyPoints.Count; i++)
+            {
+                path.AddLine(_polyPoints[i - 1], _polyPoints[i]);
+            }
+            return path;
+            var index = 0;
             float posX = 0;
             float posY = 0;
-            var index = 0;
             foreach (var moveType in Moves)
             {
                 switch (moveType)
@@ -311,6 +301,42 @@ namespace MLTest.Sim
             SimBezier result = new SimBezier((float[])_points.Clone(), (SimBezierMove[])Moves.Clone());
             return result;
         }
+        //// todo: need an insertDataAtIndex
+        //public override void SetRawDataAt(int index, Series series)
+        //{
+        //    index = Math.Max(0, Math.Min(Moves.Length - 1, index));
+        //    var start = 0;
+        //    for (var i = 0; i < index; i++)
+        //    {
+        //        start += MoveSize[(int)Moves[i]];
+        //    }
+
+        //    // todo: need to adjust float array length if move size is different
+        //    var size = MoveSize[(int)Moves[index]];
+        //    if (series is BezierSeries)
+        //    {
+        //        var newMove = ((BezierSeries)series).Moves[0];
+        //        var newSize = MoveSize[(int)newMove];
+        //        if (newSize != size)
+        //        {
+        //            int diff = newSize - size;
+        //            float[] newFloats = new float[_floatValues.Length + diff];
+        //            Array.Copy(_floatValues, 0, newFloats, 0, start);
+        //            Array.Copy(series.FloatDataRef, 0, newFloats, start, newSize);
+        //            Array.Copy(_floatValues, start + 1, newFloats, start + newSize, _floatValues.Length - start);
+        //            _floatValues = newFloats; // todo: make immutable, return a series (or this if no change) to store.
+        //        }
+        //        else
+        //        {
+        //            Array.Copy(series.FloatDataRef, 0, _floatValues, start, newSize);
+        //        }
+        //        Moves[index] = newMove;
+        //    }
+        //    else
+        //    {
+        //        Array.Copy(series.FloatDataRef, 0, _floatValues, start, size);
+        //    }
+        //}
     }
 
     // maybe store all values as quadratic, allowing easier blending?

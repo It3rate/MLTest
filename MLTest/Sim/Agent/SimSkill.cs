@@ -54,9 +54,9 @@ namespace MLTest.Sim
 
             // Make R tail
             // getstroke needs an option to pass an expected joint and direction, returning the stroke with Start 0 at passed joint
-            refStroke = pad.GetStroke(new SimWhere(SimDirection.E, SimShapeType.Current, SimElementType.Stroke));
-            start = new SimNode(refStroke, 0.44, 0.25);
-            end = new SimNode(refStroke, 1, .5);
+            refStroke = pad.GetStroke(new SimWhere(SimDirection.W, SimShapeType.Current, SimElementType.Stroke));
+            start = new SimNode(refStroke, .8, 0);
+            end = new SimNode(newStroke, 1, .5);
             var tailStroke = new SimStroke(start, end);
             pad.AddStroke(tailStroke);
 

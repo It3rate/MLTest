@@ -145,21 +145,30 @@ namespace MLTest.Sim
         }
         public PointF GetPointOnLine(double position, double offset)
         {
-            var sp = Start.AnchorPoint;
-            var ep = End.AnchorPoint;
-            float xOffset = 0;
-            float yOffset = 0;
-            float xDif = ep.X - sp.X;
-            float yDif = ep.Y - sp.Y;
-            if (offset != 0)
+            PointF result;
+            if(Edges.Count == 0)
             {
-                float ang = (float)(Math.Atan2(yDif, xDif));
-                xOffset = (float)(-Math.Sin(ang) * Math.Abs(offset) * Math.Sign(-offset));
-                yOffset = (float)(Math.Cos(ang) * Math.Abs(offset) * Math.Sign(-offset));
+                var sp = Start.AnchorPoint;
+                var ep = End.AnchorPoint;
+                float xOffset = 0;
+                float yOffset = 0;
+                float xDif = ep.X - sp.X;
+                float yDif = ep.Y - sp.Y;
+                if (offset != 0)
+                {
+                    float ang = (float)(Math.Atan2(yDif, xDif));
+                    xOffset = (float)(-Math.Sin(ang) * Math.Abs(offset) * Math.Sign(-offset));
+                    yOffset = (float)(Math.Cos(ang) * Math.Abs(offset) * Math.Sign(-offset));
+                }
+                result = new PointF(
+                    sp.X + (ep.X - sp.X) * (float)position + xOffset, 
+                    sp.Y + (ep.Y - sp.Y) * (float)position + yOffset);
             }
-            return new PointF(
-                sp.X + (ep.X - sp.X) * (float)position + xOffset, 
-                sp.Y + (ep.Y - sp.Y) * (float)position + yOffset);
+            else
+            {
+                result = Bezier.GetPointAtT(position);
+            }
+            return result;
         }
 
 
