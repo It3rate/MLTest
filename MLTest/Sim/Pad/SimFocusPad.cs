@@ -27,7 +27,7 @@ namespace MLTest.Sim
         // Make and actual hexgrid class.
         private List<SimSection> PadBitmap = new List<SimSection>();
         public List<SimShape> Shapes { get; } = new List<SimShape>();
-        private SimShape CurrentShape { get; set; }
+        public SimShape CurrentShape { get; set; }
 
         private SimFocusPad(PadType type, int horizontalSize, int verticalSize)
         {
@@ -195,6 +195,11 @@ namespace MLTest.Sim
                 AddShape();
             }
             CurrentShape.AddStroke(stroke);
+        }
+
+        public void AddJoint(SimJoint joint)
+        {
+            CurrentShape.AddJoint(joint);
         }
         public void CreateRectSkeleton()
         {

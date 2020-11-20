@@ -384,6 +384,7 @@
     <Compile Include="Sim\Agent\SimSkill.cs" />
     <Compile Include="Sim\Agent\SimVision.cs" />
     <Compile Include="Sim\Control\SimRenderer.cs" />
+    <Compile Include="Sim\Primitives\SimBezier.cs" />
     <Compile Include="Sim\Primitives\SimSection.cs" />
     <Compile Include="Sim\Pad\SimWhere.cs" />
     <Compile Include="Sim\Agent\SimAgent.cs" />

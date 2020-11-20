@@ -23,7 +23,32 @@ namespace MLTest.Sim
 
     // smooth joint follows along a segment, defines location, curvature, offset, speed, angle that the segment needs at that point.
     // Also can define the way two tips from separate segments join (e.g. 'ST' at the join is continuous)
-    public enum JointType { Smooth, Tip, Corner, Butt, Cross, Loop, Branch}
+    public enum JointType { Smooth, Tip, Corner, ButtInto, CutOff, Cross, Loop, SplitFrom}
+
+    /// <summary>
+    /// A stroke that attempts to create a joint encodes where it expects a joint to happen. Include where on current stroke, target stroke, target location, joint type, joint metadata.
+    /// Maybe this is what a joint is actually.
+    /// </summary>
+    public class SimJointAttempt
+    {
+        public JointType JointType { get; }
+        public SimStroke Source { get; } // might be shape too?
+        public SimSection SourcePosition { get; }
+        public SimStroke Target { get; } // might be shape too?
+        public SimSection TargetPosition { get; }
+        public SimSection JoiningAngle { get; }
+
+
+        public SimJointAttempt(JointType jointType, SimStroke source, double sourcePosition, SimStroke target, double targetPosition, double joiningAngle = 0.5)
+        {
+            JointType = JointType;
+            Source = source;
+            SourcePosition = new SimSection(sourcePosition);
+            Target = target;
+            TargetPosition = new SimSection(targetPosition);
+            JoiningAngle = new SimSection(joiningAngle);
+        }
+    }
 
     /// <summary>
     /// Defines segment connections and lines at the intersection. There aren't TYLOX style joints explicitly defined because they are inferred by probability.
@@ -39,6 +64,7 @@ namespace MLTest.Sim
 
         public SimJoint(JointType jointType, params SimEdge[] edges)
         {
+            JointType = JointType;
             References.AddRange(edges);
         }
 
@@ -59,13 +85,13 @@ namespace MLTest.Sim
                     break;
                 case JointType.Corner:
                     break;
-                case JointType.Butt:
+                case JointType.ButtInto:
                     break;
                 case JointType.Cross:
                     break;
                 case JointType.Loop:
                     break;
-                case JointType.Branch:
+                case JointType.SplitFrom:
                     break;
         }
             return result;

@@ -17,12 +17,17 @@ namespace MLTest.Sim
         public SimNode End { get; set; }
         public List<SimEdge> Edges { get; set; } = new List<SimEdge>(); // straight line if empty
 
+        public List<SimJointAttempt> JointAttempts { get; } = new List<SimJointAttempt>();
+
         public SimNode[] EndPoints { get; private set; }
         public SimNode[] AllElements { get; private set; }
         public PointF Center { get; private set; }
 
         public double StartAngle { get; protected set; }
         public double EndAngle { get; protected set; }
+
+        public SimBezier Bezier { get; }
+
         public SimStroke(SimNode start, SimNode end, params SimEdge[] grooves)
         {
             Start = start;
@@ -38,8 +43,12 @@ namespace MLTest.Sim
 
             SetAccessArrays();
             SetCenter();
+
+            Bezier = new SimBezier(GetBezierPoints());
         }
 
+        // needs to change to MaximumExtent - largest dimension of bounding box, or furthest two points? Or shape's anchor stroke or *bounds*?
+        // Offset is relative to length, but a circle is long compared to how it 'looks'
         public double Length() => Start.DistanceTo(End);
 
         private void SetAccessArrays()

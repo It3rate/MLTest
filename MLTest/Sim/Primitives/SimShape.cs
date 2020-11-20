@@ -103,6 +103,10 @@ namespace MLTest.Sim
             Strokes.Add(stroke);
             // check for joints
         }
+        public void AddJoint(SimJoint joint)
+        {
+            Joints.Add(joint);
+        }
 
         public static SimShape CreateRect(SimShapeType shapeType, double x, double y, double w, double h, bool includeCenter = true)
         {

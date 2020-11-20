@@ -77,7 +77,8 @@ namespace MLTest.Sim
             var pts = stroke.GetBezierPoints();
             if(pts.Length >= 4)
             {
-                g.DrawBeziers(Pens[penIndex], pts);
+                g.DrawPath(Pens[penIndex], stroke.Bezier.Path());
+                //g.DrawBeziers(Pens[penIndex], pts);
             }
             else
             {

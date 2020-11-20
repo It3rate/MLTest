@@ -38,25 +38,31 @@ namespace MLTest.Sim
             var newStroke = new SimStroke(start, end);
             pad.AddStroke(newStroke);
 
+            // Make top Loop (P)
             refStroke = pad.GetStroke(new SimWhere(SimDirection.E, SimShapeType.Current, SimElementType.Stroke));
             start = new SimNode(refStroke, 0, 0);
             var edge = new SimEdge(refStroke, .25, .5, 0.35, 0, -1, 0.3);
             //var edge2 = new SimEdge(refStroke, .35, .3, 0.25, -.2, -1, 0.2);
             end = new SimNode(refStroke, 0.5, 0);
-            newStroke = new SimStroke(start, end, new[] { edge });
-            pad.AddStroke(newStroke);
+            var loopStroke = new SimStroke(start, end, new[] { edge });
+            pad.AddStroke(loopStroke);
 
-            //refStroke = pad.GetStroke(new SimWhere(SimDirection.E, SimShapeType.Current, SimElementType.Stroke));
-            //start = new SimNode(refStroke, 0.5, 0);
-            //end = new SimNode(refStroke, 0.5, .6);
-            //newStroke = new SimStroke(start, end);
-            //pad.AddStroke(newStroke);
+            // Add top and mid expected joints
+            var topJoint = new SimJointAttempt(JointType.Corner, loopStroke, 0, refStroke, 0, 0.5);
+            var midJoint = new SimJointAttempt(JointType.ButtInto, loopStroke, 0, refStroke, 0.5, -0.5);
+            loopStroke.JointAttempts.AddRange(new[] { topJoint, midJoint });
 
+            // Make R tail
+            // getstroke needs an option to pass an expected joint and direction, returning the stroke with Start 0 at passed joint
             refStroke = pad.GetStroke(new SimWhere(SimDirection.E, SimShapeType.Current, SimElementType.Stroke));
             start = new SimNode(refStroke, 0.44, 0.25);
             end = new SimNode(refStroke, 1, .5);
-            newStroke = new SimStroke(start, end);
-            pad.AddStroke(newStroke);
+            var tailStroke = new SimStroke(start, end);
+            pad.AddStroke(tailStroke);
+
+            // Add tail and loop expected joint
+            var tailJoint = new SimJointAttempt(JointType.SplitFrom, tailStroke, 0, refStroke, 0.75, 1); // Hmm, really focused on midJoint here, 0 is bottom joint, 1 is top (of P loop)
+            newStroke.JointAttempts.Add(tailJoint);
 
             pad.AddShape();
         }
