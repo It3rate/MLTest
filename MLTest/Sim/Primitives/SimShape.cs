@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace MLTest.Sim
 {
-    public enum SimShapeType { Any = 0, PadStructure, Focusing, Current, Previous, SecondLast, Exisiting, Planning, Comparing } 
+    public enum SimStructuralType { Any = 0, PadStructure, Focusing, Current, Previous, SecondLast, Exisiting, Planning, Comparing } 
 
     public class SimShape : SimElement
     {
-        public SimShapeType ShapeType;
+        public SimStructuralType StructuralType;
 
         public List<SimNode> Nodes { get; } = new List<SimNode>();
 
@@ -26,9 +26,10 @@ namespace MLTest.Sim
         public SimNode Center { get; } = new SimNode(null, 0, 0); // default
         public SimNode[] Bounds => null;
 
-        public SimShape(SimShapeType shapeType, params SimStroke[] strokes)
+
+        public SimShape(SimStructuralType structuralType, params SimStroke[] strokes)
         {
-            ShapeType = shapeType;
+            StructuralType = structuralType;
             Strokes.AddRange(strokes);
         }
         /// <summary>
@@ -108,7 +109,7 @@ namespace MLTest.Sim
             Joints.Add(joint);
         }
 
-        public static SimShape CreateRect(SimShapeType shapeType, double x, double y, double w, double h, bool includeCenter = true)
+        public static SimShape CreateRect(SimStructuralType shapeType, double x, double y, double w, double h, bool includeCenter = true)
         {
             var result = new SimShape(shapeType);
 

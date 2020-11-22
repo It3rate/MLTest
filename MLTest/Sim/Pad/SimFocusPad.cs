@@ -91,11 +91,11 @@ namespace MLTest.Sim
             return result;
         }
 
-        public IEnumerable<SimNode> AllEndpoints(SimShapeType shapeType = SimShapeType.Any)
+        public IEnumerable<SimNode> AllEndpoints(SimStructuralType shapeType = SimStructuralType.Any)
         {
             foreach (var shape in Shapes)
             {
-                if (shapeType == SimShapeType.Any || shape.ShapeType == shapeType)
+                if (shapeType == SimStructuralType.Any || shape.StructuralType == shapeType)
                 {
                     foreach (var stroke in shape.Strokes)
                     {
@@ -105,11 +105,11 @@ namespace MLTest.Sim
                 }
             }
         }
-        public IEnumerable<SimEdge> AllEdges(SimShapeType shapeType = SimShapeType.Any)
+        public IEnumerable<SimEdge> AllEdges(SimStructuralType shapeType = SimStructuralType.Any)
         {
             foreach (var shape in Shapes)
             {
-                if (shapeType == SimShapeType.Any || shape.ShapeType == shapeType)
+                if (shapeType == SimStructuralType.Any || shape.StructuralType == shapeType)
                 {
                     foreach (var stroke in shape.Strokes)
                     {
@@ -121,11 +121,11 @@ namespace MLTest.Sim
                 }
             }
         }
-        public IEnumerable<SimElement> AllNodes(SimShapeType shapeType = SimShapeType.Any)
+        public IEnumerable<SimElement> AllNodes(SimStructuralType shapeType = SimStructuralType.Any)
         {
             foreach (var shape in Shapes)
             {
-                if (shapeType == SimShapeType.Any || shape.ShapeType == shapeType)
+                if (shapeType == SimStructuralType.Any || shape.StructuralType == shapeType)
                 {
                     foreach (var stroke in shape.Strokes)
                     {
@@ -139,11 +139,11 @@ namespace MLTest.Sim
                 }
             }
         }
-        public IEnumerable<SimStroke> AllStrokes(SimShapeType shapeType = SimShapeType.Any)
+        public IEnumerable<SimStroke> AllStrokes(SimStructuralType shapeType = SimStructuralType.Any)
         {
             foreach (var shape in Shapes)
             {
-                if (shapeType == SimShapeType.Any || shape.ShapeType == shapeType)
+                if (shapeType == SimStructuralType.Any || shape.StructuralType == shapeType)
                 {
                     foreach (var stroke in shape.Strokes)
                     {
@@ -152,11 +152,11 @@ namespace MLTest.Sim
                 }
             }
         }
-        public IEnumerable<SimJoint> AllJoints(SimShapeType shapeType = SimShapeType.Any)
+        public IEnumerable<SimJoint> AllJoints(SimStructuralType shapeType = SimStructuralType.Any)
         {
             foreach (var shape in Shapes)
             {
-                if (shapeType == SimShapeType.Any || shape.ShapeType == shapeType)
+                if (shapeType == SimStructuralType.Any || shape.StructuralType == shapeType)
                 {
                     foreach (var joint in shape.Joints)
                     {
@@ -181,9 +181,9 @@ namespace MLTest.Sim
         {
             if(CurrentShape != null)
             {
-                CurrentShape.ShapeType = SimShapeType.Exisiting;
+                CurrentShape.StructuralType = SimStructuralType.Exisiting;
             }
-            CurrentShape = new SimShape(SimShapeType.Current);
+            CurrentShape = new SimShape(SimStructuralType.Current);
             Shapes.Add(CurrentShape);
             return CurrentShape;
         }
@@ -204,7 +204,7 @@ namespace MLTest.Sim
         public void CreateRectSkeleton()
         {
             Shapes.Clear();
-            var rect = SimShape.CreateRect(SimShapeType.PadStructure, 0, 0, 1, 1, true);
+            var rect = SimShape.CreateRect(SimStructuralType.PadStructure, 0, 0, 1, 1, true);
             Shapes.Add(rect);
             _skeletonShapeCount = Shapes.Count;
         }

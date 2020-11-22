@@ -13,6 +13,9 @@ namespace MLTest.Sim
     // We don't overtly care about stroke order (unless it matters while creating) because the stroke is always evaluated on inspection
     public class SimStroke : SimElement
     {
+        // A circle can be defined with two nodes, a start (center) and an end (radius). May need a draw direction? Or not if always linked by nearness and tangent.
+        // For a 'C', define a circle, then a start and end point on it (.85 to .65) and an edge/node on the left side of the circle (so it knows to go ccw).
+        // May be able to get rid of edges completely for skeleton layer (all joints are straight lines or on tangent circles).
         public SimNode Start { get; set; }
         public SimNode End { get; set; }
         public List<SimEdge> Edges { get; set; } = new List<SimEdge>(); // straight line if empty
@@ -44,12 +47,37 @@ namespace MLTest.Sim
             SetAccessArrays();
             SetCenter();
 
+            SetCurvePoints();
+
             Bezier = new SimBezier(GetBezierPoints());
         }
 
         // needs to change to MaximumExtent - largest dimension of bounding box, or furthest two points? Or shape's anchor stroke or *bounds*?
         // Offset is relative to length, but a circle is long compared to how it 'looks'
         public double Length() => Start.DistanceTo(End);
+
+        private void SetCurvePoints()
+        {
+            if(Edges.Count > 0)
+            {
+                var p0 = Start.AnchorPoint;
+                for (int i = 0; i < Edges.Count; i++)
+                {
+                    var c = Edges[i].AnchorPoint;
+                    var p1 = Edges.Count > i + 1 ? Edges[i + 1].AnchorPoint : End.AnchorPoint;
+                    var pol = c.ProjectedOntoLine(p0, p1);
+
+                    var dif = pol.Subtract(c);
+
+                    var a0 = p0.Add(dif);// new PointF(c.X + (pol.X - p1.X), c.Y + (pol.Y - p1.Y));
+                    var a1 = p1.Add(dif);//new PointF(c.X - (pol.X - p1.X), c.Y - (pol.Y - p1.Y));
+
+                    Edges[i].Anchor0 = a0;// p0.ProjectedOntoLine(a0, a1);// new PointF(c.X - (pol.X - p1.X), c.Y + (pol.Y - p1.Y));
+                    Edges[i].Anchor1 = a1;// p1.ProjectedOntoLine(a0, a1);// new PointF(c.X + (pol.X - p1.X), c.Y - (pol.Y - p1.Y));
+                    p0 = c;
+                }
+            }
+        }
 
         private void SetAccessArrays()
         {
@@ -103,7 +131,7 @@ namespace MLTest.Sim
                     var mid0 = p0.MidPoint(a0);
                     PointF a1 = edge.Anchor1;
                     var mid1 = a0.MidPoint(a1);
-                    pts.AddRange(new[] { mid0, a0, mid1 });
+                    pts.AddRange(new[] { mid0, a0, edge.AnchorPoint });
 
                     p0 = (i < Edges.Count - 1) ? Edges[i + 1].Anchor0 : End.AnchorPoint;
                     var mid2 = a1.MidPoint(p0);
@@ -161,14 +189,18 @@ namespace MLTest.Sim
                     yOffset = (float)(Math.Cos(ang) * Math.Abs(offset) * Math.Sign(-offset));
                 }
                 result = new PointF(
-                    sp.X + (ep.X - sp.X) * (float)position + xOffset, 
-                    sp.Y + (ep.Y - sp.Y) * (float)position + yOffset);
+                    sp.X + xDif * (float)position + xOffset, 
+                    sp.Y + yDif * (float)position + yOffset);
             }
             else
             {
                 result = Bezier.GetPointAtT(position);
             }
             return result;
+        }
+        public PointF GetJointOnLine(SimJoint joint)
+        {
+            return PointF.Empty;
         }
 
 

@@ -14,16 +14,16 @@ namespace MLTest.Sim
     {
         // Start with just PostionXY
         public SimNode Locator { get; }
-        public SimShapeType ShapeType { get; }
+        public SimStructuralType ShapeType { get; }
         public SimElementType ElementType { get; }
 
-        public SimWhere(SimNode pos, SimShapeType shapeType = SimShapeType.Any, SimElementType elementType = SimElementType.Any)
+        public SimWhere(SimNode pos, SimStructuralType shapeType = SimStructuralType.Any, SimElementType elementType = SimElementType.Any)
         {
             Locator = pos;
             ShapeType = shapeType;
             ElementType = elementType;
         }
-        public SimWhere(SimDirection dir, SimShapeType shapeType = SimShapeType.Any, SimElementType elementType = SimElementType.Any) : this(NodeFromDirection(dir), shapeType, elementType){ }
+        public SimWhere(SimDirection dir, SimStructuralType shapeType = SimStructuralType.Any, SimElementType elementType = SimElementType.Any) : this(NodeFromDirection(dir), shapeType, elementType){ }
         
         public static SimNode NodeFromDirection(SimDirection dir)
         {

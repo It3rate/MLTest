@@ -33,6 +33,23 @@ namespace MLTest.Sim
         }
     }
 
+    //public enum SimPrimitiveType { Dot, Line, TwoLine, RightTriangle, Triangle, Square, Rectangle, Circle, Oval, Arc, Polyline, ConvexShape, ComplexShape }
+    public enum SimPrimitiveType { Triangle, Rectangle, Oval }
+    // two points define a line (maybe this is always a rect with zero thickness? No, because it is part of a rect, triangle etc) (maybe an arc with zero curve?)
+    // maybe dots, lines and polylines+ shouldn't be primitives? Seems right. Maybe merged primitive made of multiple basic shapes.
+    // three points can define a triangle, rect, oval (including start angle), arc
+
+    public class SimPrimitive : SimElement // maybe this is a stroke or a shape... Whatever the minimum reference is? Or only used when imagining strokes, so stays primitive and only used to generate reference nodes/strokes.
+    {
+        public SimPrimitiveType PrimitiveType { get; }
+        public SimStructuralType StructuralType { get => SimStructuralType.PadStructure; }
+        PointF P0 { get; }
+        PointF P1 { get; }
+        PointF P2 { get; }
+
+        /// methods to get points, corners, lines, arcs, tangents etc from imagined element
+    }
+
     public class SimNode : SimElement
     {
         public SimStroke Reference { get; set; } // if reference is null, this is skeleton point, position is x, offset is y
@@ -99,8 +116,8 @@ namespace MLTest.Sim
         public SimSection Angle { get; set; }    // abs angle of intersection with endpoint. Set speed to zero if don't care
         public SimSection Spread { get; set; }   // inertia of intersection connection ( probably sets cubic bezier endpoint with angle)
 
-        public PointF Anchor0 { get; private set; }
-        public PointF Anchor1 { get; private set; }
+        public PointF Anchor0 { get; set; }
+        public PointF Anchor1 { get; set; }
 
         public SimEdge(SimStroke reference, double position, double offset = 0, double spread = 1, double angle = 0, double curve = 0, double cross = 0) : base(reference, position, offset)
         {
@@ -110,7 +127,7 @@ namespace MLTest.Sim
             spread = reference == null ? spread : spread * reference.Length();
             Spread = new SimSection(spread);
             _isTip = Position_X.Likelihood(0) > 0.01 || Position_X.Likelihood(1) > 0.01; // todo: account for offset
-            SetCurveAnchors();
+            //SetCurveAnchors();
         }
 
         public double AngleSimilarity(SimEdge edge) => edge.Angle.Likelihood(Angle.Exact);

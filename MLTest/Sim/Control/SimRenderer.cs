@@ -35,7 +35,7 @@ namespace MLTest.Sim
         {
             foreach(var stroke in shape.Strokes)
             {
-                DrawStroke(g, stroke, (int)shape.ShapeType);
+                DrawStroke(g, stroke, (int)shape.StructuralType);
             }
         }
 
@@ -52,8 +52,11 @@ namespace MLTest.Sim
             }
             else
             {
-                DrawCircle(g, stroke.Edges[0].Anchor0, 2, 0.5);
-                DrawCircle(g, stroke.Edges[0].Anchor1, 3, 0.5);
+                foreach (var edge in stroke.Edges)
+                {
+                    DrawCircle(g, edge.Anchor0, 2, 0.5);
+                    DrawCircle(g, edge.Anchor1, 3, 0.5);
+                }
                 //DrawCurve(g, stroke.Start, stroke.Edges[0], stroke.End, penIndex);
                 DrawCurve(g, stroke, penIndex);
             }
