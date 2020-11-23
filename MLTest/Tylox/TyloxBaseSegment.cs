@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace MLTest.Tylox
 {
-    public abstract class BaseSegment
+    public abstract class TyloxBaseSegment
     {
         protected static int idCounter;
         public int Id { get; set; }
 
-        public static List<BaseSegment> Segments { get; } = new List<BaseSegment>();
+        public static List<TyloxBaseSegment> Segments { get; } = new List<TyloxBaseSegment>();
 
         public int ParentId { get; set; }
         public int PenIndex { get; set; }
@@ -29,15 +29,15 @@ namespace MLTest.Tylox
             }
         }
 
-        public BaseSegment(int parentId = -1, int penIndex = 0)
+        public TyloxBaseSegment(int parentId = -1, int penIndex = 0)
         {
             Id = idCounter++;
             ParentId = parentId;
             PenIndex = penIndex;
         }
-        protected BaseSegment GetParent()
+        protected TyloxBaseSegment GetParent()
         {
-            BaseSegment result = null;
+            TyloxBaseSegment result = null;
             if (ParentId >= 0 && ParentId < Segments.Count)
             {
                 result = Segments[ParentId];

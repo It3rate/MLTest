@@ -12,16 +12,16 @@ namespace MLTest
 {
     public partial class InteractForm : Form
     {
-        DesignGenerator _generator;
+        MLDesignGenerator _generator;
 
-        public List<Design> _targets;
-        public List<Design> _mutated;
-        public List<Design> _predictions;
+        public List<MLDesign> _targets;
+        public List<MLDesign> _mutated;
+        public List<MLDesign> _predictions;
         int _currentIndex = 0;
 
         public DrawTarget CurrentDrawTarget = DrawTarget.Predictions;
 
-        public InteractForm(DesignGenerator generator)
+        public InteractForm(MLDesignGenerator generator)
         {
             InitializeComponent();
 

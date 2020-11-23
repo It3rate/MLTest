@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MLTest
 {
-    public class Box
+    public class MLBox
     {
         public float Cx;
         public float Cy;
@@ -29,10 +29,10 @@ namespace MLTest
             }
         }
 
-        public Box()
+        public MLBox()
         {
         }
-        public Box(float cx, float cy, float rx, float ry, float colorOffset = 0)
+        public MLBox(float cx, float cy, float rx, float ry, float colorOffset = 0)
         {
             Cx = cx;
             Cy = cy;
@@ -41,7 +41,7 @@ namespace MLTest
 
             ColorOffset = colorOffset;
         }
-        public Box(float cx, float cy, float rx, float ry, HSL hsl)
+        public MLBox(float cx, float cy, float rx, float ry, HSL hsl)
         {
             Cx = cx;
             Cy = cy;

@@ -32,20 +32,20 @@ namespace MLTest.Sim
         public static void LetterR(SimFocusPad pad)
         {
             // Probably should swap Pos and offset here? Or maybe vertical line isn't typical for an anchor.
-            var refStroke = pad.GetStroke(new SimWhere(SimDirection.E, SimStructuralType.PadStructure, SimElementType.Stroke));
-            var start = new SimNode(refStroke, .1, .1);
-            var end = new SimNode(refStroke, .9, .2);
+            var letterbox = pad.GetStroke(new SimWhere(SimDirection.E, SimStructuralType.PadStructure, SimElementType.Stroke));
+            var start = new SimNode(letterbox, .1, .1);
+            var end = new SimNode(letterbox, .9, .2);
             var newStroke = new SimStroke(start, end);
             pad.AddStroke(newStroke);
 
             // Make top Loop (P)
-            refStroke = pad.GetStroke(new SimWhere(SimDirection.E, SimStructuralType.Current, SimElementType.Stroke));
+            var refStroke = pad.GetStroke(new SimWhere(SimDirection.E, SimStructuralType.Current, SimElementType.Stroke));
             start = new SimNode(refStroke, 0, 0);
-            var edge = new SimEdge(refStroke, .15, .3);
+            var edge = new SimEdge(refStroke, .25, .5);
             var edge2 = new SimEdge(refStroke, .45, .5);//, 0.35, 0.0, -1, 0.3);
             //var edge2 = new SimEdge(refStroke, .35, .3, 0.25, -.2, -1, 0.2);
             end = new SimNode(refStroke, 0.5, 0);
-            var loopStroke = new SimStroke(start, end, edge, edge2);
+            var loopStroke = new SimStroke(start, end, edge);
             pad.AddStroke(loopStroke);
 
             // Add top and mid expected joints
@@ -56,9 +56,10 @@ namespace MLTest.Sim
             // Make R tail
             // getstroke needs an option to pass an expected joint and direction, returning the stroke with Start 0 at passed joint
             refStroke = pad.GetStroke(new SimWhere(SimDirection.NW, SimStructuralType.Current, SimElementType.Stroke));
-            start = new SimNode(refStroke, .9, 0);
+            start = new SimNode(refStroke, .8, 0);
             edge = new SimEdge(newStroke, .5, .4, .2, -.3, 0, 0);
-            end = new SimNode(newStroke, 1, .5);
+            //end = new SimNode(newStroke, 1, .5);
+            end = new SimNode(letterbox, .9, .6);
             var tailStroke = new SimStroke(start, end); // , edge
             pad.AddStroke(tailStroke);
 

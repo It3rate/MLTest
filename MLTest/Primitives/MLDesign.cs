@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace MLTest
 {
-    public class Design
+    public class MLDesign
     {
         public float Variation { get; set; }
         public HSL BaseColor { get; set; }
@@ -18,14 +18,14 @@ namespace MLTest
         private static HSL _defaultColor = new HSL(0.9f, 0.7f, 0.3f);
 
 
-        private Box[] _boxes;
-        public Box[] BoxesRef => _boxes;
+        private MLBox[] _boxes;
+        public MLBox[] BoxesRef => _boxes;
 
-        public Design(int count)
+        public MLDesign(int count)
         {
             Init(count);
         }
-        public Design(int count, params float[] values)
+        public MLDesign(int count, params float[] values)
         {
             if (values.Length == 19) // input array (has base color and variation)
             {
@@ -48,18 +48,18 @@ namespace MLTest
         }
         private void Init(int count, float[] values)
         {
-            _boxes = new Box[count];
+            _boxes = new MLBox[count];
             for (int i = 0; i < count; i++)
             {
                 var st = i * 4;
-                _boxes[i] = new Box(values[st + 0], values[st + 1], values[st + 2], values[st + 3]);
+                _boxes[i] = new MLBox(values[st + 0], values[st + 1], values[st + 2], values[st + 3]);
             }
         }
 
         static Random rnd = new Random();
-        public static Design GenLayout3(float h, float v)
+        public static MLDesign GenLayout3(float h, float v)
         {
-            Design result = new Design(3);
+            MLDesign result = new MLDesign(3);
             TruncatedGaussian colorGenGaussian = new TruncatedGaussian(0.5, 0.04, 0.2, 0.8);
             //Gaussian colorGenGaussian = new Gaussian(0.5, 0.3);
             result.BaseColor = new HSL(
@@ -100,9 +100,9 @@ namespace MLTest
             return result;
 
         }
-        public static void ColorBoxesWithOffset(Design design, float stdDev)
+        public static void ColorBoxesWithOffset(MLDesign mlDesign, float stdDev)
         {
-            var boxes = design.BoxesRef;
+            var boxes = mlDesign.BoxesRef;
 
             // sort by size to keep coloring constant across shuffles
             var dict = new Dictionary<int, float>() { { 0, 0 }, { 1, 0 }, { 2, 0 } };
@@ -120,7 +120,7 @@ namespace MLTest
             boxes[list[0].Key].ColorOffset = -offset;
             foreach (var box in boxes)
             {
-                box.Color = design.BaseColor.HSLFromDistance(design.Variation + box.ColorOffset);
+                box.Color = mlDesign.BaseColor.HSLFromDistance(mlDesign.Variation + box.ColorOffset);
             }
         }
         public void GenColor()
@@ -131,12 +131,12 @@ namespace MLTest
             }
         }
 
-        public Box this[int i] => _boxes[i];
+        public MLBox this[int i] => _boxes[i];
         public int Count => _boxes.Length;
 
         public void Rotate()
         {
-            foreach (Box box in _boxes)
+            foreach (MLBox box in _boxes)
             {
                 float temp;
                 temp = box.Cy;
@@ -164,9 +164,9 @@ namespace MLTest
             }
             return result;
         }
-        public Design Clone()
+        public MLDesign Clone()
         {
-            var result = new Design(_boxes.Length);
+            var result = new MLDesign(_boxes.Length);
             result.BaseColor = BaseColor.Clone();
             result.Variation = Variation;
             for (int i = 0; i < _boxes.Length; i++)
@@ -186,10 +186,10 @@ namespace MLTest
             Variation = v[0];
             BaseColor = new HSL(v[1], v[2], v[3]);
             int vIndex = 4;
-            _boxes = new Box[count];
+            _boxes = new MLBox[count];
             for (int i = 0; i < count; i++)
             {
-                _boxes[i] = new Box(v[vIndex + 0], v[vIndex + 1], v[vIndex + 2], v[vIndex + 3], v[vIndex + 4]);
+                _boxes[i] = new MLBox(v[vIndex + 0], v[vIndex + 1], v[vIndex + 2], v[vIndex + 3], v[vIndex + 4]);
                 vIndex += 5;
             }
             GenColor(); // This won't be the exact target or input color, as that isn't saved (input is only variation).
@@ -197,10 +197,10 @@ namespace MLTest
         public void InitWithTargetArray(int count, float[] v)
         {
             int vIndex = 0;
-            _boxes = new Box[count];
+            _boxes = new MLBox[count];
             for (int i = 0; i < _boxes.Length; i++)
             {
-                _boxes[i] = new Box(v[vIndex + 0], v[vIndex + 1], v[vIndex + 2], v[vIndex + 3], new HSL(v[vIndex + 4], v[vIndex + 5], v[vIndex + 6]));
+                _boxes[i] = new MLBox(v[vIndex + 0], v[vIndex + 1], v[vIndex + 2], v[vIndex + 3], new HSL(v[vIndex + 4], v[vIndex + 5], v[vIndex + 6]));
                 vIndex += 7;
             }
         }

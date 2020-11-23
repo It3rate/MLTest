@@ -14,7 +14,7 @@ namespace MLTest.Tylox
     {
         public int Width { get; set; } = 250;
         public int Height { get; set; } = 250;
-        private List<BaseSegment> Segments => BaseSegment.Segments;
+        private List<TyloxBaseSegment> Segments => TyloxBaseSegment.Segments;
 
         private List<Pen> Pens { get; } = new List<Pen>();
         public TyloxGenerator()
@@ -41,17 +41,17 @@ namespace MLTest.Tylox
             AddRect(Segments, .3f, .4f, .7f, .6f);
         }
 
-        private void AddRect(List<BaseSegment> segments, float x0, float y0, float x1, float y1)
+        private void AddRect(List<TyloxBaseSegment> segments, float x0, float y0, float x1, float y1)
         {
-            var top  = AddSegment(segments, new AnchorSegment(x0, y0, x1, y0, penIndex: (int)PenTypes.LightGray));
-            var left = AddSegment(segments, new AnchorSegment(x0, y0, x0, y1, penIndex: (int)PenTypes.LightGray));
+            var top  = AddSegment(segments, new TyloxAnchorSegment(x0, y0, x1, y0, penIndex: (int)PenTypes.LightGray));
+            var left = AddSegment(segments, new TyloxAnchorSegment(x0, y0, x0, y1, penIndex: (int)PenTypes.LightGray));
             AddSegment(segments, new TyloxSegment(top.Id,  offset: 0, crossSlide: 0.2f, pos: 0f, len: top.Length * 1.4f, angle: 0.5f, penIndex: (int)PenTypes.Black));  // -
             AddSegment(segments, new TyloxSegment(left.Id, offset: 0, crossSlide: 0.2f, pos: 0f, len: left.Length * 1.4f, angle: 1f, penIndex: (int)PenTypes.DarkRed)); // |.
             AddSegment(segments, new TyloxSegment(top.Id, offset: 0, crossSlide: 0f, pos: 1f, len: left.Length, angle: 1f, penIndex: (int)PenTypes.DarkBlue)); // .|
             AddSegment(segments, new TyloxSegment(left.Id, offset: 0, crossSlide: 0f, pos: 1f, len: top.Length, angle: 0.5f, penIndex: (int)PenTypes.Black));  // _
         }
 
-        private BaseSegment AddSegment(List<BaseSegment> segments, BaseSegment seg)
+        private TyloxBaseSegment AddSegment(List<TyloxBaseSegment> segments, TyloxBaseSegment seg)
         {
             segments.Add(seg);
             return seg;

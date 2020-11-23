@@ -18,7 +18,7 @@ using System.Windows.Media;
 
 namespace MLTest
 {
-    public class DesignGenerator
+    public class MLDesignGenerator
     {
         private static MLContext mlContext;
         private static TensorFlowModel _tfModel;
@@ -59,16 +59,16 @@ namespace MLTest
             }
         }
 
-        public List<Design> Mutated = new List<Design>();
-        public List<Design> Targets = new List<Design>();
-        public List<Design> Predictions = new List<Design>();
+        public List<MLDesign> Mutated = new List<MLDesign>();
+        public List<MLDesign> Targets = new List<MLDesign>();
+        public List<MLDesign> Predictions = new List<MLDesign>();
 
         Random rnd = new Random();
 
         private bool _genTrainData = false;
         private int _trainDataCount = 80000;
         private bool useModelData = false;
-        public DesignGenerator()
+        public MLDesignGenerator()
         {
             mlContext = new MLContext();
             if (_genTrainData)
@@ -94,7 +94,7 @@ namespace MLTest
              LoadData("D:/tmp/Python/PythonApplication1/PythonApplication1/boxModel/", "testPredictions.txt", Predictions);
         }
 
-        public void LoadData(string folder, string inputFile, List<Design> container)
+        public void LoadData(string folder, string inputFile, List<MLDesign> container)
         {
             container.Clear();
             float val;
@@ -105,7 +105,7 @@ namespace MLTest
                 var line = reader.ReadLine();
                 var values = line.Split(',');
                 vals = values.Select(str => float.TryParse(str, out val) ? val : 0);
-                container.Add(new Design(3, vals.ToArray()));
+                container.Add(new MLDesign(3, vals.ToArray()));
             }
             reader.Close();
         }
@@ -135,7 +135,7 @@ namespace MLTest
 
         private bool _useOnnx = true;
         bool runModelOnNewData = false;
-        public void TestModel(List<Design> mutatedInput = null, List<Design> outputPredictions = null)
+        public void TestModel(List<MLDesign> mutatedInput = null, List<MLDesign> outputPredictions = null)
         {
             mutatedInput = mutatedInput ?? Mutated;
             outputPredictions = outputPredictions ?? Predictions;
@@ -162,14 +162,14 @@ namespace MLTest
             foreach (var prediction in outScores)
             {
                 //Console.WriteLine(string.Join(",", prediction.Identity));
-                outputPredictions.Add(new Design(3, prediction.Identity));
+                outputPredictions.Add(new MLDesign(3, prediction.Identity));
             }
         }
 
         Gaussian vGaussian = new Gaussian(0.5, 0.009);
         HSL baseColor = new HSL(0.9f, 0.7f, 0.3f);
 
-        public Design GenLayout() => Design.GenLayout3((float)vGaussian.Sample(), (float)vGaussian.Sample());
+        public MLDesign GenLayout() => MLDesign.GenLayout3((float)vGaussian.Sample(), (float)vGaussian.Sample());
 
         public void GenerateDataAt(int count, string folder, string inputFile, string targetFile)
         {
@@ -192,15 +192,15 @@ namespace MLTest
             targetStream.Close();
         }
 
-        public void RecolorDesigns(List<Design> designs, float stdDev = 0.03f)
+        public void RecolorDesigns(List<MLDesign> designs, float stdDev = 0.03f)
         {
             foreach (var design in designs)
             {
-                Design.ColorBoxesWithOffset(design, stdDev);
+                MLDesign.ColorBoxesWithOffset(design, stdDev);
             }
         }
 
-        public void TransformAll(List<Design> input, List<Design> container)
+        public void TransformAll(List<MLDesign> input, List<MLDesign> container)
         {
             container.Clear();
             for (int i = 0; i < input.Count; i++)
@@ -213,9 +213,9 @@ namespace MLTest
         TruncatedGaussian colTransformOffset = new TruncatedGaussian(0, 0.06, -0.2, 0.2);
         Gaussian nudgeGaussian = new Gaussian(0, 0.001);
         //Gaussian colTransformOffset = new Gaussian(0, 0.01);
-        private Design Transform(Design design)
+        private MLDesign Transform(MLDesign mlDesign)
         {
-            var result = design.Clone();
+            var result = mlDesign.Clone();
             int smallestIndex = result.SmallestIndex();
 
             for (int i = 0; i < result.Count; i++)
@@ -248,7 +248,7 @@ namespace MLTest
 
         LayoutInput(float[] values) { layoutInput = values; }
 
-        public static LayoutInput[] GetInputs(List<Design> layouts)
+        public static LayoutInput[] GetInputs(List<MLDesign> layouts)
         {
             var result = new LayoutInput[layouts.Count];
             for (int i = 0; i < layouts.Count; i++)

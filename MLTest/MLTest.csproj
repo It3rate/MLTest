@@ -365,8 +365,8 @@
     <Compile Include="Forms\TyloxForm.Designer.cs">
       <DependentUpon>TyloxForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Primitives\Box.cs" />
-    <Compile Include="Primitives\DesignGenerator.cs" />
+    <Compile Include="Primitives\MLBox.cs" />
+    <Compile Include="Primitives\MLDesignGenerator.cs" />
     <Compile Include="Forms\GeneratorForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -374,7 +374,7 @@
       <DependentUpon>GeneratorForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Primitives\HSL.cs" />
-    <Compile Include="Primitives\Design.cs" />
+    <Compile Include="Primitives\MLDesign.cs" />
     <Compile Include="Forms\InteractForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -397,8 +397,8 @@
     <Compile Include="Sim\Primitives\SimNode.cs" />
     <Compile Include="Sim\Primitives\SimShape.cs" />
     <Compile Include="Sim\SimWorld.cs" />
-    <Compile Include="Tylox\AnchorSegment.cs" />
-    <Compile Include="Tylox\BaseSegment.cs" />
+    <Compile Include="Tylox\TyloxAnchorSegment.cs" />
+    <Compile Include="Tylox\TyloxBaseSegment.cs" />
     <Compile Include="Tylox\TyloxGenerator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

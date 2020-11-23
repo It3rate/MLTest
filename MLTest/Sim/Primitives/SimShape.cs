@@ -1,13 +1,31 @@
 ﻿using Microsoft.ML.Probabilistic.Collections;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace MLTest.Sim
 {
-    public enum SimStructuralType { Any = 0, PadStructure, Focusing, Current, Previous, SecondLast, Exisiting, Planning, Comparing } 
+    public enum SimStructuralType { Any = 0, PadStructure, Focusing, Current, Previous, SecondLast, Exisiting, Planning, Comparing }
+
+    //public enum SimPrimitiveType { Dot, Line, TwoLine, RightTriangle, Triangle, Square, Rectangle, Circle, Oval, Arc, Polyline, ConvexShape, ComplexShape }
+    public enum SimPrimitiveType { Triangle, Rectangle, Oval }
+    // two points define a line (maybe this is always a rect with zero thickness? No, because it is part of a rect, triangle etc) (maybe an arc with zero curve?)
+    // maybe dots, lines and polylines+ shouldn't be primitives? Seems right. Maybe merged primitive made of multiple basic shapes.
+    // three points can define a triangle, rect, oval (including start angle), arc
+
+    public class SimPrimitiveShape : SimElement // maybe this is a stroke or a shape... Whatever the minimum reference is? Or only used when imagining strokes, so stays primitive and only used to generate reference nodes/strokes.
+    {
+        public SimStructuralType StructuralType { get => SimStructuralType.PadStructure; }
+        public SimPrimitiveType PrimitiveType { get; }
+        PointF P0 { get; }
+        PointF P1 { get; }
+        PointF P2 { get; }
+
+        /// methods to get points, corners, lines, arcs, tangents etc from imagined element
+    }
 
     public class SimShape : SimElement
     {

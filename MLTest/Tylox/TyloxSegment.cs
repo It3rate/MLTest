@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MLTest.Tylox
 {
-    public class TyloxSegment : BaseSegment
+    public class TyloxSegment : TyloxBaseSegment
     {
         public float CrossSlide { get; set; } // x for default line of origin to 0,1
         public float Position { get; set; } // y for default line of origin to 0,1
@@ -26,7 +26,7 @@ namespace MLTest.Tylox
             AbsLength = len;
             CrossSlide = crossSlide;
             AbsAngle = angle;
-            BaseSegment p = GetParent();
+            TyloxBaseSegment p = GetParent();
             if (p != null)
             {
                 // maybe angles and lens are absolute to parent segments, but relative to Anchor lines.

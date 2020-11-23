@@ -12,19 +12,19 @@ namespace MLTest
 {
     public partial class GeneratorForm : Form
     {
-        public DesignGenerator Generator { get; set; }
+        public MLDesignGenerator Generator { get; set; }
         public DrawTarget CurrentDrawTarget = DrawTarget.Truth;
 
-        public List<Design> _mutated;
-        public List<Design> _targets;
-        public List<Design> _predictions;
+        public List<MLDesign> _mutated;
+        public List<MLDesign> _targets;
+        public List<MLDesign> _predictions;
 
         public GeneratorForm()
         {
             InitializeComponent();
             DoubleBuffered = true;
             //var t = new Test1(this);
-            Generator = new DesignGenerator();
+            Generator = new MLDesignGenerator();
 
             _mutated = Generator.Mutated;
             _targets = Generator.Targets;
