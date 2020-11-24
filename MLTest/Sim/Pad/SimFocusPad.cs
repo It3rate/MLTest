@@ -58,7 +58,7 @@ namespace MLTest.Sim
             double similarity = 0;
             foreach (var stroke in AllStrokes(where.ShapeType))
             {
-                double max = SimUtils.ComparePoints(where.Locator.AnchorPoint, stroke.Center);
+                double max = Utils.ComparePoints(where.Locator.AnchorPoint, stroke.Center);
                 if (max > similarity)
                 {
                     similarity = max;

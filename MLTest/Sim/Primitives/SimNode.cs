@@ -119,7 +119,7 @@ namespace MLTest.Sim
         {
             var negLen = Spread.Exact * ((CrossSlide.Exact / 2.0) + 0.5);
             var posLen = Spread.Exact - negLen;
-            var ang = SimUtils.NormalizedToRadians(Angle.Exact);
+            var ang = Utils.NormalizedToRadians(Angle.Exact);
             var x = AnchorPoint.X;
             var y = AnchorPoint.Y;
             var xNeg = (float)(-Math.Sin(ang) * negLen);

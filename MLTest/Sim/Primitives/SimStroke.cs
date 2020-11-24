@@ -41,8 +41,8 @@ namespace MLTest.Sim
             float yDif = Start.AnchorPoint.Y - End.AnchorPoint.Y;
 
             float ang = (float)(Math.Atan2(yDif, xDif)); // (- Math.PI / 2.0) so zero is up?
-            StartAngle = SimUtils.NormalizeRadians(ang);
-            EndAngle = SimUtils.NormalizeRadians(ang + Math.PI);
+            StartAngle = Utils.NormalizeRadians(ang);
+            EndAngle = Utils.NormalizeRadians(ang + Math.PI);
 
             SetAccessArrays();
             SetCenter();
@@ -146,7 +146,7 @@ namespace MLTest.Sim
         }
 
         /// <summary>
-        /// Clone and return stroke oriented top to bottom, or if aproximately horizontal, left to right.
+        /// Clone and return stroke oriented top to bottom, or if approximately horizontal, left to right.
         /// </summary>
         public SimStroke GetOrientedClone()
         {
@@ -154,11 +154,11 @@ namespace MLTest.Sim
             var start = result.Start.AnchorPoint;
             var end = result.End.AnchorPoint;
             // this needs to eventually use the bounds scale of the stroke being tested
-            if (SimUtils.LikelyLess(end.Y, start.Y))
+            if (Utils.LikelyLess(end.Y, start.Y))
             {
                 result.FlipEnds();
             }
-            else if (SimUtils.LikelyEqual(start.Y, end.Y) && SimUtils.LikelyLess(end.X, start.X))
+            else if (Utils.LikelyEqual(start.Y, end.Y) && Utils.LikelyLess(end.X, start.X))
             {
                 result.FlipEnds();
             }

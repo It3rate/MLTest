@@ -392,7 +392,7 @@
     <Compile Include="Sim\Control\SimController.cs" />
     <Compile Include="Sim\Pad\SimFocusPad.cs" />
     <Compile Include="Sim\Primitives\SimJoint.cs" />
-    <Compile Include="Sim\Primitives\SimUtils.cs" />
+    <Compile Include="Utils.cs" />
     <Compile Include="Sim\SimPlanner.cs" />
     <Compile Include="Sim\Primitives\SimNode.cs" />
     <Compile Include="Sim\Primitives\SimShape.cs" />
@@ -406,6 +406,14 @@
     <Compile Include="ML\Test1.cs" />
     <Compile Include="Tylox\TyloxSegment.cs" />
     <Compile Include="Tylox\TyloxShape.cs" />
+    <Compile Include="Vis\Agent\VisSkill.cs" />
+    <Compile Include="Vis\Primitives\VisElement.cs" />
+    <Compile Include="Vis\Primitives\VisJoint.cs" />
+    <Compile Include="Vis\Primitives\VisLocator.cs" />
+    <Compile Include="Vis\Primitives\VisNode.cs" />
+    <Compile Include="Vis\VisPad.cs" />
+    <Compile Include="Vis\Primitives\VisShape.cs" />
+    <Compile Include="Vis\Primitives\VisStroke.cs" />
     <EmbeddedResource Include="Forms\GeneratorForm.resx">
       <DependentUpon>GeneratorForm.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -452,6 +460,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

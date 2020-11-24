@@ -7,9 +7,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MLTest.Sim
+namespace MLTest
 {
-    public class SimUtils
+    public class Utils
     {
         private static Gaussian _narrowCompare = new Gaussian(0, 0.025);
         private static Gaussian _wideCompare = new Gaussian(0, 0.1);
@@ -20,7 +20,7 @@ namespace MLTest.Sim
         {
             var difX = Math.Abs(p0.X - p1.X);
             var difY = Math.Abs(p0.Y - p1.Y);
-            return SimUtils.Likelihood(_fullCompare, difX) * SimUtils.Likelihood(_fullCompare, difY);
+            return Utils.Likelihood(_fullCompare, difX) * Utils.Likelihood(_fullCompare, difY);
         }
 
         /// <summary>
