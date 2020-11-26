@@ -41,8 +41,8 @@ namespace MLTest.Sim
             float yDif = Start.AnchorPoint.Y - End.AnchorPoint.Y;
 
             float ang = (float)(Math.Atan2(yDif, xDif)); // (- Math.PI / 2.0) so zero is up?
-            StartAngle = Utils.NormalizeRadians(ang);
-            EndAngle = Utils.NormalizeRadians(ang + Math.PI);
+            StartAngle = Utils.RadiansToNorm(ang);
+            EndAngle = Utils.RadiansToNorm(ang + Math.PI);
 
             SetAccessArrays();
             SetCenter();

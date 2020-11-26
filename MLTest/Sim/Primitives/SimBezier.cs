@@ -249,52 +249,52 @@ namespace MLTest.Sim
                 path.AddLine(_polyPoints[i - 1], _polyPoints[i]);
             }
             return path;
-            var index = 0;
-            float posX = 0;
-            float posY = 0;
-            foreach (var moveType in Moves)
-            {
-                switch (moveType)
-                {
-                    case SimBezierMove.MoveTo:
-                        posX = _points[index];
-                        posY = _points[index + 1];
-                        break;
-                    case SimBezierMove.LineTo:
-                        path.AddLine(posX, posY, _points[index], _points[index + 1]);
-                        posX = _points[index];
-                        posY = _points[index + 1];
-                        break;
-                    case SimBezierMove.QuadTo:
-                        // must convert to cubic for gdi
-                        var cx = _points[index];
-                        var cy = _points[index + 1];
-                        var a1x = _points[index + 2];
-                        var a1y = _points[index + 3];
-                        var c1x = (cx - posX) * 2 / 3 + posX;
-                        var c1y = (cy - posY) * 2 / 3 + posY;
-                        var c2x = a1x - (a1x - cx) * 2 / 3;
-                        var c2y = a1y - (a1y - cy) * 2 / 3;
-                        path.AddBezier(posX, posY, c1x, c1y, c2x, c2y, a1x, a1y);
-                        posX = a1x;
-                        posY = a1y;
-                        break;
-                    case SimBezierMove.CubeTo:
-                        path.AddBezier(posX, posY,
-                            _points[index], _points[index + 1],
-                            _points[index + 2], _points[index + 3],
-                            _points[index + 4], _points[index + 5]);
-                        posX = _points[index + 4];
-                        posY = _points[index + 5];
-                        break;
-                    default:
-                        path.CloseFigure();
-                        break;
-                }
-                index += MoveSize[(int)moveType];
-            }
+            //var index = 0;
+            //float posX = 0;
+            //float posY = 0;
+            //foreach (var moveType in Moves)
+            //{
+            //    switch (moveType)
+            //    {
+            //        case SimBezierMove.MoveTo:
+            //            posX = _points[index];
+            //            posY = _points[index + 1];
+            //            break;
+            //        case SimBezierMove.LineTo:
+            //            path.AddLine(posX, posY, _points[index], _points[index + 1]);
+            //            posX = _points[index];
+            //            posY = _points[index + 1];
+            //            break;
+            //        case SimBezierMove.QuadTo:
+            //            // must convert to cubic for gdi
+            //            var cx = _points[index];
+            //            var cy = _points[index + 1];
+            //            var a1x = _points[index + 2];
+            //            var a1y = _points[index + 3];
+            //            var c1x = (cx - posX) * 2 / 3 + posX;
+            //            var c1y = (cy - posY) * 2 / 3 + posY;
+            //            var c2x = a1x - (a1x - cx) * 2 / 3;
+            //            var c2y = a1y - (a1y - cy) * 2 / 3;
+            //            path.AddBezier(posX, posY, c1x, c1y, c2x, c2y, a1x, a1y);
+            //            posX = a1x;
+            //            posY = a1y;
+            //            break;
+            //        case SimBezierMove.CubeTo:
+            //            path.AddBezier(posX, posY,
+            //                _points[index], _points[index + 1],
+            //                _points[index + 2], _points[index + 3],
+            //                _points[index + 4], _points[index + 5]);
+            //            posX = _points[index + 4];
+            //            posY = _points[index + 5];
+            //            break;
+            //        default:
+            //            path.CloseFigure();
+            //            break;
+            //    }
+            //    index += MoveSize[(int)moveType];
+            //}
 
-            return path;
+            //return path;
         }
         public SimBezier Copy()
         {

@@ -13,20 +13,17 @@ namespace MLTest.Vis
 	    public override VisElementType ElementType => VisElementType.Stroke;
 
         public VisJoint[] Joints { get; }
-        public bool IsImagined { get; }
 
-	    public VisJoint Start { get => Joints[0]; }
-	    public VisJoint End { get => Joints[Joints.Length - 1]; }
-	    public override float Length { get; }
+	    public VisJoint Start => Joints[0];
+	    public VisJoint End => Joints[Joints.Length - 1];
+	    public override float Length() => 0;
 
 	    public override VisPoint AnchorPoint => Start.AnchorPoint;
 
-	    public VisStroke(bool isImagined, params VisJoint[] joints)
+	    public VisStroke( params VisJoint[] joints)
 	    {
 		    Debug.Assert(joints.Length > 1);
-		    IsImagined = isImagined;
 		    Joints = joints;
-		    Length = 1f;
 	    }
 
 	    public void Flip(){ }

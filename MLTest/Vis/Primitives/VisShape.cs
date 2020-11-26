@@ -10,7 +10,7 @@ namespace MLTest.Vis
     {
 	    public override VisElementType ElementType => VisElementType.Shape;
 
-	    public override float Length { get; } = 0;
+	    public override float Length() => 0;
 	    public override VisPoint AnchorPoint { get; } = null;
 
 	    public List<VisStroke> Strokes { get; } = new List<VisStroke>();

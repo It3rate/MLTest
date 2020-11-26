@@ -12,7 +12,7 @@ namespace MLTest.Vis
     {
 	    public override VisElementType ElementType => VisElementType.Joint;
 
-	    public override float Length => 0;
+	    public override float Length() => 0;
 	    public override VisPoint AnchorPoint => SourceLocation.AnchorPoint;
 
 	    public VisJointType JointType { get; }

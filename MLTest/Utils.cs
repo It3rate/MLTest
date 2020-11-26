@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using MLTest.Vis;
 
 namespace MLTest
 {
@@ -50,13 +51,18 @@ namespace MLTest
         }
 
         private static double TWO_PI = 2 * Math.PI;
-        public static double NormalizeRadians(double radians)
+        public static double RadiansToNorm(double radians)
         {
             double normalized = radians % TWO_PI;
             normalized = (normalized + TWO_PI) % TWO_PI;
             return normalized <= Math.PI ? normalized : normalized - TWO_PI;
         }
-        public static double NormalizedToRadians(double norm)
+        /// <summary>
+        /// 0 North, 0.5 East, 1/-1 South, -0.5 West
+        /// </summary>
+        /// <param name="norm"></param>
+        /// <returns></returns>
+        public static double NormToRadians(double norm)
         {
             double normalized = -(1.0 - (norm / 2.0 + 0.5) - 0.5); // 0-1 cw, 0 is east with extra 0.25
             normalized *= TWO_PI;
@@ -72,6 +78,8 @@ namespace MLTest
 
     public static class ExtensionMethods
     {
+        public static VisPoint VisPoint(this PointF p0) => new VisPoint(p0.X, p0.Y);
+
         public static float Length(this PointF p0) => (float)Math.Sqrt(p0.X * p0.X + p0.Y * p0.Y);
         public static float SquaredLength(this PointF p0) => p0.X * p0.X + p0.Y * p0.Y;
         public static float DistanceTo(this PointF p0, PointF p1) => (float)Math.Sqrt(Math.Pow(p1.X - p0.X, 2) + Math.Pow(p1.Y - p0.Y, 2));
