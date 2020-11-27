@@ -9,5 +9,5 @@ namespace MLTest.Vis
     public class VisLocator
     {
     }
-    public enum VisDirection { Default, N, NE, E, SE, S, SW, W, NW, Center }
+    public enum VisDirection { Default, N, NE, E, SE, S, SW, W, NW, Center, WE, NS }
 }

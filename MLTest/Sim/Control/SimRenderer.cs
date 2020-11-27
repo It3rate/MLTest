@@ -91,7 +91,7 @@ namespace MLTest.Sim
 
         public void DrawCurve(Graphics g, SimNode p0, SimEdge edge, SimNode p1, int penIndex = 0)
         {
-            //g.DrawBezier(Pens[4], p0.AnchorPoint, edge.Anchor0, edge.Anchor1, p1.AnchorPoint);
+            //g.DrawBezier(Pens[4], p0.Anchor, edge.Anchor0, edge.Anchor1, p1.Anchor);
             var mid0 = p0.AnchorPoint.MidPoint(edge.Anchor0);
             var mid1 = edge.Anchor0.MidPoint(edge.Anchor1);
             var mid2 = p1.AnchorPoint.MidPoint(edge.Anchor1);
@@ -102,8 +102,8 @@ namespace MLTest.Sim
             DrawCircle(g, mid1, 5, 0.5);
             DrawCircle(g, mid2, 5, 0.5);
 
-            //g.DrawBezier(Pens[penIndex], p0.AnchorPoint, edge.Anchor0, edge.Anchor0, edge.Anchor1);
-            //g.DrawBezier(Pens[penIndex], edge.Anchor0, edge.Anchor1, edge.Anchor1, p1.AnchorPoint);
+            //g.DrawBezier(Pens[penIndex], p0.Anchor, edge.Anchor0, edge.Anchor0, edge.Anchor1);
+            //g.DrawBezier(Pens[penIndex], edge.Anchor0, edge.Anchor1, edge.Anchor1, p1.Anchor);
         }
 
         public List<Pen> Pens = new List<Pen>();

@@ -78,7 +78,7 @@ namespace MLTest
 
     public static class ExtensionMethods
     {
-        public static VisPoint VisPoint(this PointF p0) => new VisPoint(p0.X, p0.Y);
+        public static Vis.Point VisPoint(this PointF p0) => new Vis.Point(p0.X, p0.Y);
 
         public static float Length(this PointF p0) => (float)Math.Sqrt(p0.X * p0.X + p0.Y * p0.Y);
         public static float SquaredLength(this PointF p0) => p0.X * p0.X + p0.Y * p0.Y;

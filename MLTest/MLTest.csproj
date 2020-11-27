@@ -410,6 +410,7 @@
     <Compile Include="Vis\Primitives\VisElement.cs" />
     <Compile Include="Vis\Primitives\VisJoint.cs" />
     <Compile Include="Vis\Primitives\VisLocator.cs" />
+    <Compile Include="Vis\Primitives\VisPrimitives.cs" />
     <Compile Include="Vis\Primitives\VisNode.cs" />
     <Compile Include="Vis\VisPad.cs" />
     <Compile Include="Vis\Primitives\VisShape.cs" />

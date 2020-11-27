@@ -7,26 +7,27 @@ using Microsoft.ML.Probabilistic.Distributions;
 
 namespace MLTest.Vis
 {
+    public interface IJoiner{}
 
-    public class VisJoint : VisElement
+    public class VisJoint : IJoiner
     {
-	    public override VisElementType ElementType => VisElementType.Joint;
+	    //public override VisElementType ElementType => VisElementType.Joint;
 
-	    public override float Length() => 0;
-	    public override VisPoint AnchorPoint => SourceLocation.AnchorPoint;
+	    //public override float Length() => 0;
+	    //public override Point Anchor => Target.Anchor;
 
 	    public VisJointType JointType { get; }
 
-	    public VisNode SourceLocation { get; }
-	    public VisNode TargetLocation { get; }
+	    public VisNode Source { get; }
+	    public VisNode Target { get; }
 
 	    // computed
 	    public double JointAngle { get; }
 
 	    public VisJoint(VisNode source, VisNode target, VisJointType jointType = VisJointType.Inferred)
 	    {
-		    SourceLocation = source;
-		    TargetLocation = target;
+		    Source = source;
+		    Target = target;
 		    JointType = jointType;
 	    }
 
@@ -38,7 +39,7 @@ namespace MLTest.Vis
 	public enum VisJointType
 	{
         Inferred,
-		Tip,
+        Line,
 		Corner,
 		Butt,
 		Tangent,

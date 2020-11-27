@@ -7,14 +7,24 @@ using System.Threading.Tasks;
 namespace MLTest.Vis.Agent
 {
     public class VisSkill
-    { 
-	    // Use separate pads for imagined and seen elements
-	    VisPad<VisPoint> focusPad = new VisPad<VisPoint>();
+    {
+        // Use separate pads for imagined and seen elements
+
+        // pads are a complex version of the visual-motor connection of neurons in early life: see, process/transmit, signal muscles
+        // Sensory capture - Input (visualization)
+        // Understanding - processing to primitive shapes on pad (Primitives)
+        // Planning - Lookup of letter recipes (cell)
+        // Deciding - Form next stroke plan (thought)
+        // Transmitting - encode and send to renderer (via nervous system)
+        // Motor - render (muscle motion)
+        // Feedback - back to step 1
+
+        VisPad<Point> focusPad = new VisPad<Point>();
 	    VisPad<VisStroke> viewPad = new VisPad<VisStroke>();
 
 	    public void LetterR()
 	    {
-            var letterbox = new VisRectangle(0.4f, 0.5f, 0.1f, 0.1f);
+            var letterbox = new Rectangle(0.4f, 0.5f, 0.1f, 0.1f);
             focusPad.Elements.Add(letterbox);
 
             // LB: imagine letterbox

@@ -18,7 +18,7 @@ namespace MLTest.Vis
 	    public VisJoint End => Joints[Joints.Length - 1];
 	    public override float Length() => 0;
 
-	    public override VisPoint AnchorPoint => Start.AnchorPoint;
+	    public override Point Anchor => Start.Source.Anchor;
 
 	    public VisStroke( params VisJoint[] joints)
 	    {

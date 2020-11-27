@@ -200,7 +200,7 @@ namespace MLTest.Tylox
         //public PointF[] GetSegmentPoints(int index)
         //{
         //    var posPair = Positions[index];
-        //    var st = Parent.Positions[posPair.AnchorPoint];
+        //    var st = Parent.Positions[posPair.Anchor];
         //}
         public void Draw(List<Pen> pens, Graphics g, int colorIndex)
         {
