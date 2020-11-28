@@ -8,21 +8,23 @@ namespace MLTest.Vis
 {
 	public class VisNode : IPrimitive, IJoiner
     {
-		public VisElement Reference { get; }
+		public IPath Reference { get; }
 		public float Position { get; }
 		public float Offset { get; }
 
 		public Point Anchor { get; }
 
-		public VisNode(VisElement reference, float position, float offset)
+		public VisNode(IPath reference, float position, float offset)
 		{
 			Reference = reference;
 			Position = position;
 			Offset = offset;
+
+			Anchor = reference.GetPoint(position, offset);
 		}
 
 		public float Length { get; }
-		public Point GetPointUsing(float position, float offset)
+		public Point GetPoint(float position, float offset)
 		{
 			throw new NotImplementedException();
 		}

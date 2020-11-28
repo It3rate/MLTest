@@ -30,6 +30,11 @@ namespace MLTest.Vis
 		    Target = target;
 		    JointType = jointType;
 	    }
+	    public VisJoint(VisNode source)
+	    {
+		    JointType = VisJointType.Tip;
+		    Source = source;
+	    }
 
         public static Gaussian TipProbability;
 	    public static Gaussian ButtProbability;
@@ -39,8 +44,10 @@ namespace MLTest.Vis
 	public enum VisJointType
 	{
         Inferred,
+        Tip,
         Line,
-		Corner,
+        Curve,
+        Corner,
 		Butt,
 		Tangent,
 		Cross,

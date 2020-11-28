@@ -407,6 +407,10 @@
     <Compile Include="Tylox\TyloxSegment.cs" />
     <Compile Include="Tylox\TyloxShape.cs" />
     <Compile Include="Vis\Agent\VisSkill.cs" />
+    <Compile Include="Vis\Primitives\Circle.cs" />
+    <Compile Include="Vis\Primitives\Line.cs" />
+    <Compile Include="Vis\Primitives\Point.cs" />
+    <Compile Include="Vis\Primitives\Rectangle.cs" />
     <Compile Include="Vis\Primitives\VisElement.cs" />
     <Compile Include="Vis\Primitives\VisJoint.cs" />
     <Compile Include="Vis\Primitives\VisLocator.cs" />

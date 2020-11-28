@@ -8,25 +8,26 @@ using Microsoft.ML.Probabilistic.Utilities;
 
 namespace MLTest.Vis
 {
-    public class VisStroke : VisElement
+    public class VisStroke : VisElement, IPath
     {
 	    public override VisElementType ElementType => VisElementType.Stroke;
 
-        public VisJoint[] Joints { get; }
+        public List<VisJoint> Joints { get; } = new List<VisJoint>();
 
 	    public VisJoint Start => Joints[0];
-	    public VisJoint End => Joints[Joints.Length - 1];
+	    public VisJoint End => Joints[Joints.Count - 1];
 	    public override float Length() => 0;
 
 	    public override Point Anchor => Start.Source.Anchor;
 
-	    public VisStroke( params VisJoint[] joints)
+	    public VisStroke(VisJoint first, VisJoint second, params VisJoint[] remaining)
 	    {
-		    Debug.Assert(joints.Length > 1);
-		    Joints = joints;
+		    Joints.Add(first);
+		    Joints.Add(second);
+		    Joints.AddRange(remaining);
 	    }
 
-	    public void Flip(){ }
+        public void Flip(){ }
 	    public VisStroke OrientedClone() => null;
 	    public override float CompareTo(VisElement element) => 0;
 	    public bool BoundsOverlaps(VisStroke stroke) => false;
@@ -41,5 +42,15 @@ namespace MLTest.Vis
 	    public float LikelyHorizontal { get; }
 	    public float LikelyDiagonalUp { get; }
 	    public float LikelyDiagonalDown { get; }
+
+	    public Point GetPoint(float position, float offset)
+	    {
+		    throw new NotImplementedException();
+	    }
+
+	    public Point GetPointFromCenter(float centeredPosition, float offset)
+	    {
+		    throw new NotImplementedException();
+	    }
     }
 }
