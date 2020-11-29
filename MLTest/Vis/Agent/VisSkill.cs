@@ -21,9 +21,9 @@ namespace MLTest.Vis.Agent
 		// Feedback - back to step 1
 
 		VisPad<Point> focusPad = new VisPad<Point>();
-		VisPad<VisStroke> viewPad = new VisPad<VisStroke>();
+		VisPad<Stroke> viewPad = new VisPad<Stroke>();
 
-		public VisStroke[] LetterR()
+		public Stroke[] LetterR()
 		{
             // LB: imagine letterbox
             // LB0: find left vertical line (need to find sub pieces of imagined elements - if using the whole rect can just reference it)
@@ -46,18 +46,18 @@ namespace MLTest.Vis.Agent
 			var center = seenLeftStroke.NodeAt(0.25f, 0.5f);
 			var topCircle = new Circle(center, radius);
 
-			var circleNode = new VisNode(topCircle, 0);
+			var circleNode = new Node(topCircle, 0);
 
 			//var loopStartJoint = new VisJoint(seenLeftStroke.StartNode, circleNode0, VisJointType.Corner);
 			//var circleJoint = new VisJoint(circleNode0, circleNode1, VisJointType.Curve);
 			//var loopEndJoint = new VisJoint(circleNode1, seenLeftStroke.NodeAt(0.5f), VisJointType.Butt);
 
-			var loopStroke = new VisStroke(seenLeftStroke.StartNode, circleNode, seenLeftStroke.NodeAt(0.5f));
+			var loopStroke = new Stroke(seenLeftStroke.StartNode, circleNode, seenLeftStroke.NodeAt(0.5f));
 
 			return viewPad.Elements.ToArray();
         }
 
-		public VisStroke[] LetterC()
+		public Stroke[] LetterC()
 		{
 			var letterbox = new Rectangle(0.4f, 0.5f, 0.1f, 0.1f);
 			focusPad.Elements.Add(letterbox);
@@ -65,7 +65,7 @@ namespace MLTest.Vis.Agent
 			var circle = new Circle(letterbox.Center, letterbox.GetPoint(CompassDirection.E), ClockDirection.CCW);
 			var startC = circle.NodeAt(0.1f);
 			var endC = circle.NodeAt(0.9f);
-			var loopStroke = new VisStroke(startC, endC);
+			var loopStroke = new Stroke(startC, endC);
 			viewPad.Elements.Add(loopStroke);
 
 			return viewPad.Elements.ToArray();

@@ -88,9 +88,7 @@ namespace MLTest
 
         private void btNext_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            Program._tyloxForm.DesktopLocation = this.DesktopLocation;
-            Program._tyloxForm.Show();
+            Program.NextForm();
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -127,7 +125,7 @@ namespace MLTest
             g.TranslateTransform(left / w, top / h);
         }
 
-        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        private void _formClosed(object sender, FormClosedEventArgs e)
         {
             Application.Exit();
         }

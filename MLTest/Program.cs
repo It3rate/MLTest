@@ -13,35 +13,49 @@ namespace MLTest
 {
     static class Program
     {
-        public static GeneratorForm _generatorForm;
-        public static InteractForm _interactForm;
-        public static TyloxForm _tyloxForm;
-        public static SimForm _simForm;
+        private static int _formIndex = 2;
+        private static Form ActiveForm;
+        private static List<Form> Forms;
 
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
         [STAThread]
         static void Main()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            var genForm = new GeneratorForm();
+            Forms = new List<Form>
+            {
+	            genForm,
+	            new InteractForm(genForm.Generator),
+	            new TyloxForm(),
+	            new SimForm(),
+	            new VisForm(),
+            };
 
-            _generatorForm = new GeneratorForm();
-            _generatorForm.Hide();
+            NextForm();
 
-            _interactForm = new InteractForm(_generatorForm.Generator);
-            _interactForm.Hide();
-
-            _tyloxForm = new TyloxForm(new TyloxRenderer());
-            _tyloxForm.Hide();
-
-            _simForm = new SimForm();
-            _simForm.Hide();
-
-            // Application.Run(_generatorForm);
-            Application.Run(_simForm);
+            Application.Run(ActiveForm);
         }
 
+        public static void NextForm()
+        {
+	        _formIndex++;
+	        if (_formIndex >= Forms.Count)
+	        {
+		        _formIndex = 0;
+	        }
+
+	        foreach (var form in Forms)
+	        {
+		        form.StartPosition = FormStartPosition.CenterScreen;
+		        if (form.Visible)
+		        {
+			        form.Hide();
+		        }
+	        }
+
+            ActiveForm = Forms[_formIndex];
+            ActiveForm.Show();
+        }
     }
 }

@@ -365,6 +365,12 @@
     <Compile Include="Forms\TyloxForm.Designer.cs">
       <DependentUpon>TyloxForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\VisForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\VisForm.Designer.cs">
+      <DependentUpon>VisForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Primitives\MLBox.cs" />
     <Compile Include="Primitives\MLDesignGenerator.cs" />
     <Compile Include="Forms\GeneratorForm.cs">
@@ -406,7 +412,9 @@
     <Compile Include="ML\Test1.cs" />
     <Compile Include="Tylox\TyloxSegment.cs" />
     <Compile Include="Tylox\TyloxShape.cs" />
+    <Compile Include="Vis\Agent\VisAgent.cs" />
     <Compile Include="Vis\Agent\VisSkill.cs" />
+    <Compile Include="Vis\Controller\VisRenderer.cs" />
     <Compile Include="Vis\Primitives\Circle.cs" />
     <Compile Include="Vis\Primitives\Line.cs" />
     <Compile Include="Vis\Primitives\Point.cs" />
@@ -415,10 +423,10 @@
     <Compile Include="Vis\Primitives\VisJoint.cs" />
     <Compile Include="Vis\Primitives\VisLocator.cs" />
     <Compile Include="Vis\Primitives\VisPrimitives.cs" />
-    <Compile Include="Vis\Primitives\VisNode.cs" />
+    <Compile Include="Vis\Primitives\Node.cs" />
     <Compile Include="Vis\VisPad.cs" />
     <Compile Include="Vis\Primitives\VisShape.cs" />
-    <Compile Include="Vis\Primitives\VisStroke.cs" />
+    <Compile Include="Vis\Primitives\Stroke.cs" />
     <EmbeddedResource Include="Forms\GeneratorForm.resx">
       <DependentUpon>GeneratorForm.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -431,6 +439,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\TyloxForm.resx">
       <DependentUpon>TyloxForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\VisForm.resx">
+      <DependentUpon>VisForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

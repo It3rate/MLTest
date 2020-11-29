@@ -8,16 +8,16 @@ using Microsoft.ML.Probabilistic.Utilities;
 
 namespace MLTest.Vis
 {
-    public class VisStroke : VisElement, IPath
+    public class Stroke : VisElement, IPath
     {
 	    public override VisElementType ElementType => VisElementType.Stroke;
 
-        public List<VisNode> Nodes { get; } = new List<VisNode>();
+        public List<Node> Nodes { get; } = new List<Node>();
 
         public override Point Anchor => StartNode.Anchor;
         public override float Length { get; }
 
-        public VisStroke(VisNode first, VisNode second, params VisNode[] remaining)
+        public Stroke(Node first, Node second, params Node[] remaining)
 	    {
 		    Nodes.Add(first);
 		    Nodes.Add(second);
@@ -25,10 +25,10 @@ namespace MLTest.Vis
 	    }
 
         public void Flip(){ }
-	    public VisStroke OrientedClone() => null;
+	    public Stroke OrientedClone() => null;
 	    public override float CompareTo(VisElement element) => 0;
-	    public bool BoundsOverlaps(VisStroke stroke) => false;
-	    public float DistanceTo(VisStroke stroke, out float position, out float targetPosition)
+	    public bool BoundsOverlaps(Stroke stroke) => false;
+	    public float DistanceTo(Stroke stroke, out float position, out float targetPosition)
 	    {
 		    position = 0;
 		    targetPosition = 0;
@@ -50,12 +50,12 @@ namespace MLTest.Vis
 		    throw new NotImplementedException();
 	    }
 
-	    public VisNode NodeAt(float position) => new VisNode(this, position);
-	    public VisNode NodeAt(float position, float offset) => new VisTipNode(this, position, offset);
-	    public VisNode StartNode => new VisNode(this, 0f);
-	    public VisNode MidNode => new VisNode(this, 0.5f);
-	    public VisNode EndNode => new VisNode(this, 1f);
-	    public VisStroke FullStroke => new VisStroke(StartNode, EndNode);
-	    public VisStroke Stroke(float start, float end) => new VisStroke(NodeAt(start), NodeAt(end));
+	    public Node NodeAt(float position) => new Node(this, position);
+	    public Node NodeAt(float position, float offset) => new TipNode(this, position, offset);
+	    public Node StartNode => new Node(this, 0f);
+	    public Node MidNode => new Node(this, 0.5f);
+	    public Node EndNode => new Node(this, 1f);
+	    public Stroke FullStroke => new Stroke(StartNode, EndNode);
+	    public Stroke PartialStroke(float start, float end) => new Stroke(NodeAt(start), NodeAt(end));
     }
 }

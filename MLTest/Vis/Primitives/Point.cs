@@ -24,12 +24,12 @@ namespace MLTest.Vis
         Point GetPoint(float position, float offset = 0);
         Point GetPointFromCenter(float centeredPosition, float offset);
 
-        VisNode NodeAt(float position, float offset = 0);
-        VisNode StartNode { get; }
-        VisNode MidNode { get; }
-        VisNode EndNode { get; }
-        VisStroke FullStroke { get; }
-        VisStroke Stroke(float start, float end);
+        Node NodeAt(float position, float offset = 0);
+        Node StartNode { get; }
+        Node MidNode { get; }
+        Node EndNode { get; }
+        Stroke FullStroke { get; }
+        Stroke PartialStroke(float start, float end);
 
     }
 

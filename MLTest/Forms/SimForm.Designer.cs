@@ -79,6 +79,7 @@
             this.Controls.Add(this.lbTitleX);
             this.Name = "SimForm";
             this.Text = "SimForm";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this._formClosed);
             this.ResumeLayout(false);
 
         }

@@ -7,34 +7,34 @@ using Microsoft.ML.Probabilistic.Distributions;
 
 namespace MLTest.Vis
 {
-    public interface IJoiner{}
-
-    // a node with a stroke reference is a joint in fact, hmm
-    public class VisJoint : IJoiner
+    /// <summary>
+    /// A joint is observed on a concrete shape (primitives can not make joints). Generally any node with a reference that is a stroke will be a joint, but there can be others, such as crosses.
+    /// </summary>
+    public class VisJoint
     {
-	    //public override VisElementType ElementType => VisElementType.Joint;
+        // center point of joint - average of connection points if they aren't perfect
+        // one+ points of a joint (ideally just one, but might not be perfect, so more are needed when joints don't meet correctly)
+        // joint type
+        // joint approximate angle 
+        // compare with perfect, get likelihood 
+        // error level
 
-	    //public override float Length() => 0;
-	    //public override Point Anchor => Target.Anchor;
+        // maybe joints need to be oriented on creation, like circles
 
 	    public VisJointType JointType { get; }
 
-	    public VisNode Source { get; }
-	    public VisNode Target { get; }
+	    public Point Center { get; }
+	    public CompassDirection Direction { get; }
+        public float Sharpness { get; } // smallest angle of the joint if it is a butt or cross, otherwise angle of the corner.
 
-	    // computed
-	    public double JointAngle { get; }
+        // computed
+        public double JointAngle { get; }
 
-	    public VisJoint(VisNode source, VisNode target, VisJointType jointType = VisJointType.Inferred)
+	    public VisJoint(Point center, VisJointType jointType, CompassDirection direction)
 	    {
-		    Source = source;
-		    Target = target;
+		    Center = center;
 		    JointType = jointType;
-	    }
-	    public VisJoint(VisNode source)
-	    {
-		    JointType = VisJointType.Tip;
-		    Source = source;
+		    Direction = direction;
 	    }
 
         public static Gaussian TipProbability;
@@ -44,13 +44,10 @@ namespace MLTest.Vis
 
 	public enum VisJointType
 	{
-        Inferred,
-        Tip,
-        Line,
-        Curve,
-        Corner,
-		Butt,
-		Tangent,
-		Cross,
+		Corner, // "L" May need to distinguish between serifs, not quite connecting corners, and other poorly made corners. Or just be able to eval probability of all types
+        Butt, // T, H
+        Split, // Y
+        CurveSplit, // like in 'r' or 'h'
+        Cross, // X
 	}
 }

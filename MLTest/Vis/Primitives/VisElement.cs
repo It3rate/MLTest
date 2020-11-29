@@ -14,12 +14,12 @@ namespace MLTest.Vis
 	    public abstract float Length { get; }
 
 
-        public virtual VisNode Center { get; protected set; }
-	    public virtual VisNode[] Bounds { get => null; }
+        public virtual Node Center { get; protected set; }
+	    public virtual Node[] Bounds { get => null; }
 
         public virtual float CompareTo(VisElement element) => 0;
         public virtual Point GetPointUsing(float position, float offset) => null;
-        public virtual Point GetPointUsing(VisNode node) => null;
+        public virtual Point GetPointUsing(Node node) => null;
     }
 
     public enum VisElementType { Any, Point, Node, Circle, Square, Rectangle, Oval, Joint, Stroke, Shape }

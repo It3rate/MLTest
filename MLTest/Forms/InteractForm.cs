@@ -34,9 +34,7 @@ namespace MLTest
 
         private void btNext_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            Program._generatorForm.DesktopLocation = this.DesktopLocation;
-            Program._generatorForm.Show();
+	        Program.NextForm();
         }
 
         private void panel1_Paint(object sender, PaintEventArgs e)
@@ -93,7 +91,7 @@ namespace MLTest
         {
             panel1.Invalidate();
         }
-        private void InteractForm_FormClosed(object sender, FormClosedEventArgs e)
+        private void _formClosed(object sender, FormClosedEventArgs e)
         {
             Application.Exit();
         }

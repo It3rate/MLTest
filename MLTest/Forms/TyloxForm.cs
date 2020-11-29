@@ -17,12 +17,12 @@ namespace MLTest.Forms
     public partial class TyloxForm : Form
     {
         TyloxRenderer _tylox;
-        public TyloxForm(TyloxRenderer generator)
+        public TyloxForm()
         {
             InitializeComponent();
 
             DoubleBuffered = true;
-            _tylox = generator;
+            _tylox = new TyloxRenderer();
 
             //var g = Variable.GammaFromMeanAndVariance(0, 0.0333);
 
@@ -72,9 +72,11 @@ namespace MLTest.Forms
 
         private void btNext_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            Program._interactForm.DesktopLocation = this.DesktopLocation;
-            Program._interactForm.Show();
+	        Program.NextForm();
+        }
+        private void _formClosed(object sender, FormClosedEventArgs e)
+        {
+	        Application.Exit();
         }
     }
 }

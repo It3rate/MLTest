@@ -120,9 +120,9 @@ namespace MLTest.Vis
             return result;
         }
 
-        public VisStroke GetStroke(CompassDirection direction)
+        public Stroke GetStroke(CompassDirection direction)
         {
-            VisStroke result= GetLine(direction).FullStroke;
+            Stroke result= GetLine(direction).FullStroke;
             //Line line = GetLine(direction);
             //switch (direction)
             //{
@@ -130,16 +130,16 @@ namespace MLTest.Vis
 	           //     result = line.FullStroke;
             //        break;
             //    case CompassDirection.S:
-            //        result = new VisStroke(line);
+            //        result = new Stroke(line);
             //        break;
             //    case CompassDirection.E:
-            //        result = new VisStroke(line);
+            //        result = new Stroke(line);
             //        break;
             //    case CompassDirection.W:
-            //        result = new VisStroke(line);
+            //        result = new Stroke(line);
             //        break;
             //    default:
-            //        result = new VisStroke(line);
+            //        result = new Stroke(line);
             //        break;
             //}
             return result;

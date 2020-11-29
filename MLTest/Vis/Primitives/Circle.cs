@@ -49,7 +49,7 @@ namespace MLTest.Vis
 			Direction = direction;
 			Initialize();
 		}
-		public Circle(VisNode center, VisNode perimeterOrigin, ClockDirection direction = ClockDirection.CW) : this(center.Anchor, perimeterOrigin.Anchor, direction){ }
+		public Circle(Node center, Node perimeterOrigin, ClockDirection direction = ClockDirection.CW) : this(center.Anchor, perimeterOrigin.Anchor, direction){ }
 
 		private void Initialize()
 		{
@@ -73,15 +73,15 @@ namespace MLTest.Vis
 			return GetPoint(centeredPosition * 2f - 1f, offset);
 		}
 
-		public VisStroke GetTangentArc(Point leftPoint, Point rightPoint) => null;
+		public Stroke GetTangentArc(Point leftPoint, Point rightPoint) => null;
 
-		public VisNode NodeAt(float position) => new VisNode(this, position);
-		public VisNode NodeAt(float position, float offset) => new VisTipNode(this, position, offset);
-        public VisNode StartNode => new VisNode(this, 0f);
-		public VisNode MidNode => new VisNode(this, 0.5f);
-		public VisNode EndNode => new VisNode(this, 1f);
-		public VisStroke FullStroke => new VisStroke(StartNode, EndNode);
-		public VisStroke Stroke(float start, float end) => new VisStroke(NodeAt(start), NodeAt(end));
+		public Node NodeAt(float position) => new Node(this, position);
+		public Node NodeAt(float position, float offset) => new TipNode(this, position, offset);
+        public Node StartNode => new Node(this, 0f);
+		public Node MidNode => new Node(this, 0.5f);
+		public Node EndNode => new Node(this, 1f);
+		public Stroke FullStroke => new Stroke(StartNode, EndNode);
+		public Stroke PartialStroke(float start, float end) => new Stroke(NodeAt(start), NodeAt(end));
 
 		public ClockDirection CounterDirection => Direction == ClockDirection.CW ? ClockDirection.CCW : ClockDirection.CW;
         public Circle CounterCircle => new Circle(Center, PerimeterOrigin, CounterDirection);

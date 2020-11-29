@@ -13,14 +13,14 @@ namespace MLTest.Vis
 	    public override float Length => 0;
 	    public override Point Anchor { get; } = null;
 
-	    public List<VisStroke> Strokes { get; } = new List<VisStroke>();
+	    public List<Stroke> Strokes { get; } = new List<Stroke>();
 
         // computed
 	    public List<VisJoint> ComputedJoints { get; } = new List<VisJoint>();
 
 	    public float IsInside(VisElement element) => 0;
 
-	    public VisShape(params VisStroke[] strokes)
+	    public VisShape(params Stroke[] strokes)
 	    {
 		    Strokes.AddRange(strokes);
 	    }

@@ -70,9 +70,11 @@ namespace MLTest.Forms
 
         private void btNext_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            Program._tyloxForm.DesktopLocation = this.DesktopLocation;
-            Program._tyloxForm.Show();
+	        Program.NextForm();
+        }
+        private void _formClosed(object sender, FormClosedEventArgs e)
+        {
+	        Application.Exit();
         }
     }
 }

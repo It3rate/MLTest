@@ -14,10 +14,10 @@ namespace MLTest.Vis
  //   {
 	//    public override VisElementType ElementType => VisElementType.Oval;
 
-	//    public VisNode PerimeterSide { get; }
+	//    public Node PerimeterSide { get; }
 	//    public float RadiusSide{ get; }
 
-	//    public VisOval(VisNode center, VisNode perimeterOrigin, VisNode perimeterSide) : base(center, perimeterOrigin)
+	//    public VisOval(Node center, Node perimeterOrigin, Node perimeterSide) : base(center, perimeterOrigin)
 	//    {
 	//	    PerimeterSide = perimeterSide;
 	//	    RadiusSide = center.Anchor.DistanceTo(PerimeterSide.Anchor);
@@ -28,26 +28,26 @@ namespace MLTest.Vis
 	//	    var rads = Utils.NormToRadians(position);
 	//	    return new Point(Anchor.X + (float)Math.Sin(rads) * (Radius + offset), Anchor.Y + (float)Math.Cos(rads) * (Radius + offset));
 	//    }
- //       public VisStroke GetElement(CompassDirection direction) => null;
+ //       public Stroke GetElement(CompassDirection direction) => null;
  //   }
  //   public class VisSquare : Point
 	//{
 	//	public override VisElementType ElementType => VisElementType.Square;
 
-	//	public VisStroke Reference { get; }
+	//	public Stroke Reference { get; }
 	//	public float Position => Val0;
 	//	public float Radius => Val1;
 
 
 	//	public override Point Anchor { get; }
 
-	//	public VisSquare(VisStroke reference, float position, float offset) : base(position, offset * reference.Length())
+	//	public VisSquare(Stroke reference, float position, float offset) : base(position, offset * reference.Length())
 	//	{
 	//		Reference = reference;
 	//		Anchor = Reference.GetPoint(Position, 0); // start
 	//	}
 
-	//	public VisStroke GetElement(CompassDirection direction) => null;
+	//	public Stroke GetElement(CompassDirection direction) => null;
 
 	//	public override Point GetPoint(float position, float offset)
 	//	{
