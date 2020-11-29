@@ -75,21 +75,13 @@ namespace MLTest.Vis
             return GetPoint(centeredPosition * 2f - 1f, offset);
         }
 
-        public VisNode NodeAt(float position, float offset = 0) => new VisNode(this, position, offset);
-        public VisNode StartNode => new VisNode(this, 0f, 0);
-        public VisNode MidNode => new VisNode(this, 0.5f, 0);
-        public VisNode EndNode => new VisNode(this, 1f, 0);
-        public VisJoint StartTipJoint => new VisJoint(StartNode);
-        public VisJoint TipJointAt(float position, float offset = 0) => new VisJoint(NodeAt(position, offset));
-        public VisJoint EndTipJoint => new VisJoint(EndNode);
-        public VisStroke FullStroke => new VisStroke(StartTipJoint, EndTipJoint);
-        public VisStroke Stroke(float start, float end) => new VisStroke(TipJointAt(start), TipJointAt(end));
-
-        public VisStroke GetStroke(float startPosition, float endPosition)
-        {
-            VisStroke result = new VisStroke(null, null);
-            return result;
-        }
+        public VisNode NodeAt(float position) => new VisNode(this, position);
+        public VisNode NodeAt(float position, float offset) => new VisTipNode(this, position, offset);
+        public VisNode StartNode => new VisNode(this, 0f);
+        public VisNode MidNode => new VisNode(this, 0.5f);
+        public VisNode EndNode => new VisNode(this, 1f);
+        public VisStroke FullStroke => new VisStroke(StartNode, EndNode);
+        public VisStroke Stroke(float start, float end) => new VisStroke(NodeAt(start), NodeAt(end));
 
         public Point MidPoint => new Point(X + (End.X - X) / 2f, Y + (End.Y - Y) / 2f);
         public Point IntersectionPoint(Line line) => null;

@@ -3,28 +3,53 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Python.Runtime;
 
 namespace MLTest.Vis
 {
+    public enum ClockDirection{CW, CCW}
 	/// <summary>
-	/// North pointing circle at given point with an offset radius. For directional circles, use ovals, or strokes.
+	/// A circle centered at the XY point, with a Radius. There is no natural 'home' angle -a second point is given to calculate the radius and orient it the circle (which becomes 0).
+	/// Circles are the only natural primitive that can have an area - it is a 'large point', not a shape made of joints.
+	/// The perimeter is 0-1 as it has a start and end from angle zero around (default is clockwise).
+	/// It will be used as tangent targets to and from other points (it arrives and leaves, doesn't care about orientation), unless it is a point starting or ending on the circle.
 	/// </summary>
 	public class Circle : Point, IPath
 	{
-		public Point PerimeterOrigin { get; }
+		public ClockDirection Direction { get; }
+        public Point PerimeterOrigin { get; }
 		public float Radius { get; private set; }
 		public override bool IsRounded => true;
 
-		public Circle(Point center, Point perimeterOrigin) : base(center.X, center.Y)
+		public override float Length
+		{
+			get
+			{
+				if (_length == 0)
+				{
+					_length = (float)(2f * Radius * Math.PI);
+				}
+				return _length;
+			}
+		}
+
+		//public Circle(Point center, float radius) : base(center.X, center.Y)
+		//{
+		//	Radius = radius;
+		//	PerimeterOrigin = new Point(X, Y - radius); // default north
+		//}
+        public Circle(Point center, Point perimeterOrigin, ClockDirection direction = ClockDirection.CW) : base(center.X, center.Y)
 		{
 			PerimeterOrigin = perimeterOrigin;
-		}
-        public Circle(float cx, float cy, float perimeterX, float perimeterY) : base(cx, cy)
+			Direction = direction;
+        }
+        public Circle(float cx, float cy, float perimeterX, float perimeterY, ClockDirection direction = ClockDirection.CW) : base(cx, cy)
 		{
 			PerimeterOrigin = new Point(perimeterX, perimeterY);
+			Direction = direction;
 			Initialize();
 		}
-		public Circle(VisNode center, VisNode perimeterOrigin) : this(center.Anchor, perimeterOrigin.Anchor){ }
+		public Circle(VisNode center, VisNode perimeterOrigin, ClockDirection direction = ClockDirection.CW) : this(center.Anchor, perimeterOrigin.Anchor, direction){ }
 
 		private void Initialize()
 		{
@@ -50,8 +75,16 @@ namespace MLTest.Vis
 
 		public VisStroke GetTangentArc(Point leftPoint, Point rightPoint) => null;
 
-		public VisNode StartNode => new VisNode(this, 0f, 0);
-		public VisNode EndNode => new VisNode(this, 1f, 0);
+		public VisNode NodeAt(float position) => new VisNode(this, position);
+		public VisNode NodeAt(float position, float offset) => new VisTipNode(this, position, offset);
+        public VisNode StartNode => new VisNode(this, 0f);
+		public VisNode MidNode => new VisNode(this, 0.5f);
+		public VisNode EndNode => new VisNode(this, 1f);
+		public VisStroke FullStroke => new VisStroke(StartNode, EndNode);
+		public VisStroke Stroke(float start, float end) => new VisStroke(NodeAt(start), NodeAt(end));
+
+		public ClockDirection CounterDirection => Direction == ClockDirection.CW ? ClockDirection.CCW : ClockDirection.CW;
+        public Circle CounterCircle => new Circle(Center, PerimeterOrigin, CounterDirection);
     }
 
 }

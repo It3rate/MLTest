@@ -13,22 +13,21 @@ namespace MLTest.Vis
     /// </summary>
     public interface IPrimitive
     {
-        float Length { get; }
-        Point GetPoint(float position, float offset);
+        //float Length { get; }
+        Point GetPoint(float position, float offset = 0);
         float Similarity(IPrimitive p);
     }
 
     public interface IPath
     {
-        Point GetPoint(float position, float offset);
+	    float Length { get; }
+        Point GetPoint(float position, float offset = 0);
         Point GetPointFromCenter(float centeredPosition, float offset);
 
         VisNode NodeAt(float position, float offset = 0);
         VisNode StartNode { get; }
         VisNode MidNode { get; }
         VisNode EndNode { get; }
-        VisJoint StartTipJoint { get; }
-        VisJoint EndTipJoint { get; }
         VisStroke FullStroke { get; }
         VisStroke Stroke(float start, float end);
 
@@ -61,6 +60,9 @@ namespace MLTest.Vis
         {
             return new Point(X + position, Y + offset);
         }
+
+        public Point Center => new Point(X, Y);
+
         public virtual float Length => _length;
         //public override float Length() => (float)Math.Sqrt(X * X + Y * Y);
         public float SquaredLength() => X * X + Y * Y;
@@ -70,7 +72,7 @@ namespace MLTest.Vis
         public Point Add(Point pt) => new Point(X + pt.X, Y + pt.Y);
         public Point Subtract(Point pt) => new Point(pt.X - X, pt.Y - Y);
         public Point Multiply(Point pt) => new Point(X * pt.X, Y * pt.Y);
-        public Point MidPoint(Point pt) => new Point((pt.X - X) / 2f + X, (pt.Y - Y) / 2f + Y);
+        public Point MidPointOf(Point pt) => new Point((pt.X - X) / 2f + X, (pt.Y - Y) / 2f + Y);
         public Point Multiply(float scalar) => new Point(X * scalar, Y * scalar);
         public Point DivideBy(float scalar) => new Point(X / scalar, Y / scalar);
         public float DistanceTo(Point pt) => (float)Math.Sqrt(Math.Pow(pt.X - X, 2) + Math.Pow(pt.Y - Y, 2));

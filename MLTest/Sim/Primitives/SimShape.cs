@@ -36,7 +36,7 @@ namespace MLTest.Sim
         // SimShape may need to also recognize enclosed, or partially enclosed spaces. SimJoint sibling class like SimContainer?
         public List<SimStroke> Strokes = new List<SimStroke>();
 
-        // Joints are halucinated on top of shapes. They are informational, not structural.
+        // Nodes are halucinated on top of shapes. They are informational, not structural.
         public List<SimJoint> Joints = new List<SimJoint>();
 
         public SimStroke this[int index] => Strokes[index];

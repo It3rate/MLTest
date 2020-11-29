@@ -12,19 +12,16 @@ namespace MLTest.Vis
     {
 	    public override VisElementType ElementType => VisElementType.Stroke;
 
-        public List<VisJoint> Joints { get; } = new List<VisJoint>();
+        public List<VisNode> Nodes { get; } = new List<VisNode>();
 
-	    public VisJoint Start => Joints[0];
-	    public VisJoint End => Joints[Joints.Count - 1];
-	    public override float Length() => 0;
+        public override Point Anchor => StartNode.Anchor;
+        public override float Length { get; }
 
-	    public override Point Anchor => Start.Source.Anchor;
-
-	    public VisStroke(VisJoint first, VisJoint second, params VisJoint[] remaining)
+        public VisStroke(VisNode first, VisNode second, params VisNode[] remaining)
 	    {
-		    Joints.Add(first);
-		    Joints.Add(second);
-		    Joints.AddRange(remaining);
+		    Nodes.Add(first);
+		    Nodes.Add(second);
+		    Nodes.AddRange(remaining);
 	    }
 
         public void Flip(){ }
@@ -52,5 +49,13 @@ namespace MLTest.Vis
 	    {
 		    throw new NotImplementedException();
 	    }
+
+	    public VisNode NodeAt(float position) => new VisNode(this, position);
+	    public VisNode NodeAt(float position, float offset) => new VisTipNode(this, position, offset);
+	    public VisNode StartNode => new VisNode(this, 0f);
+	    public VisNode MidNode => new VisNode(this, 0.5f);
+	    public VisNode EndNode => new VisNode(this, 1f);
+	    public VisStroke FullStroke => new VisStroke(StartNode, EndNode);
+	    public VisStroke Stroke(float start, float end) => new VisStroke(NodeAt(start), NodeAt(end));
     }
 }

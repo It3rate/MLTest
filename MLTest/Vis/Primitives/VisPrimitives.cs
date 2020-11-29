@@ -28,7 +28,7 @@ namespace MLTest.Vis
 	//	    var rads = Utils.NormToRadians(position);
 	//	    return new Point(Anchor.X + (float)Math.Sin(rads) * (Radius + offset), Anchor.Y + (float)Math.Cos(rads) * (Radius + offset));
 	//    }
- //       public VisStroke GetElement(VisDirection direction) => null;
+ //       public VisStroke GetElement(CompassDirection direction) => null;
  //   }
  //   public class VisSquare : Point
 	//{
@@ -47,7 +47,7 @@ namespace MLTest.Vis
 	//		Anchor = Reference.GetPoint(Position, 0); // start
 	//	}
 
-	//	public VisStroke GetElement(VisDirection direction) => null;
+	//	public VisStroke GetElement(CompassDirection direction) => null;
 
 	//	public override Point GetPoint(float position, float offset)
 	//	{

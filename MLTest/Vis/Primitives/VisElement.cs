@@ -11,7 +11,8 @@ namespace MLTest.Vis
 	    public abstract VisElementType ElementType { get; }
 
 	    public abstract Point Anchor { get; }
-	    public abstract float Length();
+	    public abstract float Length { get; }
+
 
         public virtual VisNode Center { get; protected set; }
 	    public virtual VisNode[] Bounds { get => null; }

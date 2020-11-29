@@ -75,7 +75,7 @@ namespace MLTest.Sim
         //  - can be used for top half, most, a bit, all. % signifies 2 std dev? More precise envs means less variance from the mean. Mean can change with style.
         //  - joints are defined on the most precise locations (first endpoints, then mid points, and last inners).
         //  - ovals use this with NSEW as segments
-        // Joints probably are sensitive in the same way
+        // Nodes probably are sensitive in the same way
 
         // Absolute lines
         // box sides, center lines, circle raduius's based on angle, circle diameters, any point to point above. Specify Vert, Horz etc

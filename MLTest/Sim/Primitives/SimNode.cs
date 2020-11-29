@@ -26,7 +26,7 @@ namespace MLTest.Sim
         }
         public virtual double CompareToConceptual(SimElement element)
         {
-            // Joints relative to each other. Even just similar joint types is a relation (triangle, square, twisted/concave square)
+            // Nodes relative to each other. Even just similar joint types is a relation (triangle, square, twisted/concave square)
             // Account for shape, scale/rotation/translation/flip/squish/skew, pointyness, complexity, stability, variation. 
             // Later: motion, momentum, friction, rigidity, count, risk, plan, emotion etc.
             return 0;

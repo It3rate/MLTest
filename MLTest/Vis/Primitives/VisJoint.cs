@@ -9,6 +9,7 @@ namespace MLTest.Vis
 {
     public interface IJoiner{}
 
+    // a node with a stroke reference is a joint in fact, hmm
     public class VisJoint : IJoiner
     {
 	    //public override VisElementType ElementType => VisElementType.Joint;

@@ -8,23 +8,30 @@ namespace MLTest.Vis
 {
 	public class VisNode : IPrimitive, IJoiner
     {
-		public IPath Reference { get; }
+	    //public VisJointType JointType { get; }
+
+        public IPath Reference { get; } // if reference is a stroke, this must be a joint
 		public float Position { get; }
-		public float Offset { get; }
 
-		public Point Anchor { get; }
+		public VisNode PreviousNode { get; private set; }
+		public VisNode NextNode { get; private set; }
 
-		public VisNode(IPath reference, float position, float offset)
+        // calculated
+        public Point Anchor { get; }
+		public float Length { get; }
+		public virtual Point Start => Anchor;
+        public Point End { get; }
+
+        public VisNode(IPath reference, float position)
 		{
 			Reference = reference;
 			Position = position;
-			Offset = offset;
 
-			Anchor = reference.GetPoint(position, offset);
+			Anchor = reference.GetPoint(position);
 		}
 
-		public float Length { get; }
-		public Point GetPoint(float position, float offset)
+
+        public Point GetPoint(float position, float offset=0)
 		{
 			throw new NotImplementedException();
 		}
@@ -34,4 +41,23 @@ namespace MLTest.Vis
 			throw new NotImplementedException();
 		}
     }
+
+	public class VisTipNode : VisNode
+	{
+		// Offset can't be zero in a middle node, as it causes overlap on lines that are tangent to each other. 
+		// The corner of a P is part of the shape with potential overlap on the serif.
+		// Maybe X could be a V with overlap.H would be a half U with 0.5 overlap. Maybe this is too obfuscated. Yes it is. Might work for serifs though.
+        public float Offset { get; }
+
+        public VisTipNode(IPath reference, float position, float offset) : base(reference, position)
+		{
+			Offset = offset;
+        }
+		//public VisTipNode(IPath reference, float position, float offset, float length) : base(reference, position)
+		//{
+		//	Offset = offset;
+		//	Length = length;
+  //      }
+    }
+
 }
