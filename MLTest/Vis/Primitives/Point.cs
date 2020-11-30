@@ -21,6 +21,11 @@ namespace MLTest.Vis
     public interface IPath
     {
 	    float Length { get; }
+	    Point StartPoint { get; }
+	    Point MidPoint { get; }
+	    Point EndPoint { get; }
+        Point Center { get; }
+
         Point GetPoint(float position, float offset = 0);
         Point GetPointFromCenter(float centeredPosition, float offset);
 
@@ -35,48 +40,144 @@ namespace MLTest.Vis
 
     public class Point : IPrimitive
     {
-        public float X { get; }
-        public float Y { get; }
+	    public float X { get; }
+	    public float Y { get; }
 
-        public virtual bool IsRounded => false;
-        protected float _length = 0;
+	    public virtual bool IsRounded => false;
+	    protected float _length = 0;
 
-        public Point(float x, float y)
-        {
-            X = x;
-            Y = y;
+	    public Point(float x, float y)
+	    {
+		    X = x;
+		    Y = y;
+	    }
+
+	    public Point(Point p)
+	    {
+		    X = p.X;
+		    Y = p.Y;
+	    }
+
+	    public PointF PointF => new PointF(X, Y);
+
+	    public Point Sample(Gaussian g) => new Point(X + (float) g.Sample(), Y + (float) g.Sample());
+	    public virtual float Similarity(IPrimitive p) => 0;
+
+	    public virtual Point GetPoint(float position, float offset)
+	    {
+		    return new Point(X + position, Y + offset);
+	    }
+
+	    public Point Center => new Point(X, Y);
+
+	    public virtual float Length => _length;
+
+	    //public override float Length() => (float)Math.Sqrt(X * X + Y * Y);
+	    public float SquaredLength() => X * X + Y * Y;
+	    public Point Abs() => new Point(Math.Abs(X), Math.Abs(Y));
+	    public Point Swap() => new Point(Y, X);
+
+	    public Point Add(Point pt) => new Point(X + pt.X, Y + pt.Y);
+	    public Point Subtract(Point pt) => new Point(pt.X - X, pt.Y - Y);
+	    public Point Multiply(Point pt) => new Point(X * pt.X, Y * pt.Y);
+	    public Point MidPointOf(Point pt) => new Point((pt.X - X) / 2f + X, (pt.Y - Y) / 2f + Y);
+	    public Point Multiply(float scalar) => new Point(X * scalar, Y * scalar);
+	    public Point DivideBy(float scalar) => new Point(X / scalar, Y / scalar);
+	    public float DistanceTo(Point pt) => (float) Math.Sqrt(Math.Pow(pt.X - X, 2) + Math.Pow(pt.Y - Y, 2));
+	    public float DotProduct(Point pt) => -(X * pt.X) + (Y * pt.Y); // negative because inverted Y
+
+	    public LinearDirection LinearDirection(Point pt)
+	    {
+		    // make this return probability as well
+		    LinearDirection result;
+		    var dir = Math.Atan2(pt.Y - Y, pt.X - X);
+		    var pi8 = Math.PI / 8f;
+		    if (dir < -(pi8 * 7))
+		    {
+			    result = Vis.LinearDirection.Horizontal;
+		    }
+		    else if (dir < -(pi8 * 5))
+		    {
+			    result = Vis.LinearDirection.TRDiagonal;
+		    }
+		    else if (dir < -(pi8 * 3))
+		    {
+			    result = Vis.LinearDirection.Vertical;
+		    }
+		    else if (dir < -(pi8 * 1))
+		    {
+			    result = Vis.LinearDirection.TLDiagonal;
+		    }
+		    else if (dir < (pi8 * 1))
+		    {
+			    result = Vis.LinearDirection.Horizontal;
+		    }
+		    else if (dir < (pi8 * 3))
+		    {
+			    result = Vis.LinearDirection.TRDiagonal;
+		    }
+		    else if (dir < (pi8 * 5))
+		    {
+			    result = Vis.LinearDirection.Vertical;
+		    }
+		    else if (dir < (pi8 * 7))
+		    {
+			    result = Vis.LinearDirection.TLDiagonal;
+		    }
+		    else
+		    {
+			    result = Vis.LinearDirection.Horizontal;
+		    }
+
+		    return result;
+	    }
+
+	    public CompassDirection DirectionFrom(Point pt)
+	    {
+            // make this return probability as well
+            CompassDirection result;
+		    var dir = Math.Atan2(pt.Y - Y, pt.X - X);
+		    var pi8 = Math.PI / 8f;
+		    if (dir < -(pi8 * 7))
+		    {
+			    result = CompassDirection.W;
+		    }
+		    else if (dir < -(pi8 * 5))
+		    {
+			    result =CompassDirection.SW;
+		    }
+		    else if (dir < -(pi8 * 3))
+		    {
+			    result =CompassDirection.S;
+		    }
+		    else if (dir < -(pi8 * 1))
+		    {
+			    result =CompassDirection.SE;
+		    }
+		    else if (dir < (pi8 * 1))
+		    {
+			    result =CompassDirection.E;
+		    }
+		    else if (dir < (pi8 * 3))
+		    {
+			    result =CompassDirection.NE;
+		    }
+		    else if (dir < (pi8 * 5))
+		    {
+			    result =CompassDirection.N;
+		    }
+		    else if (dir < (pi8 * 7))
+		    {
+			    result =CompassDirection.NW;
+		    }
+		    else
+		    {
+			    result =CompassDirection.W;
+		    }
+
+		    return result;
         }
-        public Point(Point p)
-        {
-            X = p.X;
-            Y = p.Y;
-        }
-        public PointF PointF => new PointF(X, Y);
-
-        public Point Sample(Gaussian g) => new Point(X + (float)g.Sample(), Y + (float)g.Sample());
-        public virtual float Similarity(IPrimitive p) => 0;
-
-        public virtual Point GetPoint(float position, float offset)
-        {
-            return new Point(X + position, Y + offset);
-        }
-
-        public Point Center => new Point(X, Y);
-
-        public virtual float Length => _length;
-        //public override float Length() => (float)Math.Sqrt(X * X + Y * Y);
-        public float SquaredLength() => X * X + Y * Y;
-        public Point Abs() => new Point(Math.Abs(X), Math.Abs(Y));
-        public Point Swap() => new Point(Y, X);
-
-        public Point Add(Point pt) => new Point(X + pt.X, Y + pt.Y);
-        public Point Subtract(Point pt) => new Point(pt.X - X, pt.Y - Y);
-        public Point Multiply(Point pt) => new Point(X * pt.X, Y * pt.Y);
-        public Point MidPointOf(Point pt) => new Point((pt.X - X) / 2f + X, (pt.Y - Y) / 2f + Y);
-        public Point Multiply(float scalar) => new Point(X * scalar, Y * scalar);
-        public Point DivideBy(float scalar) => new Point(X / scalar, Y / scalar);
-        public float DistanceTo(Point pt) => (float)Math.Sqrt(Math.Pow(pt.X - X, 2) + Math.Pow(pt.Y - Y, 2));
-        public float DotProduct(Point pt) => -(X * pt.X) + (Y * pt.Y); // negative because inverted Y
     }
 
+    public enum LinearDirection{Centered, Horizontal, Vertical, TLDiagonal, TRDiagonal }
 }

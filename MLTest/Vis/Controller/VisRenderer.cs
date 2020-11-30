@@ -27,10 +27,10 @@ namespace MLTest.Vis
             g.DrawLine(Pens[(int)PenTypes.LightGray], new PointF(-1f, 0), new PointF(1f, 0));
             g.DrawLine(Pens[(int)PenTypes.LightGray], new PointF(0, -1f), new PointF(0, 1f));
 
-            //foreach (var element in Agent.ActivePad.Elements)
-            //{
-            //    DrawShape(g, element);
-            //}
+            foreach (var path in Agent.ViewPad.Paths)
+            {
+                DrawPath(g, path);
+            }
         }
         public void DrawShape(Graphics g, Stroke shape)
         {
@@ -40,8 +40,9 @@ namespace MLTest.Vis
             //}
         }
 
-        public void DrawStroke(Graphics g, Stroke stroke, int penIndex = 0)
+        public void DrawPath(Graphics g, IPath path, int penIndex = 0)
         {
+            DrawLine(g, path.StartNode.Anchor, path.EndNode.Anchor);
             //foreach (var point in stroke.Anchors)
             //{
             //    DrawCircle(g, point, 0);
@@ -72,9 +73,9 @@ namespace MLTest.Vis
             g.DrawEllipse(Pens[penIndex], pos.X - r, pos.Y - r, r * 2f, r * 2f);
         }
 
-        public void DrawLine(Graphics g, Node p0, Node p1, int penIndex = 0)
+        public void DrawLine(Graphics g, Point p0, Point p1, int penIndex = 0)
         {
-            g.DrawLine(Pens[penIndex], p0.Anchor.X, p0.Anchor.Y, p1.Anchor.X, p1.Anchor.Y);
+            g.DrawLine(Pens[penIndex], p0.X, p0.Y, p1.X, p1.Y);
         }
 
         public List<Pen> Pens = new List<Pen>();

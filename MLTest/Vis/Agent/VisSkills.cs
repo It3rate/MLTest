@@ -5,9 +5,9 @@ using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MLTest.Vis.Agent
+namespace MLTest.Vis
 {
-	public class VisSkill
+	public class VisSkills
 	{
 		// Use separate pads for imagined and seen elements
 
@@ -20,11 +20,8 @@ namespace MLTest.Vis.Agent
 		// Motor - render (muscle motion)
 		// Feedback - back to step 1
 
-		VisPad<Point> focusPad = new VisPad<Point>();
-		VisPad<Stroke> viewPad = new VisPad<Stroke>();
-
-		public Stroke[] LetterR()
-		{
+		public Stroke[] LetterR(VisPad<Point> focusPad, VisPad<Stroke> viewPad)
+        {
             // LB: imagine letterbox
             // LB0: find left vertical line (need to find sub pieces of imagined elements - if using the whole rect can just reference it)
             // LeftS: make left stroke along LB0 with top and bottom tipJoints
@@ -35,11 +32,11 @@ namespace MLTest.Vis.Agent
 
 
             var letterbox = new Rectangle(0.4f, 0.5f, 0.1f, 0.1f);
-			focusPad.Elements.Add(letterbox);
+			focusPad.Paths.Add(letterbox);
 
 			var leftLine = letterbox.GetLine(CompassDirection.W);
 			var leftStroke = leftLine.FullStroke;
-			viewPad.Elements.Add(leftStroke);
+			viewPad.Paths.Add(leftStroke);
 
 			var seenLeftStroke = viewPad.GetSimilar(leftLine);
 			var radius = seenLeftStroke.NodeAt(0.25f, 0f);
@@ -54,21 +51,21 @@ namespace MLTest.Vis.Agent
 
 			var loopStroke = new Stroke(seenLeftStroke.StartNode, circleNode, seenLeftStroke.NodeAt(0.5f));
 
-			return viewPad.Elements.ToArray();
+			return viewPad.Paths.ToArray();
         }
 
-		public Stroke[] LetterC()
+		public Stroke[] LetterC(VisPad<Point> focusPad, VisPad<Stroke> viewPad)
 		{
 			var letterbox = new Rectangle(0.4f, 0.5f, 0.1f, 0.1f);
-			focusPad.Elements.Add(letterbox);
+			focusPad.Paths.Add(letterbox);
 
 			var circle = new Circle(letterbox.Center, letterbox.GetPoint(CompassDirection.E), ClockDirection.CCW);
 			var startC = circle.NodeAt(0.1f);
 			var endC = circle.NodeAt(0.9f);
 			var loopStroke = new Stroke(startC, endC);
-			viewPad.Elements.Add(loopStroke);
+			viewPad.Paths.Add(loopStroke);
 
-			return viewPad.Elements.ToArray();
+			return viewPad.Paths.ToArray();
         }
 	}
 }

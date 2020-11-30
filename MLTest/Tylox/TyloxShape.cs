@@ -231,7 +231,7 @@ namespace MLTest.Tylox
 
             // reference attachments always have to attach to parent object in tree.
             // If you have an 'A', the cross has to be a sublayer of the upside down V
-            // this maps to L being the same object, Y being a fork needing two paths, and X being two crossing objects
+            // this maps to L being the same object, Y being a fork needing two Paths, and X being two crossing objects
             // Also kind of maps to handwriting strokes, and helps the idea of roughing things in with upper layer,
             // and increasing level of detail as you go down the tree.
             // could even have lower layers do detail like serifs or texture, with a different system for different level of detail.

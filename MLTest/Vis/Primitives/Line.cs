@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 
 namespace MLTest.Vis
 {
+    public interface IPrimitivePath : IPath{}
     /// <summary>
     /// Maybe primitives are always 0-1 (lengths are always positive) and joints/nodes are -1 to 1 (we balance by midpoints of objects)?
     /// Or because lines have a start and end (no volume) they are 0-1, where rects and circles are a point mass that is centered (no start and end). How does inside/outside map to start/end? (center0, edge1, outside>1)
     /// We only use rects and circles to express containment boundaries so they are 0 centered, the corner (or edge) of a rect isn't a volume so it has a start (and end).
     /// 0 is past (known duration), 1 is present, > 1 is future (unknown potentially infinite duration)
     /// </summary>
-    public class Line : Point, IPath
+    public class Line : Point, IPath, IPrimitivePath
     {
         /// No. (A line where XY is the midpoint (0), and Start (-1) and End (1) are defined.)
         public Point Start => new Point(X, Y);
@@ -29,6 +30,9 @@ namespace MLTest.Vis
                 return _length;
             }
         }
+        public Point StartPoint => Start.Center;
+        public Point MidPoint => GetPoint(0.5f, 0);
+        public Point EndPoint => End.Center;
 
         private Line(float startX, float startY, float endX, float endY) : base(startX, startY)
         {
@@ -56,7 +60,6 @@ namespace MLTest.Vis
 
         public override Point GetPoint(float position, float offset)
         {
-            position = position / 2f + 0.5f;
             var xOffset = 0f;
             var yOffset = 0f;
             var xDif = End.X - X;
@@ -83,7 +86,6 @@ namespace MLTest.Vis
         public Stroke FullStroke => new Stroke(StartNode, EndNode);
         public Stroke PartialStroke(float start, float end) => new Stroke(NodeAt(start), NodeAt(end));
 
-        public Point MidPoint => new Point(X + (End.X - X) / 2f, Y + (End.Y - Y) / 2f);
         public Point IntersectionPoint(Line line) => null;
         public Point ProjectedOntoLine(Point p)
         {

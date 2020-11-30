@@ -12,10 +12,17 @@ namespace MLTest.Vis
     {
 	    public override VisElementType ElementType => VisElementType.Stroke;
 
-        public List<Node> Nodes { get; } = new List<Node>();
+        private List<Node> Nodes { get; } = new List<Node>();
 
         public override Point Anchor => StartNode.Anchor;
         public override float Length { get; }
+        public Point StartPoint => StartNode.Anchor;
+        public Point MidPoint => GetPoint(0.5f, 0);
+        public Point EndPoint => EndNode.Anchor;
+        public Point Center => MidPoint; // Will be the center of the bounds once that is calculated
+
+        public List<IPrimitivePath> Segments = new List<IPrimitivePath>();
+
 
         public Stroke(Node first, Node second, params Node[] remaining)
 	    {
@@ -23,6 +30,39 @@ namespace MLTest.Vis
 		    Nodes.Add(second);
 		    Nodes.AddRange(remaining);
 	    }
+
+        private void GenerateSegments()
+        {
+	        Segments.Clear();
+			Node lastNode = Nodes[0];
+	        for (var i = 1; i < Nodes.Count; i++)
+	        {
+		        var curNode = Nodes[i];
+		        Point curPoint;
+	            IPrimitivePath curPath;
+		        if (curNode is TangentNode tanNode)
+		        {
+			        curPath = Line.ByEndpoints(lastNode.Start, curNode.End);
+                }
+                else if (curNode is TipNode tipNode)
+		        {
+			        curPath = Line.ByEndpoints(lastNode.Start, curNode.End);
+                }
+		        else
+		        {
+			        curPath = Line.ByEndpoints(lastNode.Start, curNode.End);
+		        }
+
+                Segments.Add(curPath);
+		        lastNode = curNode;
+	        }
+        }
+
+        public void AddNode(Node node)
+        {
+            Nodes.Add(node);
+            GenerateSegments();
+        }
 
         public void Flip(){ }
 	    public Stroke OrientedClone() => null;
@@ -42,7 +82,10 @@ namespace MLTest.Vis
 
 	    public Point GetPoint(float position, float offset)
 	    {
-		    throw new NotImplementedException();
+            // go by length once that is running
+            var ipos = position * Nodes.Count - 1;
+            // should circles use ARCs when they are segments? 
+            return StartPoint;
 	    }
 
 	    public Point GetPointFromCenter(float centeredPosition, float offset)
@@ -52,10 +95,10 @@ namespace MLTest.Vis
 
 	    public Node NodeAt(float position) => new Node(this, position);
 	    public Node NodeAt(float position, float offset) => new TipNode(this, position, offset);
-	    public Node StartNode => new Node(this, 0f);
+	    public Node StartNode => Nodes[0];
 	    public Node MidNode => new Node(this, 0.5f);
-	    public Node EndNode => new Node(this, 1f);
-	    public Stroke FullStroke => new Stroke(StartNode, EndNode);
+	    public Node EndNode => Nodes[Nodes.Count - 1];
+        public Stroke FullStroke => new Stroke(StartNode, EndNode);
 	    public Stroke PartialStroke(float start, float end) => new Stroke(NodeAt(start), NodeAt(end));
     }
 }

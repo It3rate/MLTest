@@ -40,22 +40,33 @@ namespace MLTest.Vis
 		}
     }
 
+    // The first node on a circle needs to specify it's direction as there are two tangent lines. Points inside the circle will move to intersecting point of the second node's reference based on direction.
+	public class TangentNode : Node
+	{
+		public ClockDirection Direction { get; }
+
+        public TangentNode(Circle circle, float startPosition, float endArc, ClockDirection direction = ClockDirection.CW) : base(circle, startPosition)
+        {
+	        Direction = direction;
+        }
+    }
+
 	public class TipNode : Node
 	{
 		// Offset can't be zero in a middle node, as it causes overlap on lines that are tangent to each other. 
 		// The corner of a P is part of the shape with potential overlap on the serif.
 		// Maybe X could be a V with overlap.H would be a half U with 0.5 overlap. Maybe this is too obfuscated. Yes it is. Might work for serifs though.
-        public float Offset { get; }
+		public float Offset { get; }
 
-        public TipNode(IPath reference, float position, float offset) : base(reference, position)
+		public TipNode(IPath reference, float position, float offset) : base(reference, position)
 		{
 			Offset = offset;
-        }
+		}
 		//public TipNode(IPath reference, float position, float offset, float length) : base(reference, position)
 		//{
 		//	Offset = offset;
 		//	Length = length;
-  //      }
-    }
+		//}
+	}
 
 }

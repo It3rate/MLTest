@@ -13,7 +13,7 @@ namespace MLTest.Sim
     {
         // bitmap reference
         // focus area (subset of bitmap)
-        // mapped focusPad
+        // mapped FocusPad
         // parsed strokes and joints
     }
 }
