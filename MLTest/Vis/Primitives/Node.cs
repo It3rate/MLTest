@@ -45,39 +45,39 @@ namespace MLTest.Vis
 		}
     }
 
-    // The first node on a circle needs to specify it's direction as there are two tangent lines. Points inside the circle will move to intersecting point of the second node's reference based on direction.
+    // The first node on a circleRef needs to specify it's direction as there are two tangent lines. Points inside the circleRef will move to intersecting point of the second node's reference based on direction.
 	public class TangentNode : Node
 	{
 		public ClockDirection Direction { get; }
-		private Circle _circle;
+		public Circle CircleRef;
 		private Point _start;
 		public override Point Start => _start;
 		private Point _end;
 		public override Point End => _end;
 
-        public TangentNode(Circle circle, ClockDirection direction = ClockDirection.CW) : base(circle, 0)
+        public TangentNode(Circle circleRef, ClockDirection direction = ClockDirection.CW) : base(circleRef, 0)
         {
-	        _circle = circle;
+	        CircleRef = circleRef;
 	        Direction = direction;
         }
 
-        public Point GetStartFromPoint(Node node)
+        public Point GetTangentFromPoint(Node node)
         {
             // if node is null, get point on circumference using position. 
-            // if it is another Tangent node use circle tangents
-	        _start = _circle.FindTangentInDirection(node.End, Direction);
+            // if it is another Tangent node use circleRef tangents
+	        _start = CircleRef.FindTangentInDirection(node.End, Direction);
 	        return _start;
         }
-        public Point GetEndFromPoint(Node node)
+        public Point GetTangentToPoint(Node node)
         {
             // if p is null, get point on circumference using position.
-            // if it is another Tangent node use circle tangents
-            _end = _circle.FindTangentInDirection(node.Start, Direction.Counter());
+            // if it is another Tangent node use circleRef tangents
+            _end = CircleRef.FindTangentInDirection(node.Start, Direction.Counter());
             return _end;
         }
         public override string ToString()
         {
-	        return String.Format("tanNode:{0.##},{0.##} e{0.##},{0.##}", Start.X, Start.Y, End.X, End.Y);
+	        return String.Format("tanNode:{0:0.##},{1:0.##} e{2:0.##},{3:0.##}", Start.X, Start.Y, End.X, End.Y);
         }
     }
 

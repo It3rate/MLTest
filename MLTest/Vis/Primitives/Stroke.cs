@@ -49,8 +49,10 @@ namespace MLTest.Vis
                     //curPoint = curPath.EndPoint;
                     var pn = i > 0 ? Nodes[i - 1] : null;
                     var nn = i < Nodes.Count - 1 ? Nodes[i + 1] : null;
-                    Anchors.Add(tanNode.GetStartFromPoint(pn));
-                    Anchors.Add(tanNode.GetEndFromPoint(nn));
+                    var p0 = tanNode.GetTangentFromPoint(pn);
+                    var p1 = tanNode.GetTangentToPoint(nn);
+                    var arc = new Arc(tanNode.CircleRef, p0, p1, tanNode.Direction);
+					Anchors.AddRange(arc.GenerateSegments().ToArray());
 
                 }
                 else if (curNode is TipNode tipNode)
@@ -103,24 +105,9 @@ namespace MLTest.Vis
 
 
 	    }
-	    public Point GetPointOnLine(double position, double offset)
+	    public Point GetPointOnLine(float position, float offset)
 	    {
-            // todo: move this to Line, add for arcs, calculate based on lengths and tangents.
-		    var sp = StartPoint;
-		    var ep = EndPoint;
-		    float xOffset = 0;
-		    float yOffset = 0;
-		    float xDif = ep.X - sp.X;
-		    float yDif = ep.Y - sp.Y;
-		    if (offset != 0)
-		    {
-			    float ang = (float)(Math.Atan2(yDif, xDif));
-			    xOffset = (float)(-Math.Sin(ang) * Math.Abs(offset) * Math.Sign(-offset));
-			    yOffset = (float)(Math.Cos(ang) * Math.Abs(offset) * Math.Sign(-offset));
-		    }
-		    return new Point(
-			    sp.X + xDif * (float)position + xOffset,
-			    sp.Y + yDif * (float)position + yOffset);
+		    return StartPoint.GetPointOnLineTo(EndPoint, position, offset);
 	    }
 
         public Point GetPointFromCenter(float centeredPosition, float offset)

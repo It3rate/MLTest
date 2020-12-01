@@ -10,7 +10,7 @@ using Microsoft.ML.Probabilistic.Distributions;
 namespace MLTest.Vis
 {
 
- //   public class VisOval : Circle
+ //   public class VisOval : CircleRef
  //   {
 	//    public override VisElementType ElementType => VisElementType.Oval;
 

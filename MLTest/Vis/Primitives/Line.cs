@@ -60,17 +60,18 @@ namespace MLTest.Vis
 
         public override Point GetPoint(float position, float offset)
         {
-            var xOffset = 0f;
-            var yOffset = 0f;
-            var xDif = End.X - X;
-            var yDif = End.Y - Y;
-            if (offset != 0)
-            {
-                var ang = (float)(Math.Atan2(yDif, xDif));
-                xOffset = (float)(-Math.Sin(ang) * Math.Abs(offset) * Math.Sign(-offset));
-                yOffset = (float)(Math.Cos(ang) * Math.Abs(offset) * Math.Sign(-offset));
-            }
-            return new Point(X + xDif * position + xOffset, Y + yDif * position + yOffset);
+	        return GetPointOnLineTo(EndPoint, position, offset);
+            //var xOffset = 0f;
+            //var yOffset = 0f;
+            //var xDif = End.X - X;
+            //var yDif = End.Y - Y;
+            //if (offset != 0)
+            //{
+            //    var ang = (float)(Math.Atan2(yDif, xDif));
+            //    xOffset = (float)(-Math.Sin(ang) * Math.Abs(offset) * Math.Sign(-offset));
+            //    yOffset = (float)(Math.Cos(ang) * Math.Abs(offset) * Math.Sign(-offset));
+            //}
+            //return new Point(X + xDif * position + xOffset, Y + yDif * position - yOffset);
         }
 
         public Point GetPointFromCenter(float centeredPosition, float offset)

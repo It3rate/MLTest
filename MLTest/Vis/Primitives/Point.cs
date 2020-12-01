@@ -48,7 +48,9 @@ namespace MLTest.Vis
 	    public virtual bool IsRounded => false;
 	    protected float _length = 0;
 
-	    public Point(float x, float y)
+	    protected static float twoPi = (float)(Math.PI * 2.0);
+
+        public Point(float x, float y)
 	    {
 		    X = x;
 		    Y = y;
@@ -87,9 +89,25 @@ namespace MLTest.Vis
 	    public Point DivideBy(float scalar) => new Point(X / scalar, Y / scalar);
 	    public float DistanceTo(Point pt) => (float)Math.Sqrt((pt.X - X) * (pt.X - X) + (pt.Y - Y) * (pt.Y - Y));
 	    public float SquaredDistanceTo(Point pt) => (pt.X - X) * (pt.X - X)  + (pt.Y - Y) * (pt.Y - Y);
-        public float DotProduct(Point pt) => -(X * pt.X) + (Y * pt.Y); // negative because inverted Y
+	    public float DotProduct(Point pt) => -(X * pt.X) + (Y * pt.Y); // negative because inverted Y
+	    public float Atan2(Point pt) => (float)Math.Atan2(pt.Y - Y, pt.X - X);
 
-	    public LinearDirection LinearDirection(Point pt)
+        public Point GetPointOnLineTo(Point end, float position, float offset = 0)
+        {
+	        var xOffset = 0f;
+	        var yOffset = 0f;
+	        var xDif = end.X - X;
+	        var yDif = end.Y - Y;
+	        if (offset != 0)
+	        {
+		        var ang = (float)(Math.Atan2(yDif, xDif));
+		        xOffset = (float)(-Math.Sin(ang) * Math.Abs(offset) * Math.Sign(-offset));
+		        yOffset = (float)(Math.Cos(ang) * Math.Abs(offset) * Math.Sign(-offset));
+	        }
+	        return new Point(X + xDif * position + xOffset, Y + yDif * position - yOffset);
+        }
+
+        public LinearDirection LinearDirection(Point pt)
 	    {
 		    // make this return probability as well
 		    LinearDirection result;

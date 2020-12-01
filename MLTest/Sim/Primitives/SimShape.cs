@@ -10,7 +10,7 @@ namespace MLTest.Sim
 {
     public enum SimStructuralType { Any = 0, PadStructure, Focusing, Current, Previous, SecondLast, Exisiting, Planning, Comparing }
 
-    //public enum SimPrimitiveType { Dot, Line, TwoLine, RightTriangle, Triangle, Square, Rectangle, Circle, Oval, Arc, Polyline, ConvexShape, ComplexShape }
+    //public enum SimPrimitiveType { Dot, Line, TwoLine, RightTriangle, Triangle, Square, Rectangle, CircleRef, Oval, Arc, Polyline, ConvexShape, ComplexShape }
     public enum SimPrimitiveType { Triangle, Rectangle, Oval }
     // two points define a line (maybe this is always a rect with zero thickness? No, because it is part of a rect, triangle etc) (maybe an arc with zero curve?)
     // maybe dots, lines and polylines+ shouldn't be primitives? Seems right. Maybe merged primitive made of multiple basic shapes.

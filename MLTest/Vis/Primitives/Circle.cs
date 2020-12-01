@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Keras.Initializer;
 using Python.Runtime;
 
 namespace MLTest.Vis
@@ -12,77 +13,6 @@ namespace MLTest.Vis
     {
 	    public static ClockDirection Counter(this ClockDirection direction) => direction == ClockDirection.CW ? ClockDirection.CCW : ClockDirection.CW;
     }
-
-    // maybe primitive paths always need to reference volume primitives? Or this is a type of stroke only.
-    public class Arc : Point, IPath, IPrimitivePath
-    {
-        public Circle Reference { get; }
-	    public float StartArc { get; }
-	    public float EndArc { get; }
-	    public ClockDirection Direction { get; }
-
-        public float ArcLength => EndArc - StartArc;
-
-        public override float Length
-        {
-            get
-            {
-                if (_length == 0)
-                {
-                    _length = Reference.Length * ArcLength;
-                }
-                return _length;
-            }
-        }
-        public Point StartPoint => Reference.GetPoint(StartArc, 0);
-        public Point MidPoint => Reference.GetPoint(StartArc + ArcLength / 2f, 0);
-        public Point EndPoint => Reference.GetPoint(EndArc, 0);
-
-        public Point Center => Reference.Center;
-
-        public Arc(Circle circle, float startArc, float endArc, ClockDirection direction = ClockDirection.CW) : base(circle.GetPoint(startArc, 0))
-        {
-	        Reference = circle;
-	        StartArc = startArc;
-	        EndArc = endArc;
-        }
-
-        public override Point GetPoint(float position, float offset = 0)
-        {
-	        var pos = ArcLength * position + StartArc;
-	        return Reference.GetPoint(pos, offset);
-        }
-
-        public Point GetPointFromCenter(float centeredPosition, float offset = 0)
-        {
-            return GetPoint(centeredPosition * 2f - 1f, offset);
-        }
-
-        public Stroke GetTangentArc(Point leftPoint, Point rightPoint) => null;
-
-        public Node NodeAt(float position) => new Node(this, position);
-        public Node NodeAt(float position, float offset) => new TipNode(this, position, offset);
-        public Node StartNode => new Node(this, 0f);
-        public Node MidNode => new Node(this, 0.5f);
-        public Node EndNode => new Node(this, 1f);
-        public Stroke FullStroke => new Stroke(StartNode, EndNode);
-        public Stroke PartialStroke(float start, float end) => new Stroke(NodeAt(start), NodeAt(end));
-
-        public ClockDirection CounterDirection => Direction == ClockDirection.CW ? ClockDirection.CCW : ClockDirection.CW;
-        public Arc CounterArc => new Arc(Reference, StartArc, EndArc, CounterDirection);
-
-        public List<Point> GenerateSegments()
-        {
-	        var result = new List<Point>();
-	        float step = 1f / 8f;
-	        for (float i = 0; i < 1.0; i += step)
-	        {
-		        result.Add(GetPoint(i));
-	        }
-	        return result;
-        }
-    }
-
     /// <summary>
     /// A circle centered at the XY point, with a Radius. There is no natural 'home' angle -a second point is given to calculate the radius and orient it the circle (which becomes 0).
     /// Circles are the only natural primitive that can have an area - it is a 'large point', not a shape made of joints.
@@ -96,24 +26,16 @@ namespace MLTest.Vis
 		public float Radius { get; private set; }
 		public override bool IsRounded => true;
 
-		public override float Length
-		{
-			get
-			{
-				if (_length == 0)
-				{
-					_length = (float)(2f * Radius * Math.PI);
-				}
-				return _length;
-			}
-		}
+        public float OriginAngle { get; private set; }
+		public override float Length => (float)(2f * Radius * Math.PI);
+
 		public Point StartPoint => PerimeterOrigin;
 		public Point MidPoint => GetPoint(0.5f, 0);
 		public Point EndPoint => PerimeterOrigin;
 
 		private Point Center => new Point(X, Y);
 
-        //public Circle(Point center, float radius) : base(center.X, center.Y)
+        //public CircleRef(Point center, float radius) : base(center.X, center.Y)
         //{
         //	Radius = radius;
         //	PerimeterOrigin = new Point(X, Y - radius); // default north
@@ -135,7 +57,8 @@ namespace MLTest.Vis
 		private void Initialize()
 		{
 			Radius = Center.DistanceTo(PerimeterOrigin);
-		}
+			OriginAngle = Center.Atan2(PerimeterOrigin);
+        }
 
 		/// <summary>
 		/// Gets point along circumference of this circle using position and offset.
@@ -145,9 +68,10 @@ namespace MLTest.Vis
 		/// <returns></returns>
 		public override Point GetPoint(float position, float offset = 0)
 		{
-			var rads = Utils.NormToRadians(position);
-			return new Point(X + (float)Math.Sin(rads) * (Radius + offset), Y + (float)Math.Cos(rads) * (Radius + offset));
-		}
+			var len = twoPi * position;
+            var pos = OriginAngle + (Direction == ClockDirection.CW ? len : -len);
+            return new Point(X + (float)Math.Cos(pos) * (Radius + offset), Y + (float)Math.Sin(pos) * (Radius + offset));
+        }
 
 		public Point GetPointFromCenter(float centeredPosition, float offset)
 		{
@@ -176,7 +100,7 @@ namespace MLTest.Vis
 	        }
             var L = Math.Sqrt(distSquared - Radius * Radius);
 	        var numberOfSolutions = IntersectCircle(p, (float)L, out var pt0, out var pt1);
-	        return direction == ClockDirection.CW ? pt0 : pt1;
+	        return direction == ClockDirection.CW ? pt1 : pt0;
         }
 
         public int FindTangents(Point p, out Point pt0, out Point pt1)
@@ -252,5 +176,7 @@ namespace MLTest.Vis
 	        return String.Format("Circ:{0:0.##},{1:0.##} r{2:0.##}", X, Y, Radius);
         }
     }
+
+
 
 }

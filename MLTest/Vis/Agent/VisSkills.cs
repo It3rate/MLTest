@@ -31,7 +31,7 @@ namespace MLTest.Vis
             // TailS: Make with joints LoopS:0.8 (butt), LeftS:1 offset 1 (tip)
 
 
-            var letterbox = new Rectangle(0.4f, 0.5f, 0.1f, 0.1f);
+            var letterbox = new Rectangle(0.35f, 0.5f, 0.1f, 0.1f);
 			focusPad.Paths.Add(letterbox);
 
 			var leftLine = letterbox.GetLine(CompassDirection.W);
@@ -42,17 +42,17 @@ namespace MLTest.Vis
 			var rightLine = letterbox.GetLine(CompassDirection.E);
 			var seenLeftStroke = viewPad.GetSimilar(leftLine);
 
-            var radius = rightLine.NodeAt(0.25f, 0f);
-			var center = topLine.NodeAt(0.60f, -0.25f);
+            var radius = topLine.NodeAt(1f, 0.20f);
+			var center = topLine.NodeAt(0.6f, 0.20f);
 			var topCircle = new Circle(center, radius);
 			focusPad.Paths.Add(topCircle);
+			var circleNode = new TangentNode(topCircle,  ClockDirection.CW);
 
-            var circleNode = new TangentNode(topCircle,  ClockDirection.CCW);
+			var midNode = seenLeftStroke.NodeAt(0.55f);
 
 			//var loopStartJoint = new VisJoint(seenLeftStroke.StartNode, circleNode0, VisJointType.Corner);
 			//var circleJoint = new VisJoint(circleNode0, circleNode1, VisJointType.Curve);
 			//var loopEndJoint = new VisJoint(circleNode1, seenLeftStroke.NodeAt(0.5f), VisJointType.Butt);
-			var midNode = seenLeftStroke.NodeAt(0.5f);
 			var loopStroke = new Stroke(seenLeftStroke.StartNode, circleNode, midNode);
             viewPad.Paths.Add(loopStroke);
 

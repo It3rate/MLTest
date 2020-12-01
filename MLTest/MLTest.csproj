@@ -415,6 +415,7 @@
     <Compile Include="Vis\Agent\VisAgent.cs" />
     <Compile Include="Vis\Agent\VisSkills.cs" />
     <Compile Include="Vis\Controller\VisRenderer.cs" />
+    <Compile Include="Vis\Primitives\Arc.cs" />
     <Compile Include="Vis\Primitives\Circle.cs" />
     <Compile Include="Vis\Primitives\Line.cs" />
     <Compile Include="Vis\Primitives\Point.cs" />
