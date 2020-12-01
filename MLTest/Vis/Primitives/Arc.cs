@@ -61,17 +61,17 @@ namespace MLTest.Vis
         public ClockDirection CounterDirection => Direction == ClockDirection.CW ? ClockDirection.CCW : ClockDirection.CW;
         public Arc CounterArc => new Arc(Reference, EndPoint, StartPoint, CounterDirection);
 
-        public List<Point> GenerateSegments()
+        public Point[] GetPolylinePoints(int pointCount = 24)
         {
-            var result = new List<Point>();
-            float step = 1f / 24f;
+            var result = new List<Point>(pointCount);
+            var step = 1f / (float)pointCount;
             result.Add(StartPoint);
-            for (float i = .1f; i <.9f; i += step)
+            for (var i = .1f; i <.9f; i += step)
             {
                 result.Add(GetPoint(i));
             }
             result.Add(EndPoint);
-            return result;
+            return result.ToArray();
         }
     }
 }

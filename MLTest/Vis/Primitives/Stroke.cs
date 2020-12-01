@@ -15,7 +15,8 @@ namespace MLTest.Vis
         private List<Node> Nodes { get; } = new List<Node>();
 
         public override Point Anchor => StartNode.Anchor;
-        public override float Length { get; }
+        private float _length;
+        public override float Length => _length;
         public Point StartPoint => StartNode.Anchor;
         public Point MidPoint => GetPoint(0.5f, 0);
         public Point EndPoint => EndNode.Anchor;
@@ -30,53 +31,59 @@ namespace MLTest.Vis
 		    Nodes.Add(first);
 		    Nodes.Add(second);
 		    Nodes.AddRange(remaining);
+		    GenerateSegments();
 	    }
 
-        public List<Point> GenerateSegments()
+        private void GenerateSegments()
         {
 	        Segments.Clear();
             Anchors.Clear();
-	        for (var i = 0; i < Nodes.Count; i++)
+            Point curPoint = Nodes[0].Start;
+            Anchors.Add(Nodes[0].Start);
+
+            for (var i = 0; i < Nodes.Count; i++)
 	        {
 		        var curNode = Nodes[i];
 	            IPrimitivePath curPath;
 		        if (curNode is TangentNode tanNode)
 		        {
-                    // arc, start at tangent to last node end at tangent to next node. Set curPoint to end point.
-                    //curPath = Line.ByEndpoints(curPoint, curNode.Start);
-                    //Segments.Add(curPath);
-                    // curpath = arc
-                    //curPoint = curPath.EndPoint;
                     var pn = i > 0 ? Nodes[i - 1] : null;
                     var nn = i < Nodes.Count - 1 ? Nodes[i + 1] : null;
                     var p0 = tanNode.GetTangentFromPoint(pn);
                     var p1 = tanNode.GetTangentToPoint(nn);
                     var arc = new Arc(tanNode.CircleRef, p0, p1, tanNode.Direction);
-					Anchors.AddRange(arc.GenerateSegments().ToArray());
-
+                    Segments.Add(Line.ByEndpoints(curPoint, p0));
+                    Segments.Add(arc);
+                    Anchors.AddRange(arc.GetPolylinePoints());
+                    curPoint = p1;
                 }
                 else if (curNode is TipNode tipNode)
 		        {
-                    // must be end
-                    //curPath = Line.ByEndpoints(curPoint, curNode.End);
-                    Anchors.Add(curNode.Anchor);
+                    Anchors.Add(curNode.Start);
+                    Segments.Add(Line.ByEndpoints(curPoint, curNode.End));
+                    curPoint = curNode.End;
                 }
 		        else
 		        {
-                    // there should never be two lines in a row (otherwise it would make a joint). Unless that is ok? Maybe a stroke is a non pen lift line?
-			        //curPath = Line.ByEndpoints(curPoint, curNode.Anchor);
-			        //Segments.Add(curPath);
-			        //curPoint = curNode.Anchor;
-                    Anchors.Add(curNode.Anchor);
+			        if (i > 0)
+			        {
+	                    Anchors.Add(curNode.Start);
+	                    Segments.Add(Line.ByEndpoints(curPoint, curNode.Start));
+	                    curPoint = curNode.End;
+                    }
                 }
 	        }
 
-	        return Anchors;
+            _length = 0;
+            foreach (var segment in Segments)
+            {
+	            _length += segment.Length;
+            }
         }
 
-        public void AddNode(Node node)
+        public void AddNodes(params Node[] nodes)
         {
-            Nodes.Add(node);
+	        Nodes.AddRange(nodes);
             GenerateSegments();
         }
 

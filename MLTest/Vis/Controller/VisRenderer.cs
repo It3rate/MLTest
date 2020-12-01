@@ -45,17 +45,20 @@ namespace MLTest.Vis
             //}
         }
 
-        public void DrawPath(Graphics g, IPath path, int penIndex = 0)
+        public void DrawPath(Graphics g, Stroke stroke, int penIndex = 0)
         {
-	        var anchors = path.GenerateSegments();
-	        Point start = anchors[0];
-	        for (int i = 1; i < anchors.Count; i++)
+	        foreach (var segment in stroke.Segments)
 	        {
-		        var end = anchors[i];
-		        DrawLine(g, start, end, penIndex);
-		        start = end;
+		        if (segment is Line line)
+		        {
+					DrawLine(g, line, penIndex);
+		        }
+                else if (segment is Arc arc)
+		        {
+                    DrawPolyline(g, arc.GetPolylinePoints(), penIndex);
+		        }
 	        }
-            
+
             //foreach (var point in stroke.Anchors)
             //{
             //    DrawCircle(g, point, 0);
@@ -93,9 +96,22 @@ namespace MLTest.Vis
 	        g.DrawRectangle(Pens[penIndex], rect.TopLeft.X, rect.TopLeft.Y, rect.Size.X, rect.Size.Y);
         }
 
+        public void DrawLine(Graphics g, Line line, int penIndex = 0)
+        {
+	        g.DrawLine(Pens[penIndex], line.StartPoint.X, line.StartPoint.Y, line.EndPoint.X, line.EndPoint.Y);
+        }
         public void DrawLine(Graphics g, Point p0, Point p1, int penIndex = 0)
         {
-            g.DrawLine(Pens[penIndex], p0.X, p0.Y, p1.X, p1.Y);
+	        g.DrawLine(Pens[penIndex], p0.X, p0.Y, p1.X, p1.Y);
+        }
+        public void DrawPolyline(Graphics g, Point[] points, int penIndex = 0)
+        {
+	        for (int i = 1; i < points.Length; i++)
+	        {
+		        var p0 = points[i - 1];
+		        var p1 = points[i];
+				g.DrawLine(Pens[penIndex], p0.X, p0.Y, p1.X, p1.Y);
+	        }
         }
 
         public void DrawPrimitive(Graphics g, IPrimitive path, int penIndex = 0)

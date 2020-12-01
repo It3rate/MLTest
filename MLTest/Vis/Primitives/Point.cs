@@ -35,9 +35,6 @@ namespace MLTest.Vis
         Node EndNode { get; }
         Stroke FullStroke { get; }
         Stroke PartialStroke(float start, float end);
-
-        List<Point> GenerateSegments();
-
     }
 
     public class Point : IPrimitive

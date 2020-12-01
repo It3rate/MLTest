@@ -161,16 +161,17 @@ namespace MLTest.Vis
             }
         }
 
-        public List<Point> GenerateSegments()
+        public Point[] GetPolylinePoints(int pointCount = 24)
         {
-	        var result = new List<Point>();
-	        var step = 1f / 8f;
+	        var result = new List<Point>(pointCount);
+	        var step = 1f / (float)pointCount;
 	        for (float i = 0; i < 1.0; i += step)
 	        {
 		        result.Add(GetPoint(i));
 	        }
-	        return result;
+	        return result.ToArray();
         }
+
         public override string ToString()
         {
 	        return String.Format("Circ:{0:0.##},{1:0.##} r{2:0.##}", X, Y, Radius);

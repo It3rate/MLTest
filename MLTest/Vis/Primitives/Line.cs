@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace MLTest.Vis
 {
-    public interface IPrimitivePath : IPath{}
+    public interface IPrimitivePath : IPath
+    {
+	    Point[] GetPolylinePoints(int pointCount = 24);
+    }
     /// <summary>
     /// Maybe primitives are always 0-1 (lengths are always positive) and joints/nodes are -1 to 1 (we balance by midpoints of objects)?
     /// Or because lines have a start and end (no volume) they are 0-1, where rects and circles are a point mass that is centered (no start and end). How does inside/outside map to start/end? (center0, edge1, outside>1)
@@ -110,11 +113,12 @@ namespace MLTest.Vis
 	        return new Point(StartPoint.X + (dp * e1.X) / len2, StartPoint.Y + (dp * e1.Y) / len2);
         }
 
-        public List<Point> GenerateSegments()
+        public Point[] GetPolylinePoints(int pointCount = 24)
         {
 	        var result = new List<Point>() {StartPoint, EndPoint};
-	        return result;
+	        return result.ToArray();
         }
+
         public override string ToString()
         {
 	        return String.Format("Ln:{0:0.##},{1:0.##} {2:0.##},{3:0.##}", X, Y, End.X, End.Y);
