@@ -15,10 +15,10 @@ namespace MLTest.Vis
 		public Node NextNode { get; private set; }
 
         // calculated
-        public Point Anchor { get; }
+        public Point Anchor { get; protected set; }
 		public float Length { get; }
 		public virtual Point Start => Anchor;
-        public Point End { get; }
+		public virtual Point End => Anchor;
 
         public Node(IPath reference, float position)
 		{
@@ -38,16 +38,46 @@ namespace MLTest.Vis
 		{
 			throw new NotImplementedException();
 		}
+
+		public override string ToString()
+		{
+			return Anchor.ToString();
+		}
     }
 
     // The first node on a circle needs to specify it's direction as there are two tangent lines. Points inside the circle will move to intersecting point of the second node's reference based on direction.
 	public class TangentNode : Node
 	{
 		public ClockDirection Direction { get; }
+		private Circle _circle;
+		private Point _start;
+		public override Point Start => _start;
+		private Point _end;
+		public override Point End => _end;
 
-        public TangentNode(Circle circle, float startPosition, float endArc, ClockDirection direction = ClockDirection.CW) : base(circle, startPosition)
+        public TangentNode(Circle circle, ClockDirection direction = ClockDirection.CW) : base(circle, 0)
         {
+	        _circle = circle;
 	        Direction = direction;
+        }
+
+        public Point GetStartFromPoint(Node node)
+        {
+            // if node is null, get point on circumference using position. 
+            // if it is another Tangent node use circle tangents
+	        _start = _circle.FindTangentInDirection(node.End, Direction);
+	        return _start;
+        }
+        public Point GetEndFromPoint(Node node)
+        {
+            // if p is null, get point on circumference using position.
+            // if it is another Tangent node use circle tangents
+            _end = _circle.FindTangentInDirection(node.Start, Direction.Counter());
+            return _end;
+        }
+        public override string ToString()
+        {
+	        return String.Format("tanNode:{0.##},{0.##} e{0.##},{0.##}", Start.X, Start.Y, End.X, End.Y);
         }
     }
 
@@ -61,12 +91,17 @@ namespace MLTest.Vis
 		public TipNode(IPath reference, float position, float offset) : base(reference, position)
 		{
 			Offset = offset;
-		}
-		//public TipNode(IPath reference, float position, float offset, float length) : base(reference, position)
-		//{
-		//	Offset = offset;
-		//	Length = length;
-		//}
-	}
+			Anchor = reference.GetPoint(position, offset);
+        }
+        //public TipNode(IPath reference, float position, float offset, float length) : base(reference, position)
+        //{
+        //	Offset = offset;
+        //	Length = length;
+        //}
+        public override string ToString()
+        {
+	        return String.Format("tipNode:{0:0.##},{1:0.##} o{2:0.##}", Anchor.X, Anchor.Y, Offset);
+        }
+    }
 
 }

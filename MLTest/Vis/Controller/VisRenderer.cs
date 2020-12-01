@@ -15,21 +15,26 @@ namespace MLTest.Vis
 	    public int Height { get; set; }
 	    public VisAgent Agent { get; set; }
 
-	    public VisRenderer(VisAgent agent = null, int width = 250, int height = 250)
+	    public VisRenderer(VisAgent agent, int width = 250, int height = 250)
 	    {
 		    Width = width;
 		    Height = height;
 		    Agent = agent ?? new VisAgent();
-		    GenPens(Width);
+		    GenPens(Width*4);
         }
         public void Draw(Graphics g)
         {
             g.DrawLine(Pens[(int)PenTypes.LightGray], new PointF(-1f, 0), new PointF(1f, 0));
             g.DrawLine(Pens[(int)PenTypes.LightGray], new PointF(0, -1f), new PointF(0, 1f));
 
+            foreach (var prim in Agent.FocusPad.Paths)
+            {
+	            DrawPrimitive(g, prim, 2);
+            }
+
             foreach (var path in Agent.ViewPad.Paths)
             {
-                DrawPath(g, path);
+                DrawPath(g, path, 1);
             }
         }
         public void DrawShape(Graphics g, Stroke shape)
@@ -42,7 +47,15 @@ namespace MLTest.Vis
 
         public void DrawPath(Graphics g, IPath path, int penIndex = 0)
         {
-            DrawLine(g, path.StartNode.Anchor, path.EndNode.Anchor);
+	        var anchors = path.GenerateSegments();
+	        Point start = anchors[0];
+	        for (int i = 1; i < anchors.Count; i++)
+	        {
+		        var end = anchors[i];
+		        DrawLine(g, start, end, penIndex);
+		        start = end;
+	        }
+            
             //foreach (var point in stroke.Anchors)
             //{
             //    DrawCircle(g, point, 0);
@@ -63,19 +76,43 @@ namespace MLTest.Vis
             //    DrawCurve(g, stroke, penIndex);
             //}
         }
-        public void DrawSpot(Graphics g, Point spot, int penIndex = 0)
+        public void DrawSpot(Graphics g, Point pos, int penIndex = 0, float scale = 1f)
         {
+	        var r = Pens[penIndex].Width * scale;
+	        g.DrawEllipse(Pens[penIndex], pos.X - r, pos.Y - r, r * 2f, r * 2f);
         }
 
-        public void DrawCircle(Graphics g, PointF pos, int penIndex = 0, double scale = 0)
+        public void DrawCircle(Graphics g, Circle circ, int penIndex = 0)
         {
-            float r = (float)(scale == 0 ? Pens[penIndex].Width * 4f : Pens[penIndex].Width * scale);
-            g.DrawEllipse(Pens[penIndex], pos.X - r, pos.Y - r, r * 2f, r * 2f);
+	        var pos = circ.Center;
+	        var r = circ.Radius;
+	        g.DrawEllipse(Pens[penIndex], pos.X - r, pos.Y - r, r * 2f, r * 2f);
+        }
+        public void DrawRect(Graphics g, Rectangle rect, int penIndex = 0)
+        {
+	        g.DrawRectangle(Pens[penIndex], rect.TopLeft.X, rect.TopLeft.Y, rect.Size.X, rect.Size.Y);
         }
 
         public void DrawLine(Graphics g, Point p0, Point p1, int penIndex = 0)
         {
             g.DrawLine(Pens[penIndex], p0.X, p0.Y, p1.X, p1.Y);
+        }
+
+        public void DrawPrimitive(Graphics g, IPrimitive path, int penIndex = 0)
+        {
+	        if (path is Line line)
+	        {
+                DrawLine(g, line.StartPoint, line.EndPoint);
+	        }
+	        else if (path is Circle circ)
+	        {
+		        DrawSpot(g, circ.Center, penIndex);
+		        DrawCircle(g, circ, penIndex);
+            }
+	        else if (path is Rectangle rect)
+	        {
+		        DrawRect(g, rect, penIndex);
+	        }
         }
 
         public List<Pen> Pens = new List<Pen>();

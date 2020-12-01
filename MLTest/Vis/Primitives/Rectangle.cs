@@ -23,7 +23,6 @@ namespace MLTest.Vis
         }
         public Rectangle(float cx, float cy, float cornerX, float cornerY) : base(cx, cy)
         {
-            TopLeft = new Point(cornerX, cornerY);
             Initialize(cornerX, cornerY);
         }
         private void Initialize(float cornerX, float cornerY)
@@ -152,6 +151,11 @@ namespace MLTest.Vis
         public Point Contains(Point p) => null;
         public Point Contains(Line line) => null;
         public Point Contains(Rectangle rect) => null;
+
+        public override string ToString()
+        {
+	        return String.Format("Rect:{0:0.##},{1:0.##} {2:0.##},{3:0.##}", TopLeft.X, TopLeft.Y, Size.X, Size.Y);
+        }
     }
 
 }

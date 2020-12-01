@@ -99,5 +99,24 @@ namespace MLTest.Vis
         public Circle CircleFrom() => new Circle(this, End);
         public Rectangle RectangleFrom() => new Rectangle(this, End);
 
+
+        public Point ProjectPointOnto(Point p)
+        {
+	        var e1 = EndPoint.Subtract(StartPoint);
+	        var e2 = p.Subtract(StartPoint);
+	        var dp = e1.DotProduct(e2);
+	        var len2 = e1.SquaredLength();
+	        return new Point(StartPoint.X + (dp * e1.X) / len2, StartPoint.Y + (dp * e1.Y) / len2);
+        }
+
+        public List<Point> GenerateSegments()
+        {
+	        var result = new List<Point>() {StartPoint, EndPoint};
+	        return result;
+        }
+        public override string ToString()
+        {
+	        return String.Format("Ln:{0:0.##},{1:0.##} {2:0.##},{3:0.##}", X, Y, End.X, End.Y);
+        }
     }
 }

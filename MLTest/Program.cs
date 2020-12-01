@@ -13,7 +13,7 @@ namespace MLTest
 {
     static class Program
     {
-        private static int _formIndex = 2;
+        private static int _formIndex = 3;
         private static Form ActiveForm;
         private static List<Form> Forms;
 

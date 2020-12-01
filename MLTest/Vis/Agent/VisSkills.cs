@@ -38,18 +38,23 @@ namespace MLTest.Vis
 			var leftStroke = leftLine.FullStroke;
 			viewPad.Paths.Add(leftStroke);
 
+			var topLine = letterbox.GetLine(CompassDirection.N);
+			var rightLine = letterbox.GetLine(CompassDirection.E);
 			var seenLeftStroke = viewPad.GetSimilar(leftLine);
-			var radius = seenLeftStroke.NodeAt(0.25f, 0f);
-			var center = seenLeftStroke.NodeAt(0.25f, 0.5f);
-			var topCircle = new Circle(center, radius);
 
-			var circleNode = new Node(topCircle, 0);
+            var radius = rightLine.NodeAt(0.25f, 0f);
+			var center = topLine.NodeAt(0.60f, -0.25f);
+			var topCircle = new Circle(center, radius);
+			focusPad.Paths.Add(topCircle);
+
+            var circleNode = new TangentNode(topCircle,  ClockDirection.CCW);
 
 			//var loopStartJoint = new VisJoint(seenLeftStroke.StartNode, circleNode0, VisJointType.Corner);
 			//var circleJoint = new VisJoint(circleNode0, circleNode1, VisJointType.Curve);
 			//var loopEndJoint = new VisJoint(circleNode1, seenLeftStroke.NodeAt(0.5f), VisJointType.Butt);
-
-			var loopStroke = new Stroke(seenLeftStroke.StartNode, circleNode, seenLeftStroke.NodeAt(0.5f));
+			var midNode = seenLeftStroke.NodeAt(0.5f);
+			var loopStroke = new Stroke(seenLeftStroke.StartNode, circleNode, midNode);
+            viewPad.Paths.Add(loopStroke);
 
 			return viewPad.Paths.ToArray();
         }

@@ -36,6 +36,8 @@ namespace MLTest.Vis
         Stroke FullStroke { get; }
         Stroke PartialStroke(float start, float end);
 
+        List<Point> GenerateSegments();
+
     }
 
     public class Point : IPrimitive
@@ -68,7 +70,7 @@ namespace MLTest.Vis
 		    return new Point(X + position, Y + offset);
 	    }
 
-	    public Point Center => new Point(X, Y);
+	    public Point Center => this;
 
 	    public virtual float Length => _length;
 
@@ -78,13 +80,14 @@ namespace MLTest.Vis
 	    public Point Swap() => new Point(Y, X);
 
 	    public Point Add(Point pt) => new Point(X + pt.X, Y + pt.Y);
-	    public Point Subtract(Point pt) => new Point(pt.X - X, pt.Y - Y);
+	    public Point Subtract(Point pt) => new Point(X - pt.X, Y - pt.Y);
 	    public Point Multiply(Point pt) => new Point(X * pt.X, Y * pt.Y);
 	    public Point MidPointOf(Point pt) => new Point((pt.X - X) / 2f + X, (pt.Y - Y) / 2f + Y);
 	    public Point Multiply(float scalar) => new Point(X * scalar, Y * scalar);
 	    public Point DivideBy(float scalar) => new Point(X / scalar, Y / scalar);
-	    public float DistanceTo(Point pt) => (float) Math.Sqrt(Math.Pow(pt.X - X, 2) + Math.Pow(pt.Y - Y, 2));
-	    public float DotProduct(Point pt) => -(X * pt.X) + (Y * pt.Y); // negative because inverted Y
+	    public float DistanceTo(Point pt) => (float)Math.Sqrt((pt.X - X) * (pt.X - X) + (pt.Y - Y) * (pt.Y - Y));
+	    public float SquaredDistanceTo(Point pt) => (pt.X - X) * (pt.X - X)  + (pt.Y - Y) * (pt.Y - Y);
+        public float DotProduct(Point pt) => -(X * pt.X) + (Y * pt.Y); // negative because inverted Y
 
 	    public LinearDirection LinearDirection(Point pt)
 	    {
@@ -136,7 +139,7 @@ namespace MLTest.Vis
 	    {
             // make this return probability as well
             CompassDirection result;
-		    var dir = Math.Atan2(pt.Y - Y, pt.X - X);
+		    var dir = Math.Atan2(Y - pt.Y, X - pt.X);
 		    var pi8 = Math.PI / 8f;
 		    if (dir < -(pi8 * 7))
 		    {
@@ -177,7 +180,17 @@ namespace MLTest.Vis
 
 		    return result;
         }
+	    public Point ProjectedOntoLine(Line line)
+	    {
+		    return line.ProjectPointOnto(this);
+	    }
+
+	    public override string ToString()
+	    {
+		    return String.Format("Pt:{0:0.##},{1:0.##}", X, Y);
+	    }
     }
 
     public enum LinearDirection{Centered, Horizontal, Vertical, TLDiagonal, TRDiagonal }
+
 }
