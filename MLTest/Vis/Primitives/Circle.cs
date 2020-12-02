@@ -72,7 +72,7 @@ namespace MLTest.Vis
             return new Point(X + (float)Math.Cos(pos) * (Radius + offset), Y + (float)Math.Sin(pos) * (Radius + offset));
         }
 
-		public Point GetPointFromCenter(float centeredPosition, float offset)
+		public Point GetPointFromCenter(float centeredPosition, float offset = 0)
 		{
 			return GetPoint(centeredPosition * 2f - 1f, offset);
 		}

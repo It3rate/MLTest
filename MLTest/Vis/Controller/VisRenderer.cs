@@ -29,7 +29,7 @@ namespace MLTest.Vis
 
             foreach (var prim in Agent.FocusPad.Paths)
             {
-	            DrawPrimitive(g, prim, 2);
+	            DrawPrimitive(g, prim, 0);
             }
 
             foreach (var path in Agent.ViewPad.Paths)
@@ -145,7 +145,7 @@ namespace MLTest.Vis
         private void GenPens(float scale)
         {
             Pens.Clear();
-            Pens.Add(GetPen(Color.LightGray, 4f / scale));
+            Pens.Add(GetPen(Color.LightGray, 8f / scale));
             Pens.Add(GetPen(Color.Black, 8f / scale));
             Pens.Add(GetPen(Color.DarkRed, 8f / scale));
             Pens.Add(GetPen(Color.Orange, 8f / scale));

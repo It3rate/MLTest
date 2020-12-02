@@ -56,7 +56,10 @@ namespace MLTest.Vis
 			var loopStroke = new Stroke(seenLeftStroke.StartNode, circleNode, midNode);
             viewPad.Paths.Add(loopStroke);
 
-			return viewPad.Paths.ToArray();
+            var tailStroke = new Stroke(loopStroke.NodeAt(0.7f), rightLine.NodeAt(1f));
+            viewPad.Paths.Add(tailStroke);
+
+            return viewPad.Paths.ToArray();
         }
 
 		public Stroke[] LetterC(VisPad<Point> focusPad, VisPad<Stroke> viewPad)

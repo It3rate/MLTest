@@ -83,6 +83,33 @@ namespace MLTest.Vis
             }
         }
 
+	    public Point GetPoint(float position, float offset = 0)
+	    {
+		    var pos = Length * position;
+		    var len = 0f;
+		    var targetSegment = Segments[0];
+		    foreach (var segment in Segments)
+		    {
+			    var segLen = segment.Length;
+			    if (len + segLen > pos)
+			    {
+				    targetSegment = segment;
+				    break;
+			    }
+			    else
+			    {
+					len += segment.Length;
+			    }
+		    }
+		    var targetPosition = (pos - len) / targetSegment.Length;
+		    return targetSegment.GetPoint(targetPosition, offset);
+	    }
+
+	    public Point GetPointFromCenter(float centeredPosition, float offset = 0)
+	    {
+		    return GetPoint(centeredPosition * 2f - 1f, offset);
+	    }
+
         public void AddNodes(params Node[] nodes)
         {
 	        Nodes.AddRange(nodes);
@@ -107,24 +134,6 @@ namespace MLTest.Vis
 	    public float LikelyDiagonalUp { get; }
 	    public float LikelyDiagonalDown { get; }
 
-	    public Point GetPoint(float position, float offset)
-	    {
-            // go by length once that is running
-            var ipos = position * Nodes.Count - 1;
-            // should circles use ARCs when they are segments? 
-            return GetPointOnLine(position, offset);
-
-
-	    }
-	    public Point GetPointOnLine(float position, float offset)
-	    {
-		    return StartPoint.GetPointOnLineTo(EndPoint, position, offset);
-	    }
-
-        public Point GetPointFromCenter(float centeredPosition, float offset)
-	    {
-		    throw new NotImplementedException();
-	    }
 
 	    public Node NodeAt(float position) => new Node(this, position);
 	    public Node NodeAt(float position, float offset) => new TipNode(this, position, offset);

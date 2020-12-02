@@ -33,7 +33,7 @@ namespace MLTest.Vis
 	    Point EndPoint { get; }
 
         Point GetPoint(float position, float offset = 0);
-        Point GetPointFromCenter(float centeredPosition, float offset);
+        Point GetPointFromCenter(float centeredPosition, float offset = 0);
 
         Node NodeAt(float position, float offset = 0);
         Node StartNode { get; }
@@ -90,22 +90,7 @@ namespace MLTest.Vis
 	    public float DotProduct(Point pt) => -(X * pt.X) + (Y * pt.Y); // negative because inverted Y
 	    public float Atan2(Point pt) => (float)Math.Atan2(pt.Y - Y, pt.X - X);
 
-        public Point GetPointOnLineTo(Point end, float position, float offset = 0)
-        {
-	        var xOffset = 0f;
-	        var yOffset = 0f;
-	        var xDif = end.X - X;
-	        var yDif = end.Y - Y;
-	        if (offset != 0)
-	        {
-		        var ang = (float)(Math.Atan2(yDif, xDif));
-		        xOffset = (float)(-Math.Sin(ang) * Math.Abs(offset) * Math.Sign(-offset));
-		        yOffset = (float)(Math.Cos(ang) * Math.Abs(offset) * Math.Sign(-offset));
-	        }
-	        return new Point(X + xDif * position + xOffset, Y + yDif * position - yOffset);
-        }
-
-        public LinearDirection LinearDirection(Point pt)
+	    public LinearDirection LinearDirection(Point pt)
 	    {
 		    // make this return probability as well
 		    LinearDirection result;
