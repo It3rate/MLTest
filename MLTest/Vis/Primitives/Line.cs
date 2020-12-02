@@ -6,44 +6,40 @@ using System.Threading.Tasks;
 
 namespace MLTest.Vis
 {
-    public interface IPrimitivePath : IPath
-    {
-	    Point[] GetPolylinePoints(int pointCount = 24);
-    }
     /// <summary>
     /// Maybe primitives are always 0-1 (lengths are always positive) and joints/nodes are -1 to 1 (we balance by midpoints of objects)?
-    /// Or because lines have a start and end (no volume) they are 0-1, where rects and circles are a point mass that is centered (no start and end). How does inside/outside map to start/end? (center0, edge1, outside>1)
-    /// We only use rects and circles to express containment boundaries so they are 0 centered, the corner (or edge) of a rect isn't a volume so it has a start (and end).
+    /// Or because lines have a start and endPoint (no volume) they are 0-1, where rects and circles are a point mass that is centered (no start and endPoint). How does inside/outside map to start/endPoint? (center0, edge1, outside>1)
+    /// We only use rects and circles to express containment boundaries so they are 0 centered, the corner (or edge) of a rect isn't a volume so it has a start (and endPoint).
     /// 0 is past (known duration), 1 is present, > 1 is future (unknown potentially infinite duration)
     /// </summary>
     public class Line : Point, IPath, IPrimitivePath
     {
-        /// No. (A line where XY is the midpoint (0), and Start (-1) and End (1) are defined.)
-        public Point Start => new Point(X, Y);
-        public Point End { get; private set; }
-        public override bool IsRounded => false;
-        public override float Length
+	    public Point StartPoint => this;
+	    public Point MidPoint => GetPoint(0.5f, 0);
+        public Point EndPoint { get; private set; }
+
+        public Point Center => GetPoint(0.5f, 0);
+
+        private float _length;
+        public float Length
         {
             get
             {
                 if (_length == 0)
                 {
-                    _length = (float)Math.Sqrt((End.X - X) * (End.X - X) + (End.Y - Y) * (End.Y - Y));
+                    _length = (float)Math.Sqrt((EndPoint.X - X) * (EndPoint.X - X) + (EndPoint.Y - Y) * (EndPoint.Y - Y));
                 }
                 return _length;
             }
         }
-        public Point StartPoint => Start.Center;
-        public Point MidPoint => GetPoint(0.5f, 0);
-        public Point EndPoint => End.Center;
 
         private Line(float startX, float startY, float endX, float endY) : base(startX, startY)
         {
-            End = new Point(endX, endY);
+            EndPoint = new Point(endX, endY);
         }
-        private Line(Point start, Point end) : base(start.X, start.Y)
+        private Line(Point start, Point endPoint) : base(start.X, start.Y)
         {
-            End = end;
+            EndPoint = endPoint;
         }
 
         public static Line ByCenter(float centerX, float centerY, float originX, float originY)
@@ -61,20 +57,9 @@ namespace MLTest.Vis
             return new Line(start, end);
         }
 
-        public override Point GetPoint(float position, float offset)
+        public Point GetPoint(float position, float offset = 0)
         {
 	        return GetPointOnLineTo(EndPoint, position, offset);
-            //var xOffset = 0f;
-            //var yOffset = 0f;
-            //var xDif = End.X - X;
-            //var yDif = End.Y - Y;
-            //if (offset != 0)
-            //{
-            //    var ang = (float)(Math.Atan2(yDif, xDif));
-            //    xOffset = (float)(-Math.Sin(ang) * Math.Abs(offset) * Math.Sign(-offset));
-            //    yOffset = (float)(Math.Cos(ang) * Math.Abs(offset) * Math.Sign(-offset));
-            //}
-            //return new Point(X + xDif * position + xOffset, Y + yDif * position - yOffset);
         }
 
         public Point GetPointFromCenter(float centeredPosition, float offset)
@@ -87,21 +72,19 @@ namespace MLTest.Vis
         public Node StartNode => new Node(this, 0f);
         public Node MidNode => new Node(this, 0.5f);
         public Node EndNode => new Node(this, 1f);
-        public Stroke FullStroke => new Stroke(StartNode, EndNode);
-        public Stroke PartialStroke(float start, float end) => new Stroke(NodeAt(start), NodeAt(end));
 
         public Point IntersectionPoint(Line line) => null;
         public Point ProjectedOntoLine(Point p)
         {
-            var e1 = End.Subtract(this);
+            var e1 = EndPoint.Subtract(this);
             var e2 = p.Subtract(this);
             var dp = e1.DotProduct(e2);
-            var len2 = e1.SquaredLength();
+            var len2 = e1.VectorSquaredLength();
             return new Point(X + (dp * e1.X) / len2, Y + (dp * e1.Y) / len2);
         }
 
-        public Circle CircleFrom() => new Circle(this, End);
-        public Rectangle RectangleFrom() => new Rectangle(this, End);
+        public Circle CircleFrom() => new Circle(this, EndPoint);
+        public Rectangle RectangleFrom() => new Rectangle(this, EndPoint);
 
 
         public Point ProjectPointOnto(Point p)
@@ -109,7 +92,7 @@ namespace MLTest.Vis
 	        var e1 = EndPoint.Subtract(StartPoint);
 	        var e2 = p.Subtract(StartPoint);
 	        var dp = e1.DotProduct(e2);
-	        var len2 = e1.SquaredLength();
+	        var len2 = e1.VectorSquaredLength();
 	        return new Point(StartPoint.X + (dp * e1.X) / len2, StartPoint.Y + (dp * e1.Y) / len2);
         }
 
@@ -121,7 +104,7 @@ namespace MLTest.Vis
 
         public override string ToString()
         {
-	        return String.Format("Ln:{0:0.##},{1:0.##} {2:0.##},{3:0.##}", X, Y, End.X, End.Y);
+	        return String.Format("Ln:{0:0.##},{1:0.##} {2:0.##},{3:0.##}", X, Y, EndPoint.X, EndPoint.Y);
         }
     }
 }

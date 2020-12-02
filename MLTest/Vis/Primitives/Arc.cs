@@ -38,7 +38,7 @@ namespace MLTest.Vis
             }
         }
 
-        public override Point GetPoint(float position, float offset = 0)
+        public Point GetPoint(float position, float offset = 0)
         {
             var len = _arcLength * position;
             var pos = _startAngle + (Direction == ClockDirection.CW ? len : -len);
@@ -55,8 +55,6 @@ namespace MLTest.Vis
         public Node StartNode => new Node(this, 0f);
         public Node MidNode => new Node(this, 0.5f);
         public Node EndNode => new Node(this, 1f);
-        public Stroke FullStroke => new Stroke(StartNode, EndNode);
-        public Stroke PartialStroke(float start, float end) => new Stroke(NodeAt(start), NodeAt(end));
 
         public ClockDirection CounterDirection => Direction == ClockDirection.CW ? ClockDirection.CCW : ClockDirection.CW;
         public Arc CounterArc => new Arc(Reference, EndPoint, StartPoint, CounterDirection);

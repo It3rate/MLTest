@@ -24,16 +24,15 @@ namespace MLTest.Vis
 		public ClockDirection Direction { get; }
         public Point PerimeterOrigin { get; }
 		public float Radius { get; private set; }
-		public override bool IsRounded => true;
 
         public float OriginAngle { get; private set; }
-		public override float Length => (float)(2f * Radius * Math.PI);
+		public float Length => (float)(2f * Radius * Math.PI);
 
 		public Point StartPoint => PerimeterOrigin;
 		public Point MidPoint => GetPoint(0.5f, 0);
 		public Point EndPoint => PerimeterOrigin;
 
-		private Point Center => new Point(X, Y);
+		public Point Center => this;
 
         //public CircleRef(Point center, float radius) : base(center.X, center.Y)
         //{
@@ -66,7 +65,7 @@ namespace MLTest.Vis
 		/// <param name="position">Normalized (0-1) amount along the circle (0 is north, positive is clockwise, negative is counter clockwise). </param>
 		/// <param name="offset">Offset from circumference. Negative is inside, positive is outside. Zero is default, -1 is start.</param>
 		/// <returns></returns>
-		public override Point GetPoint(float position, float offset = 0)
+		public Point GetPoint(float position, float offset = 0)
 		{
 			var len = twoPi * position;
             var pos = OriginAngle + (Direction == ClockDirection.CW ? len : -len);
@@ -85,8 +84,6 @@ namespace MLTest.Vis
         public Node StartNode => new Node(this, 0f);
 		public Node MidNode => new Node(this, 0.5f);
 		public Node EndNode => new Node(this, 1f);
-		public Stroke FullStroke => new Stroke(StartNode, EndNode);
-		public Stroke PartialStroke(float start, float end) => new Stroke(NodeAt(start), NodeAt(end));
 
         public ClockDirection CounterDirection => Direction.Counter();
         public Circle CounterCircle => new Circle(Center, PerimeterOrigin, CounterDirection);
@@ -152,7 +149,7 @@ namespace MLTest.Vis
                 var dif = c1.Subtract(Center).DivideBy(dist).Multiply(h);
                 intersect0 = new Point(p2.X + dif.Y, p2.Y - dif.X);
                 intersect1 = new Point(p2.X - dif.Y, p2.Y + dif.X);
-                //var dif = c1.Subtract(Center).Swap().DivideBy(dist).Multiply(h);
+                //var dif = c1.Subtract(Center).Transpose().DivideBy(dist).Multiply(h);
                 //intersect0 = new Point(p2.X + dif.X, p2.Y - dif.Y);
                 //intersect1 = new Point(p2.X - dif.X, p2.Y + dif.Y);
 

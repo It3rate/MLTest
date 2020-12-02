@@ -207,7 +207,7 @@ namespace MLTest.Sim
         public override double CompareTo(SimElement element)
         {
             var result = 0.0; // default if isn't Node, for now
-            // has Edges? Edges: Start/End
+            // has Edges? Edges: Start/EndPoint
             if (element is SimStroke stroke)
             {
                 result = (stroke.Start.CompareTo(Start) + stroke.End.CompareTo(End)) / 2.0;

@@ -35,7 +35,7 @@ namespace MLTest.Vis
 			focusPad.Paths.Add(letterbox);
 
 			var leftLine = letterbox.GetLine(CompassDirection.W);
-			var leftStroke = leftLine.FullStroke;
+			var leftStroke = new Stroke(leftLine.StartNode, leftLine.EndNode);
 			viewPad.Paths.Add(leftStroke);
 
 			var topLine = letterbox.GetLine(CompassDirection.N);

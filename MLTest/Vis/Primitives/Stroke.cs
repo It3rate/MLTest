@@ -8,15 +8,13 @@ using Microsoft.ML.Probabilistic.Utilities;
 
 namespace MLTest.Vis
 {
-    public class Stroke : VisElement, IPath
+    public class Stroke : IPath
     {
-	    public override VisElementType ElementType => VisElementType.Stroke;
-
         private List<Node> Nodes { get; } = new List<Node>();
 
-        public override Point Anchor => StartNode.Anchor;
+        public Point Anchor => StartNode.Anchor;
         private float _length;
-        public override float Length => _length;
+        public float Length => _length;
         public Point StartPoint => StartNode.Anchor;
         public Point MidPoint => GetPoint(0.5f, 0);
         public Point EndPoint => EndNode.Anchor;
@@ -42,37 +40,41 @@ namespace MLTest.Vis
             Anchors.Add(Nodes[0].Start);
 
             for (var i = 0; i < Nodes.Count; i++)
-	        {
-		        var curNode = Nodes[i];
-	            IPrimitivePath curPath;
-		        if (curNode is TangentNode tanNode)
-		        {
-                    var pn = i > 0 ? Nodes[i - 1] : null;
-                    var nn = i < Nodes.Count - 1 ? Nodes[i + 1] : null;
-                    var p0 = tanNode.GetTangentFromPoint(pn);
-                    var p1 = tanNode.GetTangentToPoint(nn);
-                    var arc = new Arc(tanNode.CircleRef, p0, p1, tanNode.Direction);
-                    Segments.Add(Line.ByEndpoints(curPoint, p0));
-                    Segments.Add(arc);
-                    Anchors.AddRange(arc.GetPolylinePoints());
-                    curPoint = p1;
-                }
-                else if (curNode is TipNode tipNode)
-		        {
-                    Anchors.Add(curNode.Start);
-                    Segments.Add(Line.ByEndpoints(curPoint, curNode.End));
-                    curPoint = curNode.End;
-                }
-		        else
-		        {
-			        if (i > 0)
-			        {
-	                    Anchors.Add(curNode.Start);
-	                    Segments.Add(Line.ByEndpoints(curPoint, curNode.Start));
-	                    curPoint = curNode.End;
-                    }
-                }
-	        }
+            {
+	            var curNode = Nodes[i];
+	            switch (curNode)
+	            {
+		            case TangentNode tanNode:
+		            {
+			            var pn = i > 0 ? Nodes[i - 1] : null;
+			            var nn = i < Nodes.Count - 1 ? Nodes[i + 1] : null;
+			            var p0 = tanNode.GetTangentFromPoint(pn);
+			            var p1 = tanNode.GetTangentToPoint(nn);
+			            var arc = new Arc(tanNode.CircleRef, p0, p1, tanNode.Direction);
+			            Segments.Add(Line.ByEndpoints(curPoint, p0));
+			            Segments.Add(arc);
+			            Anchors.AddRange(arc.GetPolylinePoints());
+			            curPoint = p1;
+			            break;
+		            }
+		            case TipNode tipNode:
+			            Anchors.Add(curNode.Start);
+			            Segments.Add(Line.ByEndpoints(curPoint, curNode.End));
+			            curPoint = curNode.End;
+			            break;
+		            default:
+		            {
+			            if (i > 0)
+			            {
+				            Anchors.Add(curNode.Start);
+				            Segments.Add(Line.ByEndpoints(curPoint, curNode.Start));
+				            curPoint = curNode.End;
+			            }
+
+			            break;
+		            }
+	            }
+            }
 
             _length = 0;
             foreach (var segment in Segments)
@@ -89,7 +91,9 @@ namespace MLTest.Vis
 
         public void Flip(){ }
 	    public Stroke OrientedClone() => null;
-	    public override float CompareTo(VisElement element) => 0;
+
+	    public float CompareTo(IPath element) => 0;
+
 	    public bool BoundsOverlaps(Stroke stroke) => false;
 	    public float DistanceTo(Stroke stroke, out float position, out float targetPosition)
 	    {
@@ -127,7 +131,5 @@ namespace MLTest.Vis
 	    public Node StartNode => Nodes[0];
 	    public Node MidNode => new Node(this, 0.5f);
 	    public Node EndNode => Nodes[Nodes.Count - 1];
-        public Stroke FullStroke => new Stroke(StartNode, EndNode);
-	    public Stroke PartialStroke(float start, float end) => new Stroke(NodeAt(start), NodeAt(end));
     }
 }

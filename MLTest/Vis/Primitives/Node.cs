@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.ML.Probabilistic.Distributions;
 
 namespace MLTest.Vis
 {
@@ -16,7 +17,9 @@ namespace MLTest.Vis
 
         // calculated
         public Point Anchor { get; protected set; }
-		public float Length { get; }
+        public float X => Anchor.X;
+        public float Y => Anchor.Y;
+
 		public virtual Point Start => Anchor;
 		public virtual Point End => Anchor;
 
@@ -34,12 +37,11 @@ namespace MLTest.Vis
 			throw new NotImplementedException();
 		}
 
-		public float Similarity(IPrimitive p)
-		{
-			throw new NotImplementedException();
-		}
 
-		public override string ToString()
+        public float Similarity(IPrimitive p) => 0;
+        public Point Sample(Gaussian g) => null;
+
+        public override string ToString()
 		{
 			return Anchor.ToString();
 		}

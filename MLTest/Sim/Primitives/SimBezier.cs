@@ -85,7 +85,7 @@ namespace MLTest.Sim
                 }
                 //pts.AddRange(new[] { values[values.Length - 2].X, values[values.Length - 1].Y });
             }
-            //moves.Add(SimBezierMove.End);
+            //moves.Add(SimBezierMove.EndPoint);
 
             _points = pts.ToArray();
             Moves = moves.ToArray();

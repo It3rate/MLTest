@@ -6,19 +6,17 @@ using System.Threading.Tasks;
 
 namespace MLTest.Vis
 {
-    public class VisShape : VisElement
+    public class VisShape
     {
-	    public override VisElementType ElementType => VisElementType.Shape;
-
-	    public override float Length => 0;
-	    public override Point Anchor { get; } = null;
+	    public float Length => 0;
+	    public Point Anchor { get; } = null;
 
 	    public List<Stroke> Strokes { get; } = new List<Stroke>();
 
         // computed
 	    public List<VisJoint> ComputedJoints { get; } = new List<VisJoint>();
 
-	    public float IsInside(VisElement element) => 0;
+	    public float IsInside(IPath element) => 0;
 
 	    public VisShape(params Stroke[] strokes)
 	    {

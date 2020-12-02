@@ -8,14 +8,21 @@ using Microsoft.ML.Probabilistic.Distributions;
 
 namespace MLTest.Vis
 {
+	//public enum VisElementType { Any, Point, Node, Circle, Square, Rectangle, Oval, Joint, Stroke, Shape }
+
     /// <summary>
     /// The mental map primitives when we conceptualize things at a high level. These are meant to be (ideally) what we use, not what is mathematically possible or even simple.
     /// </summary>
     public interface IPrimitive
     {
-        //float Length { get; }
-        Point GetPoint(float position, float offset = 0);
+	    float X { get; }
+	    float Y { get; }
         float Similarity(IPrimitive p);
+        Point Sample(Gaussian g);
+    }
+    public interface IPrimitivePath : IPath
+    {
+	    Point[] GetPolylinePoints(int pointCount = 24);
     }
 
     public interface IPath
@@ -24,7 +31,6 @@ namespace MLTest.Vis
 	    Point StartPoint { get; }
 	    Point MidPoint { get; }
 	    Point EndPoint { get; }
-        Point Center { get; }
 
         Point GetPoint(float position, float offset = 0);
         Point GetPointFromCenter(float centeredPosition, float offset);
@@ -33,8 +39,18 @@ namespace MLTest.Vis
         Node StartNode { get; }
         Node MidNode { get; }
         Node EndNode { get; }
-        Stroke FullStroke { get; }
-        Stroke PartialStroke(float start, float end);
+    }
+
+    public interface IArea
+    {
+	    Point Center { get; }
+	    float Area { get; }
+	    Rectangle Bounds { get; }
+        bool IsClosed { get; }
+	    bool IsConcave { get; }
+	    int JointCount { get; }
+	    int CornerCount { get; }
+	    float Sharpness { get; }
     }
 
     public class Point : IPrimitive
@@ -42,12 +58,9 @@ namespace MLTest.Vis
 	    public float X { get; }
 	    public float Y { get; }
 
-	    public virtual bool IsRounded => false;
-	    protected float _length = 0;
-
 	    protected static float twoPi = (float)(Math.PI * 2.0);
 
-        public Point(float x, float y)
+	    public Point(float x, float y)
 	    {
 		    X = x;
 		    Y = y;
@@ -59,31 +72,19 @@ namespace MLTest.Vis
 		    Y = p.Y;
 	    }
 
-	    public PointF PointF => new PointF(X, Y);
-
 	    public Point Sample(Gaussian g) => new Point(X + (float) g.Sample(), Y + (float) g.Sample());
 	    public virtual float Similarity(IPrimitive p) => 0;
-
-	    public virtual Point GetPoint(float position, float offset)
-	    {
-		    return new Point(X + position, Y + offset);
-	    }
-
-	    public Point Center => this;
-
-	    public virtual float Length => _length;
-
-	    //public override float Length() => (float)Math.Sqrt(X * X + Y * Y);
-	    public float SquaredLength() => X * X + Y * Y;
+	    public Point Transpose() => new Point(Y, X);
 	    public Point Abs() => new Point(Math.Abs(X), Math.Abs(Y));
-	    public Point Swap() => new Point(Y, X);
-
 	    public Point Add(Point pt) => new Point(X + pt.X, Y + pt.Y);
 	    public Point Subtract(Point pt) => new Point(X - pt.X, Y - pt.Y);
 	    public Point Multiply(Point pt) => new Point(X * pt.X, Y * pt.Y);
 	    public Point MidPointOf(Point pt) => new Point((pt.X - X) / 2f + X, (pt.Y - Y) / 2f + Y);
 	    public Point Multiply(float scalar) => new Point(X * scalar, Y * scalar);
 	    public Point DivideBy(float scalar) => new Point(X / scalar, Y / scalar);
+
+	    public float VectorLength() => (float)Math.Sqrt(X * X + Y * Y);
+	    public float VectorSquaredLength() => X * X + Y * Y;
 	    public float DistanceTo(Point pt) => (float)Math.Sqrt((pt.X - X) * (pt.X - X) + (pt.Y - Y) * (pt.Y - Y));
 	    public float SquaredDistanceTo(Point pt) => (pt.X - X) * (pt.X - X)  + (pt.Y - Y) * (pt.Y - Y);
 	    public float DotProduct(Point pt) => -(X * pt.X) + (Y * pt.Y); // negative because inverted Y

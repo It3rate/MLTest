@@ -26,8 +26,8 @@ namespace MLTest.Vis
             Paths.Clear();
         }
 
-	    public VisElement GetByLocation(VisElement reference, VisLocator locator) => null;
-        public VisElement GetNearby(Node node, VisElementType elementType = VisElementType.Any) => null;
+	    //public VisElement GetByLocation(VisElement reference, VisLocator locator) => null;
+     //   public VisElement GetNearby(Node node, VisElementType elementType = VisElementType.Any) => null;
 
         public VisJoint GetSimilar(VisJoint joint) => null;
         public T GetSimilar(IPath path, params VisJoint[] joints)

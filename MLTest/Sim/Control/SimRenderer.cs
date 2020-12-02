@@ -57,7 +57,7 @@ namespace MLTest.Sim
                     DrawCircle(g, edge.Anchor0, 2, 0.5);
                     DrawCircle(g, edge.Anchor1, 3, 0.5);
                 }
-                //DrawCurve(g, stroke.Start, stroke.Edges[0], stroke.End, penIndex);
+                //DrawCurve(g, stroke.Start, stroke.Edges[0], stroke.EndPoint, penIndex);
                 DrawCurve(g, stroke, penIndex);
             }
         }

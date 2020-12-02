@@ -66,7 +66,7 @@ namespace MLTest.Vis
 
             //if (stroke.Edges.Count == 0)
             //{
-            //    DrawLine(g, stroke.Start, stroke.End, penIndex);
+            //    DrawLine(g, stroke.Start, stroke.EndPoint, penIndex);
             //}
             //else
             //{
@@ -75,7 +75,7 @@ namespace MLTest.Vis
             //        DrawCircle(g, edge.Anchor0, 2, 0.5);
             //        DrawCircle(g, edge.Anchor1, 3, 0.5);
             //    }
-            //    //DrawCurve(g, stroke.Start, stroke.Edges[0], stroke.End, penIndex);
+            //    //DrawCurve(g, stroke.Start, stroke.Edges[0], stroke.EndPoint, penIndex);
             //    DrawCurve(g, stroke, penIndex);
             //}
         }

@@ -15,7 +15,7 @@ namespace MLTest.Vis
         public Point TopLeft { get; private set; }
         public Point Size => HalfSize.Multiply(2f);
         public Point HalfSize { get; private set; }
-        public override bool IsRounded => false;
+        public Point Center => this;
 
         public Rectangle(Point center, Point corner) : base(center.X, center.Y)
         {
@@ -31,7 +31,7 @@ namespace MLTest.Vis
             HalfSize = this.Subtract(TopLeft).Abs();
         }
 
-        public override Point GetPoint(float xRatio, float yRatio)
+        public Point GetPoint(float xRatio, float yRatio)
         {
             return new Point(TopLeft.X + HalfSize.X * xRatio, TopLeft.Y + HalfSize.Y * yRatio);
         }
@@ -116,31 +116,6 @@ namespace MLTest.Vis
 	                result = new Point(X, Y);
                     break;
             }
-            return result;
-        }
-
-        public Stroke GetStroke(CompassDirection direction)
-        {
-            Stroke result= GetLine(direction).FullStroke;
-            //Line line = GetLine(direction);
-            //switch (direction)
-            //{
-            //    case CompassDirection.N:
-	           //     result = line.FullStroke;
-            //        break;
-            //    case CompassDirection.S:
-            //        result = new Stroke(line);
-            //        break;
-            //    case CompassDirection.E:
-            //        result = new Stroke(line);
-            //        break;
-            //    case CompassDirection.W:
-            //        result = new Stroke(line);
-            //        break;
-            //    default:
-            //        result = new Stroke(line);
-            //        break;
-            //}
             return result;
         }
 
