@@ -39,84 +39,11 @@ namespace MLTest.Vis
 
         public Line GetLine(CompassDirection direction)
         {
-            Line result;
-            switch (direction)
-            {
-                case CompassDirection.N:
-                    result = Line.ByEndpoints(X - HalfSize.X, Y - HalfSize.Y, X + HalfSize.X, Y - HalfSize.Y);
-                    break;
-                case CompassDirection.S:
-                    result = Line.ByEndpoints(X - HalfSize.X, Y + HalfSize.Y, X + HalfSize.X, Y + HalfSize.Y);
-                    break;
-                case CompassDirection.E:
-                    result = Line.ByEndpoints(X + HalfSize.X, Y - HalfSize.Y, X + HalfSize.X, Y + HalfSize.Y);
-                    break;
-                case CompassDirection.W:
-                    result = Line.ByEndpoints(X - HalfSize.X, Y - HalfSize.Y, X - HalfSize.X, Y + HalfSize.Y);
-                    break;
-
-                // diagonal from given point - these can go both directions because the origin depends on the use case (V vs 7)
-                case CompassDirection.NW:
-                    result = Line.ByEndpoints(X - HalfSize.X, Y - HalfSize.Y, X + HalfSize.X, Y + HalfSize.Y);
-                    break;
-                case CompassDirection.NE:
-                    result = Line.ByEndpoints(X + HalfSize.X, Y - HalfSize.Y, X - HalfSize.X, Y + HalfSize.Y);
-                    break;
-                case CompassDirection.SW:
-                    result = Line.ByEndpoints(X - HalfSize.X, Y + HalfSize.Y, X + HalfSize.X, Y - HalfSize.Y);
-                    break;
-                case CompassDirection.SE:
-                    result = Line.ByEndpoints(X + HalfSize.X, Y + HalfSize.Y, X - HalfSize.X, Y - HalfSize.Y);
-                    break;
-
-                // centered lines
-                case CompassDirection.NS:
-                    result = Line.ByEndpoints(X, Y - HalfSize.Y, X, Y + HalfSize.Y);
-                    break;
-                case CompassDirection.WE:
-                    result = Line.ByEndpoints(X - HalfSize.X, Y, X + HalfSize.X, Y);
-                    break;
-                default:
-                    result = Line.ByEndpoints(X - HalfSize.X, Y - HalfSize.Y, X - HalfSize.X, Y + HalfSize.Y);
-                    break;
-            }
-            return result;
+	        return direction.GetLineFrom(this);
         }
         public Point GetPoint(CompassDirection direction)
         {
-	        Point result;
-            switch (direction)
-            {
-                case CompassDirection.N:
-                    result = new Point(X, Y - HalfSize.Y);
-                    break;
-                case CompassDirection.S:
-	                result = new Point(X, Y + HalfSize.Y);
-                    break;
-                case CompassDirection.E:
-	                result = new Point(X + HalfSize.X, Y);
-                    break;
-                case CompassDirection.W:
-	                result = new Point(X - HalfSize.X, Y);
-                    break;
-
-                case CompassDirection.NW:
-	                result = new Point(X - HalfSize.X, Y - HalfSize.Y);
-                    break;
-                case CompassDirection.NE:
-	                result = new Point(X + HalfSize.X, Y - HalfSize.Y);
-                    break;
-                case CompassDirection.SW:
-	                result = new Point(X - HalfSize.X, Y + HalfSize.Y);
-                    break;
-                case CompassDirection.SE:
-	                result = new Point(X + HalfSize.X, Y + HalfSize.Y);
-                    break;
-                default:
-	                result = new Point(X, Y);
-                    break;
-            }
-            return result;
+	        return direction.GetPointFrom(this);
         }
 
         public Point NearestIntersectionTo(Point p) => null;

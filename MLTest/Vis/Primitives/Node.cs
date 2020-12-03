@@ -47,8 +47,20 @@ namespace MLTest.Vis
 		}
     }
 
-    // The first node on a circleRef needs to specify it's direction as there are two tangent lines. Points inside the circleRef will move to intersecting point of the second node's reference based on direction.
-	public class TangentNode : Node
+    /// <summary>
+    /// Node that joins the reference path perpendicularly at the nearest point. Mostly for circles. If inside, connects to closest edge. If center connects to origin.
+    /// Line: if it isn't valid for a line segment, it will connect to the imaginary extended line?
+    /// Arc: Connects to imaginary edge if arc isn't complete. If inside, connects to nearest interior point on arc, if invalid behaves as circle.
+    /// </summary>
+	public class PerpendicularNode : Node
+	{
+		public PerpendicularNode(IPath reference): base(reference, 0)
+		{
+		}
+    }
+
+	// The first node on a circleRef needs to specify it's direction as there are two tangent lines. Points inside the circleRef will move to intersecting point of the second node's reference based on direction.
+    public class TangentNode : Node
 	{
 		public ClockDirection Direction { get; }
 		public Circle CircleRef;

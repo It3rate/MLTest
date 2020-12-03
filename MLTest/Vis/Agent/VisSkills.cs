@@ -42,13 +42,14 @@ namespace MLTest.Vis
 			var rightLine = letterbox.GetLine(CompassDirection.E);
 			var seenLeftStroke = viewPad.GetSimilar(leftLine);
 
-            var radius = topLine.NodeAt(1f, 0.20f);
-			var center = topLine.NodeAt(0.6f, 0.20f);
-			var topCircle = new Circle(center, radius);
-			focusPad.Paths.Add(topCircle);
+            //var radius = topLine.NodeAt(0.55f, 0f);
+			//var center = topLine.NodeAt(0.55f, 0.22f);
+			//var topCircle = new Circle(center, radius);
+			var topCircle = Circle.CircleFromLineAndPoint(topLine, rightLine.NodeAt(0.25f), ClockDirection.CCW);
+            focusPad.Paths.Add(topCircle);
 			var circleNode = new TangentNode(topCircle,  ClockDirection.CW);
 
-			var midNode = seenLeftStroke.NodeAt(0.55f);
+            var midNode = seenLeftStroke.NodeAt(0.55f);
 
 			//var loopStartJoint = new VisJoint(seenLeftStroke.StartNode, circleNode0, VisJointType.Corner);
 			//var circleJoint = new VisJoint(circleNode0, circleNode1, VisJointType.Curve);
@@ -56,7 +57,9 @@ namespace MLTest.Vis
 			var loopStroke = new Stroke(seenLeftStroke.StartNode, circleNode, midNode);
             viewPad.Paths.Add(loopStroke);
 
-            var tailStroke = new Stroke(loopStroke.NodeAt(0.7f), rightLine.NodeAt(1f));
+            var circRefNode = new Node(topCircle, 0);
+            var tailStart = topCircle.NodeAt(CompassDirection.S); // topCircle.NodeAt(0.75f)
+            var tailStroke = new Stroke(tailStart, rightLine.NodeAt(1f));
             viewPad.Paths.Add(tailStroke);
 
             return viewPad.Paths.ToArray();

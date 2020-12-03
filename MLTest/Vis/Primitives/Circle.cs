@@ -8,11 +8,6 @@ using Python.Runtime;
 
 namespace MLTest.Vis
 {
-    public enum ClockDirection{CW, CCW }
-    public static class ClockDirectionExtensions
-    {
-	    public static ClockDirection Counter(this ClockDirection direction) => direction == ClockDirection.CW ? ClockDirection.CCW : ClockDirection.CW;
-    }
     /// <summary>
     /// A circle centered at the XY point, with a Radius. There is no natural 'home' angle -a second point is given to calculate the radius and orient it the circle (which becomes 0).
     /// Circles are the only natural primitive that can have an area - it is a 'large point', not a shape made of joints.
@@ -53,7 +48,20 @@ namespace MLTest.Vis
 		}
 		public Circle(Node center, Node perimeterOrigin, ClockDirection direction = ClockDirection.CW) : this(center.Anchor, perimeterOrigin.Anchor, direction){ }
 
-		private void Initialize()
+        /// <summary>
+        /// Radius is origin to line, CW or CCW determines if it winds right or left to the line.
+        /// </summary>
+		public static Circle CircleFromLineAndPoint(Line line, Node perimeterOrigin, ClockDirection direction = ClockDirection.CW)
+        {
+	        var p0 = perimeterOrigin.Anchor;
+	        var onLine = p0.ProjectedOntoLine(line);
+	        var diff = p0.Subtract(onLine);
+	        var radius = diff.VectorLength();
+	        var center = direction == ClockDirection.CW ? p0.Add(diff.Transpose()) : p0.Subtract(diff.Transpose());
+            Circle result = new Circle(center, p0, direction);      
+			return result;
+		}
+        private void Initialize()
 		{
 			Radius = Center.DistanceTo(PerimeterOrigin);
 			OriginAngle = Center.Atan2(PerimeterOrigin);
@@ -67,7 +75,7 @@ namespace MLTest.Vis
 		/// <returns></returns>
 		public Point GetPoint(float position, float offset = 0)
 		{
-			var len = twoPi * position;
+			var len = pi2 * position;
             var pos = OriginAngle + (Direction == ClockDirection.CW ? len : -len);
             return new Point(X + (float)Math.Cos(pos) * (Radius + offset), Y + (float)Math.Sin(pos) * (Radius + offset));
         }
@@ -76,16 +84,29 @@ namespace MLTest.Vis
 		{
 			return GetPoint(centeredPosition * 2f - 1f, offset);
 		}
+		public Point GetPoint(CompassDirection direction, float offset = 0)
+		{
+			var rads = direction.Radians();
+			return new Point(X + (float)Math.Cos(rads) * (Radius + offset), Y + (float)Math.Sin(rads) * (Radius + offset));
+		}
 
-		public Stroke GetTangentArc(Point leftPoint, Point rightPoint) => null;
+        public Stroke GetTangentArc(Point leftPoint, Point rightPoint) => null;
 
 		public Node NodeAt(float position) => new Node(this, position);
 		public Node NodeAt(float position, float offset) => new TipNode(this, position, offset);
+		
         public Node StartNode => new Node(this, 0f);
 		public Node MidNode => new Node(this, 0.5f);
 		public Node EndNode => new Node(this, 1f);
 
-        public ClockDirection CounterDirection => Direction.Counter();
+		public TipNode NodeAt(CompassDirection direction, float offset = 0)
+		{
+			var rads = direction.Radians() - OriginAngle;
+			rads = (rads + pi2) % pi2;
+			return new TipNode(this, rads / pi2, offset);
+		}
+
+		public ClockDirection CounterDirection => Direction.Counter();
         public Circle CounterCircle => new Circle(Center, PerimeterOrigin, CounterDirection);
 
         public Point FindTangentInDirection(Point p, ClockDirection direction)
@@ -171,7 +192,7 @@ namespace MLTest.Vis
 
         public override string ToString()
         {
-	        return String.Format("Circ:{0:0.##},{1:0.##} r{2:0.##}", X, Y, Radius);
+	        return $"Circ:{X:0.##},{Y:0.##} r{Radius:0.##}";
         }
     }
 

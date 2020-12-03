@@ -18,7 +18,7 @@ namespace MLTest.Vis
 
         public float Radius => Reference.Radius;
         public Point Center => Reference.Center;
-        public float Length => (_arcLength / twoPi) * Radius;
+        public float Length => (_arcLength / pi2) * Radius;
 
         public Point StartPoint => this;
         public Point MidPoint => Reference.GetPoint(0.5f, 0);
@@ -31,10 +31,10 @@ namespace MLTest.Vis
             EndPoint = endPoint;
             _startAngle = circle.Center.Atan2(startPoint);
             _endAngle = circle.Center.Atan2(endPoint);
-            _arcLength = (Math.Max(_startAngle, _endAngle) - Math.Min(_startAngle, _endAngle)) % twoPi;
+            _arcLength = (Math.Max(_startAngle, _endAngle) - Math.Min(_startAngle, _endAngle)) % pi2;
             if (direction == ClockDirection.CCW)
             {
-                _arcLength = twoPi - _arcLength;
+                _arcLength = pi2 - _arcLength;
             }
         }
 
@@ -48,6 +48,12 @@ namespace MLTest.Vis
         public Point GetPointFromCenter(float centeredPosition, float offset = 0)
         {   
             return GetPoint(centeredPosition * 2f - 1f, offset);
+        }
+        public Point GetPoint(CompassDirection direction, float offset = 0)
+        {
+	        var rads = direction.Radians();
+	        rads = Math.Max(_startAngle, Math.Max(_endAngle, rads));
+	        return new Point(X + (float)Math.Cos(rads) * (Radius + offset), Y + (float)Math.Sin(rads) * (Radius + offset));
         }
 
         public Node NodeAt(float position) => new Node(this, position);

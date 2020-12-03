@@ -47,8 +47,8 @@ namespace MLTest.Vis
 		            case TangentNode tanNode:
 		            {
 			            var pn = i > 0 ? Nodes[i - 1] : null;
-			            var nn = i < Nodes.Count - 1 ? Nodes[i + 1] : null;
 			            var p0 = tanNode.GetTangentFromPoint(pn);
+			            var nn = i < Nodes.Count - 1 ? Nodes[i + 1] : null;
 			            var p1 = tanNode.GetTangentToPoint(nn);
 			            var arc = new Arc(tanNode.CircleRef, p0, p1, tanNode.Direction);
 			            Segments.Add(Line.ByEndpoints(curPoint, p0));

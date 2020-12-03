@@ -84,26 +84,22 @@ namespace MLTest.Vis
         public Node EndNode => new Node(this, 1f);
 
         public Point IntersectionPoint(Line line) => null;
-        public Point ProjectedOntoLine(Point p)
-        {
-            var e1 = EndPoint.Subtract(this);
-            var e2 = p.Subtract(this);
-            var dp = e1.DotProduct(e2);
-            var len2 = e1.VectorSquaredLength();
-            return new Point(X + (dp * e1.X) / len2, Y + (dp * e1.Y) / len2);
-        }
-
         public Circle CircleFrom() => new Circle(this, EndPoint);
         public Rectangle RectangleFrom() => new Rectangle(this, EndPoint);
 
 
         public Point ProjectPointOnto(Point p)
         {
-	        var e1 = EndPoint.Subtract(StartPoint);
-	        var e2 = p.Subtract(StartPoint);
+	        var e1 = EndPoint.Subtract(this);
+	        var e2 = p.Subtract(this);
 	        var dp = e1.DotProduct(e2);
 	        var len2 = e1.VectorSquaredLength();
-	        return new Point(StartPoint.X + (dp * e1.X) / len2, StartPoint.Y + (dp * e1.Y) / len2);
+	        return new Point(X + (dp * e1.X) / len2, Y + (dp * e1.Y) / len2);
+         //   var e1 = EndPoint.Subtract(StartPoint);
+	        //var e2 = p.Subtract(StartPoint);
+	        //var dp = e1.DotProduct(e2);
+	        //var len2 = e1.VectorSquaredLength();
+	        //return new Point(StartPoint.X + (dp * e1.X) / len2, StartPoint.Y + (dp * e1.Y) / len2);
         }
 
         public Point[] GetPolylinePoints(int pointCount = 24)

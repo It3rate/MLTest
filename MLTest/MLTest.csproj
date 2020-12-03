@@ -420,7 +420,6 @@
     <Compile Include="Vis\Primitives\Line.cs" />
     <Compile Include="Vis\Primitives\Point.cs" />
     <Compile Include="Vis\Primitives\Rectangle.cs" />
-    <Compile Include="Vis\Primitives\VisElement.cs" />
     <Compile Include="Vis\Primitives\VisJoint.cs" />
     <Compile Include="Vis\Primitives\VisLocator.cs" />
     <Compile Include="Vis\Primitives\VisPrimitives.cs" />

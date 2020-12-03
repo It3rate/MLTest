@@ -58,7 +58,7 @@ namespace MLTest.Vis
 	    public float X { get; }
 	    public float Y { get; }
 
-	    protected static float twoPi = (float)(Math.PI * 2.0);
+	    protected const float pi2 = (float)(Math.PI * 2.0);
 
 	    public Point(float x, float y)
 	    {
@@ -87,7 +87,7 @@ namespace MLTest.Vis
 	    public float VectorSquaredLength() => X * X + Y * Y;
 	    public float DistanceTo(Point pt) => (float)Math.Sqrt((pt.X - X) * (pt.X - X) + (pt.Y - Y) * (pt.Y - Y));
 	    public float SquaredDistanceTo(Point pt) => (pt.X - X) * (pt.X - X)  + (pt.Y - Y) * (pt.Y - Y);
-	    public float DotProduct(Point pt) => -(X * pt.X) + (Y * pt.Y); // negative because inverted Y
+	    public float DotProduct(Point pt) => (X * pt.X) + (Y * pt.Y); // negative because inverted Y
 	    public float Atan2(Point pt) => (float)Math.Atan2(pt.Y - Y, pt.X - X);
 
 	    public LinearDirection LinearDirection(Point pt)
