@@ -90,7 +90,9 @@ namespace MLTest.Vis
 	    public float DotProduct(Point pt) => (X * pt.X) + (Y * pt.Y); // negative because inverted Y
 	    public float Atan2(Point pt) => (float)Math.Atan2(pt.Y - Y, pt.X - X);
 
-	    public LinearDirection LinearDirection(Point pt)
+        public PointF PointF => new PointF(X, Y);
+
+        public LinearDirection LinearDirection(Point pt)
 	    {
 		    // make this return probability as well
 		    LinearDirection result;

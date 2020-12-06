@@ -9,18 +9,40 @@ namespace MLTest.Vis
 {
 	public class VisSkills
 	{
-		// Use separate pads for imagined and seen elements
+        public List<float> LetterWidths = new List<float>(){};
+        // Use separate pads for imagined and seen elements
 
-		// pads are a complex version of the visual-motor connection of neurons in early life: see, process/transmit, signal muscles
-		// Sensory capture - Input (visualization)
-		// Understanding - processing to primitive shapes on pad (Primitives)
-		// Planning - Lookup of letter recipes (cell)
-		// Deciding - Form next stroke plan (thought)
-		// Transmitting - encode and send to renderer (via nervous system)
-		// Motor - render (muscle motion)
-		// Feedback - back to step 1
+        // pads are a complex version of the visual-motor connection of neurons in early life: see, process/transmit, signal muscles
+        // Sensory capture - Input (visualization)
+        // Understanding - processing to primitive shapes on pad (Primitives)
+        // Planning - Lookup of letter recipes (cell)
+        // Deciding - Form next stroke plan (thought)
+        // Transmitting - encode and send to renderer (via nervous system)
+        // Motor - render (muscle motion)
+        // Feedback - back to step 1
 
-		public Stroke[] LetterR(VisPad<Point> focusPad, VisPad<Stroke> viewPad)
+        public float halfM = 0.5f;
+
+        public Rectangle LetterA(VisPad<Point> focusPad, VisPad<Stroke> viewPad)
+        {
+            var letterbox = new Rectangle(halfM * .9f, 0.5f, 0f, 0f);
+            focusPad.Paths.Add(letterbox);
+
+            var topLine = letterbox.GetLine(CompassDirection.N);
+            var bottomLine = letterbox.GetLine(CompassDirection.S);
+
+            var leftStroke = new Stroke(topLine.MidNode, bottomLine.StartNode);
+            viewPad.Paths.Add(leftStroke);
+
+            var rightStroke = new Stroke(topLine.MidNode, bottomLine.EndNode);
+            viewPad.Paths.Add(rightStroke);
+
+            var midStroke = new Stroke(leftStroke.NodeAt(.6f), rightStroke.NodeAt(.6f));
+            viewPad.Paths.Add(midStroke);
+
+            return letterbox;
+        }
+        public Rectangle LetterR(VisPad<Point> focusPad, VisPad<Stroke> viewPad)
         {
             // LB: imagine letterbox
             // LB0: find left vertical line (need to find sub pieces of imagined elements - if using the whole rect can just reference it)
@@ -30,8 +52,7 @@ namespace MLTest.Vis
             // Find loop stroke
             // TailS: Make with joints LoopS:0.8 (butt), LeftS:1 offset 1 (tip)
 
-
-            var letterbox = new Rectangle(0.35f, 0.5f, 0.1f, 0.1f);
+            var letterbox = new Rectangle(0.25f, 0.5f, 0f, 0f);
 			focusPad.Paths.Add(letterbox);
 
 			var leftLine = letterbox.GetLine(CompassDirection.W);
@@ -58,25 +79,29 @@ namespace MLTest.Vis
             viewPad.Paths.Add(loopStroke);
 
             var circRefNode = new Node(topCircle, 0);
-            var tailStart = topCircle.NodeAt(CompassDirection.S); // topCircle.NodeAt(0.75f)
+            var tailStart = topCircle.NodeAt(.75f);// topCircle.NodeAt(CompassDirection.S); 
             var tailStroke = new Stroke(tailStart, rightLine.NodeAt(1f));
             viewPad.Paths.Add(tailStroke);
 
-            return viewPad.Paths.ToArray();
+            return letterbox;
         }
 
-		public Stroke[] LetterC(VisPad<Point> focusPad, VisPad<Stroke> viewPad)
+		public Rectangle LetterC(VisPad<Point> focusPad, VisPad<Stroke> viewPad)
 		{
-			var letterbox = new Rectangle(0.4f, 0.5f, 0.1f, 0.1f);
-			focusPad.Paths.Add(letterbox);
+			var letterbox = new Rectangle(0.5f, 0.5f, 0f, 0f);
+            focusPad.Paths.Add(letterbox);
+            var rightLine = letterbox.GetLine(CompassDirection.E);
 
-			var circle = new Circle(letterbox.Center, letterbox.GetPoint(CompassDirection.E), ClockDirection.CCW);
-			var startC = circle.NodeAt(0.1f);
-			var endC = circle.NodeAt(0.9f);
-			var loopStroke = new Stroke(startC, endC);
-			viewPad.Paths.Add(loopStroke);
+            var circle = new Circle(letterbox.Center, letterbox.GetPoint(CompassDirection.E), ClockDirection.CCW);
+            focusPad.Paths.Add(circle);
+            var startC = circle.NodeAt(0.1f);
+            var endC = circle.NodeAt(0.9f);
+            var circleNode = new TangentNode(circle, ClockDirection.CCW);
+            //var loopStroke = new Stroke(rightLine.NodeAt(.4f), circleNode, rightLine.NodeAt(.6f));
+            var loopStroke = new Stroke(startC, circleNode, endC);
+            viewPad.Paths.Add(loopStroke);
 
-			return viewPad.Paths.ToArray();
+            return letterbox;
         }
 	}
 }

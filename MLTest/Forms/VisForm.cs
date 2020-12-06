@@ -14,14 +14,15 @@ namespace MLTest.Forms
 {
     public partial class VisForm : Form
     {
-	    VisAgent _agent = new VisAgent();
-        VisRenderer _vis;
+	    VisAgent _agent;
+        VisRenderer _renderer;
         public VisForm()
         {
             InitializeComponent();
 
             DoubleBuffered = true;
-            _vis = new VisRenderer(_agent, panel1.Width, panel1.Height);
+            _renderer = new VisRenderer(panel1.Width, panel1.Height);
+            _agent = new VisAgent(_renderer);
         }
 
         private void panel1_Paint(object sender, PaintEventArgs e)
@@ -32,15 +33,7 @@ namespace MLTest.Forms
 
         public void OnDraw(Graphics g)
         {
-	        var state = g.Save();
-
-            float w = _vis.Width;
-            float h = _vis.Height;
-            g.ScaleTransform(w, h);
-            //g.ScaleTransform((_vis.Width - 1f) / 2f, (_vis.Height - 1f) / 2f);
-            //g.TranslateTransform(1f,1f); // center at 0,0, box is -1 to 1
-            _vis.Draw(g);
-	        g.Restore(state);
+            _agent.Draw(g);
         }
 
         private void btNext_Click(object sender, EventArgs e)

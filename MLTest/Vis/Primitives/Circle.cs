@@ -114,7 +114,7 @@ namespace MLTest.Vis
 	        var distSquared = Center.SquaredDistanceTo(p);
 	        if (distSquared < Radius * Radius)
 	        {
-		        return new Point(-1, -1);
+		        return p; // on line -- need to account for inside circle as well.
 	        }
             var L = Math.Sqrt(distSquared - Radius * Radius);
 	        var numberOfSolutions = IntersectCircle(p, (float)L, out var pt0, out var pt1);

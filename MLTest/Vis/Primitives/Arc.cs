@@ -29,6 +29,7 @@ namespace MLTest.Vis
         {
             Reference = circle;
             EndPoint = endPoint;
+            Direction = direction;
             _startAngle = circle.Center.Atan2(startPoint);
             _endAngle = circle.Center.Atan2(endPoint);
             _arcLength = (Math.Max(_startAngle, _endAngle) - Math.Min(_startAngle, _endAngle)) % pi2;
@@ -41,7 +42,7 @@ namespace MLTest.Vis
         public Point GetPoint(float position, float offset = 0)
         {
             var len = _arcLength * position;
-            var pos = _startAngle + (Direction == ClockDirection.CW ? len : -len);
+            var pos = _startAngle + (Direction == ClockDirection.CW ? len : -len) + pi2;
             return new Point(Reference.X + (float)Math.Cos(pos) * (Radius + offset), Reference.Y + (float)Math.Sin(pos) * (Radius + offset));
             //return Reference.GetPoint(pos, offset);
         }
@@ -65,12 +66,12 @@ namespace MLTest.Vis
         public ClockDirection CounterDirection => Direction == ClockDirection.CW ? ClockDirection.CCW : ClockDirection.CW;
         public Arc CounterArc => new Arc(Reference, EndPoint, StartPoint, CounterDirection);
 
-        public Point[] GetPolylinePoints(int pointCount = 24)
+        public Point[] GetPolylinePoints(int pointCount = 32)
         {
             var result = new List<Point>(pointCount);
             var step = 1f / (float)pointCount;
             result.Add(StartPoint);
-            for (var i = .1f; i <.9f; i += step)
+            for (var i = step; i < 1f - step; i += step)
             {
                 result.Add(GetPoint(i));
             }

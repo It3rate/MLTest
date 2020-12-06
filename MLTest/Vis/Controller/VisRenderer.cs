@@ -13,26 +13,24 @@ namespace MLTest.Vis
     {
 	    public int Width { get; set; }
 	    public int Height { get; set; }
-	    public VisAgent Agent { get; set; }
 
-	    public VisRenderer(VisAgent agent, int width = 250, int height = 250)
+	    public VisRenderer(int width = 250, int height = 250)
 	    {
 		    Width = width;
 		    Height = height;
-		    Agent = agent ?? new VisAgent();
-		    GenPens(Width*4);
+		    GenPens(height*4);
         }
-        public void Draw(Graphics g)
+        public void Draw(Graphics g, VisAgent agent)
         {
-            g.DrawLine(Pens[(int)PenTypes.LightGray], new PointF(-1f, 0), new PointF(1f, 0));
-            g.DrawLine(Pens[(int)PenTypes.LightGray], new PointF(0, -1f), new PointF(0, 1f));
+            //g.DrawLine(Pens[(int)PenTypes.LightGray], new PointF(-1f, 0), new PointF(1f, 0));
+            //g.DrawLine(Pens[(int)PenTypes.LightGray], new PointF(0, -1f), new PointF(0, 1f));
 
-            foreach (var prim in Agent.FocusPad.Paths)
+            foreach (var prim in agent.FocusPad.Paths)
             {
 	            DrawPrimitive(g, prim, 0);
             }
 
-            foreach (var path in Agent.ViewPad.Paths)
+            foreach (var path in agent.ViewPad.Paths)
             {
                 DrawPath(g, path, 1);
             }
@@ -58,6 +56,7 @@ namespace MLTest.Vis
                     DrawPolyline(g, arc.GetPolylinePoints(), penIndex);
 		        }
 	        }
+            g.Flush();
 
             //foreach (var point in stroke.Anchors)
             //{
@@ -106,12 +105,7 @@ namespace MLTest.Vis
         }
         public void DrawPolyline(Graphics g, Point[] points, int penIndex = 0)
         {
-	        for (int i = 1; i < points.Length; i++)
-	        {
-		        var p0 = points[i - 1];
-		        var p1 = points[i];
-				g.DrawLine(Pens[penIndex], p0.X, p0.Y, p1.X, p1.Y);
-	        }
+            g.DrawLines(Pens[penIndex], ToPointF(points));
         }
 
         public void DrawPrimitive(Graphics g, IPrimitive path, int penIndex = 0)
@@ -131,6 +125,15 @@ namespace MLTest.Vis
 	        }
         }
 
+        private PointF[] ToPointF(Point[] points)
+        {
+            var result = new PointF[points.Length];
+	        for (int i = 0; i < points.Length; i++)
+	        {
+		        result[i] = points[i].PointF;
+	        }
+	        return result;
+        }
         public List<Pen> Pens = new List<Pen>();
         private enum PenTypes
         {

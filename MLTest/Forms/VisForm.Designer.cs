@@ -36,10 +36,10 @@
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(224)))), ((int)(((byte)(192)))));
-            this.panel1.Location = new System.Drawing.Point(250, 34);
+            this.panel1.Location = new System.Drawing.Point(0, 61);
             this.panel1.Margin = new System.Windows.Forms.Padding(2);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(250, 250);
+            this.panel1.Size = new System.Drawing.Size(750, 250);
             this.panel1.TabIndex = 11;
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             // 
@@ -81,6 +81,7 @@
             this.Text = "VisForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this._formClosed);
             this.ResumeLayout(false);
+
         }
 
         #endregion

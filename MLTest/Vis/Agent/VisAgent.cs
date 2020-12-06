@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,15 +12,62 @@ namespace MLTest.Vis
 	    public VisPad<Point> FocusPad { get; private set; }
 	    public VisPad<Stroke> ViewPad { get; private set; }
 
+	    private VisRenderer _renderer;
+
 	    VisSkills Skills { get; }
 
-	    public VisAgent()
+	    public VisAgent(VisRenderer renderer)
 	    {
+		    _renderer = renderer;
+
             Skills = new VisSkills();
 		    FocusPad = new VisPad<Point>(250, 250);
 		    ViewPad = new VisPad<Stroke>(250, 250);
 
-		    Skills.LetterR(FocusPad, ViewPad);
+        }
+
+	    public void Clear()
+	    {
+            FocusPad.Clear();
+            ViewPad.Clear();
 	    }
+
+	    public int _unitPixels =128;
+	    public void Draw(Graphics g)
+	    {
+		    var state = g.Save();
+
+		    float w = _renderer.Width;
+		    float h = _renderer.Height;
+		    g.TranslateTransform(10, 10);
+            g.ScaleTransform(_unitPixels, _unitPixels);
+
+            DrawLetter(g, "A");
+            DrawLetter(g, "R");
+            DrawLetter(g, "C");
+
+            g.Restore(state);
+        }
+
+	    private void DrawLetter(Graphics g, string letter)
+	    {
+		    Rectangle bx;
+		    switch (letter)
+		    {
+			    case "A":
+				    bx = Skills.LetterA(FocusPad, ViewPad);
+				    break;
+			    case "C":
+				    bx = Skills.LetterC(FocusPad, ViewPad);
+				    break;
+                default:
+	                bx = Skills.LetterR(FocusPad, ViewPad);
+                    break;
+		    }
+		    _renderer.Draw(g, this);
+		    g.TranslateTransform(bx.Size.X * 1.1f, 0);
+		    Clear();
+
+        }
     }
 }
