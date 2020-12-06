@@ -65,7 +65,8 @@ namespace MLTest.Vis
             return result;
         }
 
-        public static Line GetLineFrom(this CompassDirection direction, Rectangle rect)
+	    private static float sin45 = (float)(1.0 / Math.Sin(Math.PI / 4.0));
+        public static Line GetLineFrom(this CompassDirection direction, Rectangle rect, float offset = 0)
         {
             Line result;
             var x = rect.X;
@@ -75,41 +76,41 @@ namespace MLTest.Vis
             switch (direction)
             {
                 case CompassDirection.N:
-                    result = Line.ByEndpoints(x - rx, y - ry, x + rx, y - ry);
+                    result = Line.ByEndpoints(x - rx, y - ry + offset, x + rx, y - ry + offset);
                     break;
                 case CompassDirection.S:
-                    result = Line.ByEndpoints(x - rx, y + ry, x + rx, y + ry);
+                    result = Line.ByEndpoints(x - rx, y + ry + offset, x + rx, y + ry + offset);
                     break;
                 case CompassDirection.E:
-                    result = Line.ByEndpoints(x + rx, y - ry, x + rx, y + ry);
+                    result = Line.ByEndpoints(x + rx + offset, y - ry, x + rx + offset, y + ry);
                     break;
                 case CompassDirection.W:
-                    result = Line.ByEndpoints(x - rx, y - ry, x - rx, y + ry);
+                    result = Line.ByEndpoints(x - rx + offset, y - ry, x - rx + offset, y + ry);
                     break;
 
                 // diagonal from given point - these can go both directions because the origin depends on the use case (V vs 7)
                 case CompassDirection.NW:
-                    result = Line.ByEndpoints(x - rx, y - ry, x + rx, y + ry);
+                    result = Line.ByEndpoints(x - rx + offset * sin45, y - ry + offset * sin45, x + rx + offset * sin45, y + ry + offset * sin45);
                     break;
                 case CompassDirection.NE:
-                    result = Line.ByEndpoints(x + rx, y - ry, x - rx, y + ry);
+                    result = Line.ByEndpoints(x + rx - offset * sin45, y - ry + offset * sin45, x - rx - offset * sin45, y + ry + offset * sin45);
                     break;
                 case CompassDirection.SW:
-                    result = Line.ByEndpoints(x - rx, y + ry, x + rx, y - ry);
+                    result = Line.ByEndpoints(x - rx - offset * sin45, y + ry - offset * sin45, x + rx - offset * sin45, y - ry - offset * sin45);
                     break;
                 case CompassDirection.SE:
-                    result = Line.ByEndpoints(x + rx, y + ry, x - rx, y - ry);
+                    result = Line.ByEndpoints(x + rx + offset * sin45, y + ry - offset * sin45, x - rx + offset * sin45, y - ry - offset * sin45);
                     break;
 
                 // centered lines
                 case CompassDirection.NS:
-                    result = Line.ByEndpoints(x, y - ry, x, y + ry);
+                    result = Line.ByEndpoints(x + offset, y - ry, x + offset, y + ry);
                     break;
                 case CompassDirection.WE:
-                    result = Line.ByEndpoints(x - rx, y, x + rx, y);
+                    result = Line.ByEndpoints(x - rx, y + offset, x + rx, y + offset);
                     break;
                 default:
-                    result = Line.ByEndpoints(x - rx, y - ry, x - rx, y + ry);
+                    result = Line.ByEndpoints(x - rx + offset, y - ry, x - rx + offset, y + ry);
                     break;
             }
             return result;

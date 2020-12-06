@@ -78,6 +78,8 @@ namespace MLTest.Vis
 			var loopStroke = new Stroke(seenLeftStroke.StartNode, circleNode, midNode);
             viewPad.Paths.Add(loopStroke);
 
+            // Need a way to create a butt joint from a start to end point (or angle) at the first intersection point of a stroke.
+            // Joints tell about shapes, but they should also be the way this thinks about and creates shapes.
             var circRefNode = new Node(topCircle, 0);
             var tailStart = topCircle.NodeAt(.75f);// topCircle.NodeAt(CompassDirection.S); 
             var tailStroke = new Stroke(tailStart, rightLine.NodeAt(1f));
@@ -103,5 +105,37 @@ namespace MLTest.Vis
 
             return letterbox;
         }
-	}
+        public Rectangle LetterB(VisPad<Point> focusPad, VisPad<Stroke> viewPad)
+        {
+            var letterbox = new Rectangle(0.30f, 0.5f, 0f, 0f);
+            focusPad.Paths.Add(letterbox);
+
+            var leftLine = letterbox.GetLine(CompassDirection.W);
+            var leftStroke = new Stroke(leftLine.StartNode, leftLine.EndNode);
+            viewPad.Paths.Add(leftStroke);
+
+            var rightLine = letterbox.GetLine(CompassDirection.E);
+            var seenLeftStroke = viewPad.GetSimilar(leftLine);
+
+            var midLine = letterbox.GetLine(CompassDirection.N, 0.45f);
+            var midNode = midLine.StartNode;
+            focusPad.Paths.Add(midLine);
+            
+            var trLine = Line.ByEndpoints(rightLine.StartPoint, midLine.EndPoint);
+            var topCircle = Circle.CircleFromLineAndPoint(midLine, rightLine.NodeAt(trLine.MidPoint.Y), ClockDirection.CW);
+            focusPad.Paths.Add(topCircle);
+            var circleNode = new TangentNode(topCircle);
+            var loopStroke = new Stroke(seenLeftStroke.StartNode, circleNode, midNode);
+            viewPad.Paths.Add(loopStroke);
+
+            var brLine = Line.ByEndpoints(midLine.EndPoint, rightLine.EndPoint);
+            var botCircle = Circle.CircleFromLineAndPoint(midLine, rightLine.NodeAt(brLine.MidPoint.Y), ClockDirection.CCW);
+            focusPad.Paths.Add(botCircle);
+            circleNode = new TangentNode(botCircle);
+            loopStroke = new Stroke(midNode, circleNode, seenLeftStroke.EndNode);
+            viewPad.Paths.Add(loopStroke);
+
+            return letterbox;
+        }
+    }
 }

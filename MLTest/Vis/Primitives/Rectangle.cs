@@ -37,9 +37,9 @@ namespace MLTest.Vis
         }
 
 
-        public Line GetLine(CompassDirection direction)
+        public Line GetLine(CompassDirection direction, float offset = 0)
         {
-	        return direction.GetLineFrom(this);
+	        return direction.GetLineFrom(this, offset);
         }
         public Point GetPoint(CompassDirection direction)
         {

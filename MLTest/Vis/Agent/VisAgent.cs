@@ -32,7 +32,7 @@ namespace MLTest.Vis
             ViewPad.Clear();
 	    }
 
-	    public int _unitPixels =128;
+	    public int _unitPixels =220;
 	    public void Draw(Graphics g)
 	    {
 		    var state = g.Save();
@@ -45,6 +45,7 @@ namespace MLTest.Vis
             DrawLetter(g, "A");
             DrawLetter(g, "R");
             DrawLetter(g, "C");
+            DrawLetter(g, "B");
 
             g.Restore(state);
         }
@@ -56,6 +57,9 @@ namespace MLTest.Vis
 		    {
 			    case "A":
 				    bx = Skills.LetterA(FocusPad, ViewPad);
+				    break;
+			    case "B":
+				    bx = Skills.LetterB(FocusPad, ViewPad);
 				    break;
 			    case "C":
 				    bx = Skills.LetterC(FocusPad, ViewPad);
