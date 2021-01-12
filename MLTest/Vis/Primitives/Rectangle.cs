@@ -47,16 +47,18 @@ namespace MLTest.Vis
         }
 
         public Point NearestIntersectionTo(Point p) => null;
-        public Point Overlaps(Point p) => null;
-        public Point Overlaps(Line line) => null;
-        public Point Overlaps(Rectangle rect) => null;
-        public Point Contains(Point p) => null;
-        public Point Contains(Line line) => null;
-        public Point Contains(Rectangle rect) => null;
+        public bool IntersectsWith(Point p) => false;
+        public bool IntersectsWith(Line line) => Math.Abs(Center.X - line.Center.X) <= HalfSize.X + line.MidPoint.X && Math.Abs(Center.Y - line.Center.Y) <= HalfSize.Y + line.MidPoint.Y;
+        public bool IntersectsWith(Rectangle rect) => Math.Abs(Center.X - rect.Center.X) <= HalfSize.X + rect.HalfSize.X && Math.Abs(Center.Y - rect.Center.Y) <= HalfSize.Y + rect.HalfSize.Y;
+        public bool Contains(Point p) => false;
+        public bool Contains(Line line) => false;
+        public bool Contains(Rectangle rect) => Math.Abs(Center.X - rect.Center.X) + rect.HalfSize.X <= HalfSize.X && Math.Abs(Center.Y - rect.Center.Y) + rect.HalfSize.Y <= HalfSize.Y;
+	        
+
 
         public override string ToString()
         {
-	        return String.Format("Rect:{0:0.##},{1:0.##} {2:0.##},{3:0.##}", TopLeft.X, TopLeft.Y, Size.X, Size.Y);
+	        return $"Rect:{TopLeft.X:0.##},{TopLeft.Y:0.##} {Size.X:0.##},{Size.Y:0.##}";
         }
     }
 

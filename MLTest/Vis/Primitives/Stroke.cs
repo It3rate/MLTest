@@ -121,7 +121,7 @@ namespace MLTest.Vis
 
 	    public float CompareTo(IPath element) => 0;
 
-	    public bool BoundsOverlaps(Stroke stroke) => false;
+	    public bool IntersectsWith(Stroke stroke) => false;
 	    public float DistanceTo(Stroke stroke, out float position, out float targetPosition)
 	    {
 		    position = 0;
