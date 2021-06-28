@@ -14,11 +14,11 @@ namespace MLTest.Vis
 
         private float _startAngle;
         private float _endAngle;
-        private float _arcLength;
+        private float _arcLength; // 0 to 2PI
 
         public float Radius => Reference.Radius;
         public Point Center => Reference.Center;
-        public float Length => (_arcLength / pi2) * Radius;
+        public float Length =>_arcLength * Radius;
 
         public Point StartPoint => this;
         public Point MidPoint => Reference.GetPoint(0.5f, 0);

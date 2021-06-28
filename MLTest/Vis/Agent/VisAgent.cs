@@ -14,7 +14,7 @@ namespace MLTest.Vis
 
 	    private VisRenderer _renderer;
 
-	    VisSkills Skills { get; }
+	    public VisSkills Skills { get; }
 
 	    public VisAgent(VisRenderer renderer)
 	    {

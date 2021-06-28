@@ -44,5 +44,26 @@ namespace MLTest.Forms
         {
 	        Application.Exit();
         }
+
+        private void slColor_Scroll(object sender, ScrollEventArgs e)
+        {
+	        if (_agent != null)
+	        {
+		        _agent.Skills.rTailStart = e.NewValue / 100f;
+		        lbVariationA.Text = "Value: " + e.NewValue;
+                panel1.Invalidate();
+	        }
+        }
+
+        private void slLayout_Scroll(object sender, ScrollEventArgs e)
+        {
+	        if (_agent != null)
+	        {
+		        _agent.Skills.bTopCenter = e.NewValue / 100f;
+		        lbVariationB.Text = "Value: " + e.NewValue;
+                panel1.Invalidate();
+	        }
+
+        }
     }
 }

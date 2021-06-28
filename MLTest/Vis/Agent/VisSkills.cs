@@ -81,12 +81,14 @@ namespace MLTest.Vis
             // Need a way to create a butt joint from a start to end point (or angle) at the first intersection point of a stroke.
             // Joints tell about shapes, but they should also be the way this thinks about and creates shapes.
             var circRefNode = new Node(topCircle, 0);
-            var tailStart = topCircle.NodeAt(.75f);// topCircle.NodeAt(CompassDirection.S); 
+            var tailStart = loopStroke.NodeAt(rTailStart);// topCircle.NodeAt(CompassDirection.S); 
             var tailStroke = new Stroke(tailStart, rightLine.NodeAt(1f));
             viewPad.Paths.Add(tailStroke);
 
             return letterbox;
         }
+
+        public float rTailStart = 0.80f;
 
 		public Rectangle LetterC(VisPad<Point> focusPad, VisPad<Stroke> viewPad)
 		{
@@ -120,9 +122,11 @@ namespace MLTest.Vis
             var midLine = letterbox.GetLine(CompassDirection.N, 0.45f);
             var midNode = midLine.StartNode;
             focusPad.Paths.Add(midLine);
-            
-            var trLine = Line.ByEndpoints(rightLine.StartPoint, midLine.EndPoint);
-            var topCircle = Circle.CircleFromLineAndPoint(midLine, rightLine.NodeAt(trLine.MidPoint.Y), ClockDirection.CW);
+
+            //var trLine = Line.ByEndpoints(rightLine.StartPoint, midLine.EndPoint);
+            var topLine = letterbox.GetLine(CompassDirection.N);
+            var trLine = Line.ByEndpoints(topLine.GetPoint(bTopCenter), midLine.GetPoint(bTopCenter));
+            var topCircle = Circle.CircleFromLineAndPoint(midLine, trLine.MidNode, ClockDirection.CW); //rightLine.NodeAt(trLine.MidPoint.Y), ClockDirection.CW);
             focusPad.Paths.Add(topCircle);
             var circleNode = new TangentNode(topCircle);
             var loopStroke = new Stroke(seenLeftStroke.StartNode, circleNode, midNode);
@@ -137,5 +141,7 @@ namespace MLTest.Vis
 
             return letterbox;
         }
-    }
+
+        public float bTopCenter = 0.9f;
+	}
 }
